@@ -3,9 +3,9 @@ SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-# Otp Manager
+# OTP Manager
 
-To install you have to run these steps:
+If you want to install it manually, you have to run these steps:
 
 - clone repository inside your `custom_apps` folder
 - set `'debug' => true` in `config/config.php` file:
