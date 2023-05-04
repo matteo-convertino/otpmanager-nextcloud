@@ -32,13 +32,14 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
 * [Official Android App](https://play.google.com/store/apps/details?id=com.convertino.otp_manager)
 ]]>
   </description>
-  <version>0.1.5-beta</version>
+  <version>0.1.6-beta</version>
   <licence>agpl</licence>
   <author mail="matteo@convertino.cloud" homepage="https://www.convertino.cloud">Matteo Convertino</author>
   <namespace>OtpManager</namespace>
   <category>security</category>
   <bugs>https://github.com/matteo-convertino/otpmanager-nextcloud/issues</bugs>
   <repository>https://github.com/matteo-convertino/otpmanager-nextcloud</repository>
+  <screenshot>https://raw.githubusercontent.com/matteo-convertino/otpmanager-nextcloud/c683075330a6d6839cbaa5e8b847eae44d250903/img/screenshots/1.png</screenshot>
   <dependencies>
     <nextcloud min-version="24" max-version="26" />
   </dependencies>
@@ -46,7 +47,7 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
     <navigation>
       <name>OTP Manager</name>
       <route>otpmanager.page.index</route>
-      <icon>otp_manager.svg</icon>
+      <icon>app.svg</icon>
     </navigation>
   </navigations>
 </info>
