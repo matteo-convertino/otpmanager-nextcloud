@@ -42,7 +42,8 @@ build_tools_directory=$(CURDIR)/build/tools
 source_build_directory=$(CURDIR)/build/artifacts/source
 source_package_name=$(source_build_directory)/$(app_name)
 appstore_build_directory=$(CURDIR)/build/artifacts/appstore
-appstore_package_name=$(appstore_build_directory)/$(app_name)
+appstore_tar_file=$(appstore_build_directory)/$(app_name).tar.gz
+appstore_sign_directory=$(appstore_build_directory)/$(app_name)
 npm=$(shell which npm 2> /dev/null)
 composer=$(shell which composer 2> /dev/null)
 
@@ -123,30 +124,73 @@ source:
 .PHONY: appstore
 appstore:
 	rm -rf $(appstore_build_directory)
-	mkdir -p $(appstore_build_directory)
-	tar cvzf $(appstore_package_name).tar.gz \
-	--exclude-vcs \
-	--exclude="../$(app_name)/build" \
-	--exclude="../$(app_name)/tests" \
-	--exclude="../$(app_name)/Makefile" \
-	--exclude="../$(app_name)/*.log" \
-	--exclude="../$(app_name)/phpunit*xml" \
-	--exclude="../$(app_name)/composer.*" \
-	--exclude="../$(app_name)/js/node_modules" \
-	--exclude="../$(app_name)/js/tests" \
-	--exclude="../$(app_name)/js/test" \
-	--exclude="../$(app_name)/js/*.log" \
-	--exclude="../$(app_name)/js/package.json" \
-	--exclude="../$(app_name)/js/bower.json" \
-	--exclude="../$(app_name)/js/karma.*" \
-	--exclude="../$(app_name)/js/protractor.*" \
-	--exclude="../$(app_name)/package.json" \
-	--exclude="../$(app_name)/bower.json" \
-	--exclude="../$(app_name)/karma.*" \
-	--exclude="../$(app_name)/protractor\.*" \
-	--exclude="../$(app_name)/.*" \
-	--exclude="../$(app_name)/js/.*" \
-	../$(app_name)
+	mkdir -p $(appstore_sign_directory)
+	rsync -a \
+	--cvs-exclude \
+	--exclude="/build" \
+	--exclude="/tests" \
+	--exclude="/Makefile" \
+	--exclude="/*.log" \
+	--exclude="/phpunit*xml" \
+	--exclude="/composer.*" \
+	--exclude="/js/node_modules" \
+	--exclude="/js/tests" \
+	--exclude="/js/test" \
+	--exclude="/js/*.log" \
+	--exclude="/js/package.json" \
+	--exclude="/js/bower.json" \
+	--exclude="/js/karma.*" \
+	--exclude="/js/protractor.*" \
+	--exclude="/package.json" \
+	--exclude="/bower.json" \
+	--exclude="/karma.*" \
+	--exclude="/protractor\.*" \
+	--exclude="/.*" \
+	--exclude="/js/.*" \
+	--exclude=babel.config.js \
+	--exclude=docs \
+	--exclude=.drone.jsonnet \
+	--exclude=.drone.yml \
+	--exclude=.eslintignore \
+	--exclude=.eslintrc.js \
+	--exclude=.git \
+	--exclude=.gitattributes \
+	--exclude=.github \
+	--exclude=.gitignore \
+	--exclude=jest.config.js \
+	--exclude=jest.global.setup.js \
+	--exclude=.l10nignore \
+	--exclude=mkdocs.yml \
+	--exclude=node_modules \
+	--exclude=package-lock.json \
+	--exclude=.php-cs-fixer.cache \
+	--exclude=.php-cs-fixer.dist.php \
+	--exclude=.php_cs.cache \
+	--exclude=.php_cs.dist \
+	--exclude=psalm.xml \
+	--exclude=README.* \
+	--exclude=.stylelintignore \
+	--exclude=stylelint.config.js \
+	--exclude=.tx \
+	--exclude=tsconfig.json \
+	--exclude=vendor/bamarni \
+	--exclude=vendor/bin \
+	--exclude=vendor-bin \
+	--exclude=webpack.common.config.js \
+	--exclude=webpack.config.js \
+	. $(appstore_sign_directory)
+	@if [ -f ../../otpmanager.key ]; then \
+		echo "Signing app files..."; \
+		php ../../occ integrity:sign-app \
+			--privateKey=otpmanager.key\
+			--certificate=otpmanager.crt\
+			--path=$(appstore_sign_directory); \
+	fi
+	tar cvzf $(appstore_tar_file) -C $(appstore_build_directory) $(app_name)
+	@if [ -f ../../otpmanager.key ]; then \
+		echo "Signing package..."; \
+		openssl dgst -sha512 -sign ../../otpmanager.key $(appstore_tar_file) | openssl base64; \
+	fi
 
 .PHONY: test
 test: composer
