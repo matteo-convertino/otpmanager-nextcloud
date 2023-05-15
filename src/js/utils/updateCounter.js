@@ -1,9 +1,11 @@
+import React from "react";
 import { HOTP } from "otpauth";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
 import { showNotification } from "@mantine/notifications";
 
 import { getAlgorithm } from "./getAlgorithm";
+import { IconX } from "@tabler/icons-react";
 
 export async function updateCounter(account, setUpdateCounterState) {
   setUpdateCounterState(true);

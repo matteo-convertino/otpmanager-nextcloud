@@ -52,27 +52,27 @@ class AccountController extends Controller {
 	private function validateFields($data) {
 		$errors = [];
 
-		if($data["name"] == null || strlen($data["name"]) == 0 || strlen($data["name"]) > 64)
+		if(!array_key_exists("name", $data) || strlen($data["name"]) == 0 || strlen($data["name"]) > 64)
 			$errors["name"] = "Name must be 1-64 characters long";
 
-		if($data["issuer"] == null || strlen($data["issuer"]) > 64) 
+		if(!array_key_exists("issuer", $data) || strlen($data["issuer"]) > 64) 
 			$errors["issuer"] = "Issuer must be shorter than 64 characters";
 
-		if($data["type"] == null || !in_array($data["type"], ["totp", "hotp"]))
+		if(!array_key_exists("type", $data) || !in_array($data["type"], ["totp", "hotp"]))
 			$errors["type"] = "Type of code must be one of those listed";
 
-		if($data["period"] == null || !in_array($data["period"], ["30", "45", "60"]))
+		if(!array_key_exists("period", $data) || !in_array($data["period"], ["30", "45", "60"]))
 			$errors["period"] = "Interval must be one of those listed";
 
-		if($data["algorithm"] == null || !in_array($data["algorithm"], ["SHA1", "SHA256", "SHA512", "0", "1", "2"]))
-			$errors["algorithm"] = "Algorithm must be one of those listed";
+		if(!array_key_exists("algorithm", $data) || !in_array($data["algorithm"], ["SHA1", "SHA256", "SHA512", "0", "1", "2"]))
+			$errors["algorithm"] = "Algorithm must be one of those listed";			
 
-		if($data["digits"] == null || !in_array($data["digits"], ["4", "6"]))
+		if(!array_key_exists("digits", $data) || !in_array($data["digits"], ["4", "6"]))
 			$errors["digits"] = "Digits must be one of those listed";
 
 		$regexBase32 = '/^[A-Z2-7]+=*$/i';
 
-		if($data["secret"] == null || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
+		if(!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
 			$errors["secret"] = "Secret key must be 16-256 characters long";
 		else if(!preg_match($regexBase32, $data["secret"]))
 			$errors["secret"] = "Secret key is not Base32-encodable";
@@ -174,14 +174,14 @@ class AccountController extends Controller {
 				$errors["msg"] = "This account has been deleted";
 				return $errors;
 			}
-			
+
 			$account->setName($data["name"]);
 			$account->setIssuer($data["issuer"]);
 			$account->setDigits($data["digits"]);
 			$account->setType($data["type"]);
 			$account->setPeriod($data["period"]);
 			$account->setAlgorithm($data["algorithm"]);
-			$account->setCounter($data["counter"]);
+			if(array_key_exists("counter", $data)) $account->setCounter($data["counter"]);
 			$account->setUpdatedAt(date("Y-m-d H:i:s"));
 
 			$this->accountMapper->update($account);

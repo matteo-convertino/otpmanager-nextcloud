@@ -28,10 +28,11 @@ class Account extends Entity implements JsonSerializable {
 	
 	public function __construct() {
         $this->addType('id', 'integer');
-        $this->addType('position', 'integer');
 		$this->addType('digits', 'integer');
 		$this->addType('period', 'integer');
+		$this->addType('algorithm', 'integer');
 		$this->addType('counter', 'integer');
+		$this->addType('position', 'integer');
     }
 
 	public function jsonSerialize(): array {

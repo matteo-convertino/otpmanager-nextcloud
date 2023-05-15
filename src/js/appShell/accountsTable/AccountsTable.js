@@ -16,6 +16,8 @@ export function AccountsTable({
   setShowEditOtpAccount,
   setShowAside,
   showCodes,
+  selectedAccounts,
+  setSelectedAccounts
 }) {
   const [sortStatus, setSortStatus] = useState({
     columnAccessor: "position",
@@ -58,6 +60,8 @@ export function AccountsTable({
       sortStatus={sortStatus}
       setSortStatus={setSortStatus}
       showCodes={showCodes}
+      selectedAccounts={selectedAccounts}
+      setSelectedAccounts={setSelectedAccounts}
     />
   );
 }

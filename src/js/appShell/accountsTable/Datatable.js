@@ -118,9 +118,8 @@ export default function CustomDatatable({
               <Group spacing={4} position="right" noWrap>
                 {account.type == "hotp" && (
                   <ActionIcon
-                    styles={{ color: "#114477" }}
+                    //styles={{ color: "#114477" }}
                     disabled={isUpdatingCounter}
-                    variant="outline"
                     onClick={(event) => {
                       event.stopPropagation();
                       updateCounter(account, setUpdateCounterState);
