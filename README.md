@@ -57,3 +57,12 @@ php ./occ migrations:execute <app-folder-name> <version-number>
 npm install
 make composer
 ```
+    
+# Planned Features
+- [ ] Implement research
+- [ ] Develop the possibility of setting a password to access accounts
+- [ ] Be able to move accounts into the datatable
+- [ ] Encrypt secret keys in the database
+- [ ] Develop recycle bin
+- [ ] Multiple elimination
+- [ ] [Backup accounts and codes](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/2)
