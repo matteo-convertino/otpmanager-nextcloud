@@ -176,6 +176,7 @@ appstore:
 	--exclude=vendor/bamarni \
 	--exclude=vendor/bin \
 	--exclude=vendor-bin \
+	--exclude=vendor/ \
 	--exclude=webpack.common.config.js \
 	--exclude=webpack.config.js \
 	. $(appstore_sign_directory)
