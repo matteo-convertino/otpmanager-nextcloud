@@ -36047,6 +36047,8 @@ function AppShellContent(_ref) {
       return {
         background: theme.colorScheme === 'dark' ? "rgba(0, 0, 0, .8)" : "rgba(255, 255, 255, .8)",
         padding: "16px",
+        paddingBottom: "calc(var(--body-container-margin)*2 + 16px)",
+        paddingRight: "calc(var(--body-container-margin)*2 + 16px)",
         height: "calc(100vh - 44px - 50px)"
       };
     },
@@ -93889,14 +93891,12 @@ var myCache = (0,_mantine_core__WEBPACK_IMPORTED_MODULE_4__["default"])({
 });
 
 // get nextcloud theme
-/*const nextcloudTheme =
-  window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";*/
-
 var nextcloudTheme = "dark";
 var bodyElement = document.getElementsByTagName("body")[0];
-if (bodyElement.getAttribute("data-themes").includes("light") || bodyElement.classList.contains("theme--light")) {
+var theme = bodyElement.getAttribute("data-themes");
+if (theme.includes("default")) {
+  nextcloudTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+} else if (bodyElement.getAttribute("data-themes").includes("light") || bodyElement.classList.contains("theme--light")) {
   nextcloudTheme = "light";
 }
 function App() {
@@ -93932,4 +93932,4 @@ function App() {
 
 /******/ })()
 ;
-//# sourceMappingURL=otpmanager-main.js.map?v=4572b052556f7f4e6056
+//# sourceMappingURL=otpmanager-main.js.map?v=dce7aeb22c234ed926cb

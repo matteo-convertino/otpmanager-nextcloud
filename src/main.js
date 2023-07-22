@@ -23,15 +23,13 @@ const myCache = createEmotionCache({
 });
 
 // get nextcloud theme
-/*const nextcloudTheme =
-  window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";*/
-
 var nextcloudTheme = "dark";
 const bodyElement = document.getElementsByTagName("body")[0];
+const theme = bodyElement.getAttribute("data-themes");
 
-if (
+if(theme.includes("default")) {
+  nextcloudTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+} else if (
   bodyElement.getAttribute("data-themes").includes("light") ||
   bodyElement.classList.contains("theme--light")
 ) {

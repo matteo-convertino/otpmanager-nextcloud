@@ -66,6 +66,8 @@ export function AppShellContent({
         sx={(theme) => ({
           background: theme.colorScheme === 'dark' ? "rgba(0, 0, 0, .8)" : "rgba(255, 255, 255, .8)",
           padding: "16px",
+          paddingBottom: "calc(var(--body-container-margin)*2 + 16px)",
+          paddingRight: "calc(var(--body-container-margin)*2 + 16px)",
           height: "calc(100vh - 44px - 50px)",
         })}
         grow
