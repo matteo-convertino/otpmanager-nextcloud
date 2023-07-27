@@ -16,10 +16,10 @@ SPDX-License-Identifier: CC0-1.0
 
 # Description
 OTP Manager is useful for those who use two-factor authentication (2FA) and want to manage their OTP codes securely and easily. 
-This application allows you to synchronise your OTP codes with your personal Nextcloud server so that you can access them from any device.
+This application allows you to synchronize your OTP codes with your personal Nextcloud server so that you can access them from any device.
 
 With OTP Manager, you no longer have to worry about losing your OTP codes or not having access to them when you need them. 
-All you have to do is synchronise your app with your Nextcloud server and you will always have your OTP codes at hand, wherever you are.
+All you have to do is synchronize your app with your Nextcloud server and you will always have your OTP codes at hand, wherever you are.
 
 OTP Manager offers the convenient feature of importing OTP codes from Google Authenticator by scanning the QR code. 
 This means you don't have to worry about having to manually enter every single OTP code, but can simply scan the QR code that the Google app generates when exporting 
