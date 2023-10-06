@@ -1,25 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
-import { Navbar, Text, Checkbox, Group, Collapse, Box } from "@mantine/core";
+import {
+  Navbar,
+  Text,
+  Checkbox,
+  Group,
+  Collapse,
+  Box,
+  ActionIcon,
+  Flex,
+} from "@mantine/core";
 import {
   IconList,
   IconApps,
   IconSettings,
   IconChevronRight,
   IconChevronLeft,
+  IconSun,
+  IconMoonStars,
 } from "@tabler/icons-react";
 import { navbarStyles } from "./Styles";
+import { UserSettingContext } from "./../utils/UserSettingProvider";
 
 export function NavbarLargeDevice({
   showSettings,
   setShowSettings,
-  showCodes,
-  setShowCodes,
   setShowApps,
 }) {
   const [active, setActive] = useState("All accounts");
   const { classes, cx } = navbarStyles();
   const ChevronIcon = !showSettings ? IconChevronRight : IconChevronLeft;
+  const [userSetting, setUserSetting] = useContext(UserSettingContext);
 
   return (
     <>
@@ -80,11 +91,38 @@ export function NavbarLargeDevice({
 
           <Collapse in={showSettings}>
             <Checkbox
-              checked={showCodes}
-              onChange={(e) => setShowCodes((o) => !o)}
+              checked={userSetting.showCodes}
+              onChange={(e) => setUserSetting(
+                userSetting.copyWith({ showCodes: !userSetting.showCodes })
+              )}
               className={classes.innerLink}
               label="Show codes"
             />
+            <Flex className={classes.innerLink} align="center">
+              <ActionIcon
+                variant="outline"
+                color={userSetting.darkMode ? "yellow" : "blue"}
+                onClick={() =>
+                  setUserSetting(
+                    userSetting.copyWith({ darkMode: !userSetting.darkMode })
+                  )
+                }
+                sx={{ width: "20px", height: "20px", minWidth: "20px", minHeight: "20px" }}
+                title="Toggle color scheme"
+              >
+                {userSetting.darkMode ? (
+                  <IconSun style={{ width: 16 }} />
+                ) : (
+                  <IconMoonStars style={{ width: 16 }} />
+                )}
+              </ActionIcon>
+              <Text
+                sx={{ fontSize: "14px", color: "#C1C2C5", marginLeft: "12px" }}
+              >
+                {"Switch to " +
+                  (userSetting.darkMode ? "light mode" : "dark mode")}
+              </Text>
+            </Flex>
           </Collapse>
         </Navbar.Section>
       </Navbar>

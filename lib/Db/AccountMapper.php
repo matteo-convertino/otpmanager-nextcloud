@@ -56,11 +56,31 @@ class AccountMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function callFindEntities(IQueryBuilder $qb) : Array {
+	public function findAllAccountsPosGtThan(int $pos, string $userId): array {
+		/* @var $qb IQueryBuilder */
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->gt("position", $qb->createNamedParameter($pos)))
+			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+		return $this->findEntities($qb);
+	}
+
+	public function findAllAccountsPosGteThan(int $pos, string $userId): array {
+		/* @var $qb IQueryBuilder */
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->gte("position", $qb->createNamedParameter($pos)))
+			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+		return $this->findEntities($qb);
+	}
+
+	/*public function callFindEntities(IQueryBuilder $qb) : Array {
 		return $this->findEntities($qb);
 	}
 
 	public function getQueryBuilder() : IQueryBuilder {
 		return $this->db->getQueryBuilder();
-	}
+	}*/
 }

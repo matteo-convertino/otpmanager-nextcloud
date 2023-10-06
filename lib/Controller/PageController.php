@@ -13,10 +13,8 @@ use OCP\Util;
 
 class PageController extends Controller {
 
-	public function __construct(string $AppName, IRequest $request, AccountMapper $mapper, ?string $UserId = null){
+	public function __construct(string $AppName, IRequest $request){
 		parent::__construct($AppName, $request);
-		$this->mapper = $mapper;
-		$this->userId = $UserId;
 	}
 
 	/**

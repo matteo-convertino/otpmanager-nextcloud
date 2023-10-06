@@ -10,6 +10,7 @@ use OCP\AppFramework\App;
 class Application extends App {
 	public const APP_ID = 'otpmanager';
 	public const ACCOUNTS_DB = 'otpmanager_accounts';
+	public const SETTINGS_DB = 'otpmanager_settings';
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);

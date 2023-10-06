@@ -15,7 +15,6 @@ export function AccountsTable({
   setFetchState,
   setShowEditOtpAccount,
   setShowAside,
-  showCodes,
   selectedAccounts,
   setSelectedAccounts
 }) {
@@ -59,7 +58,6 @@ export function AccountsTable({
       setShowEditOtpAccount={setShowEditOtpAccount}
       sortStatus={sortStatus}
       setSortStatus={setSortStatus}
-      showCodes={showCodes}
       selectedAccounts={selectedAccounts}
       setSelectedAccounts={setSelectedAccounts}
     />

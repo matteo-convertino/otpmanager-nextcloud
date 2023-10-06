@@ -17,11 +17,11 @@
 	 */
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
 		/** @var ISchemaWrapper $schema */
-        $schema = $schemaClosure();
+    $schema = $schemaClosure();
 		
 		$table = $schema->getTable(Application::ACCOUNTS_DB);
 
-        $table->dropColumn('last_date_time');
+    $table->dropColumn('last_date_time');
 		
 		return $schema;
 	}

@@ -6,6 +6,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { NavbarLargeDevice } from "./../navbar/LargeDevice";
 import { NavbarSmallDevice } from "./../navbar/SmallDevice";
 import { AppShellContent } from "./Content";
+
 import Aside from "./../aside/Aside";
 
 export default function MainAppShell({ children }) {
@@ -18,7 +19,6 @@ export default function MainAppShell({ children }) {
 
   // user settings
   const [showSettings, setShowSettings] = useState(false);
-  const [showCodes, setShowCodes] = useState(false);
 
   return (
     <>
@@ -29,8 +29,6 @@ export default function MainAppShell({ children }) {
         setShowNavbarSmallDevice={setShowNavbarSmallDevice}
         showSettings={showSettings}
         setShowSettings={setShowSettings}
-        showCodes={showCodes}
-        setShowCodes={setShowCodes}
         setShowApps={setShowApps}
       />
 
@@ -42,8 +40,7 @@ export default function MainAppShell({ children }) {
           <NavbarLargeDevice
             showSettings={showSettings}
             setShowSettings={setShowSettings}
-            showCodes={showCodes}
-            setShowCodes={setShowCodes}
+
             setShowApps={setShowApps}
           />
         }
@@ -59,10 +56,9 @@ export default function MainAppShell({ children }) {
           showNavbarSmallDevice={showNavbarSmallDevice}
           setShowNavbarSmallDevice={setShowNavbarSmallDevice}
           setShowAside={setShowAside}
-          showCodes={showCodes}
           showApps={showApps}
           setShowApps={setShowApps}
-        />
+        /> 
         {children}
       </AppShell>
     </>

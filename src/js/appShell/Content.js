@@ -24,7 +24,6 @@ export function AppShellContent({
   showNavbarSmallDevice,
   setShowNavbarSmallDevice,
   setShowAside,
-  showCodes,
   showApps,
   setShowApps,
 }) {
@@ -80,7 +79,6 @@ export function AppShellContent({
           setFetchState={setFetchState}
           setShowEditOtpAccount={setShowEditOtpAccount}
           setShowAside={setShowAside}
-          showCodes={showCodes}
         />
       </Group>
 

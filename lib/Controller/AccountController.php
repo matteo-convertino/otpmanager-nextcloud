@@ -32,10 +32,7 @@ class AccountController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function get($id) {
-		$account = $this->accountMapper->find("id", $id, $this->userId);
-		$data = $account;
-		
-		return $data;
+		return $this->accountMapper->find("id", $id, $this->userId);		
 	}
 
 	/**
@@ -181,7 +178,7 @@ class AccountController extends Controller {
 			$account->setType($data["type"]);
 			$account->setPeriod($data["period"]);
 			$account->setAlgorithm($data["algorithm"]);
-			if(array_key_exists("counter", $data)) $account->setCounter($data["counter"]);
+			if(isset($data["counter"])) $account->setCounter($data["counter"]);
 			$account->setUpdatedAt(date("Y-m-d H:i:s"));
 
 			$this->accountMapper->update($account);
@@ -200,13 +197,7 @@ class AccountController extends Controller {
 			return null;
 		} else {
 			// decrease by 1 the position of all accounts after it
-			$qb = $this->accountMapper->getQueryBuilder();
-			$qb->select('*')
-				->from($this->accountMapper->getTableName())
-				->where($qb->expr()->gt("position", $qb->createNamedParameter($account->getPosition())))
-				->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
-
-			$accountsGreaterPos = $this->accountMapper->callFindEntities($qb);
+			$accountsGreaterPos = $this->accountMapper->findAllAccountsPosGtThan($account->getPosition(), $this->userId);
 			
 			foreach($accountsGreaterPos as $accountGreaterPos) {
 				$accountGreaterPos->setPosition($accountGreaterPos->getPosition() - 1);
@@ -226,17 +217,11 @@ class AccountController extends Controller {
 
 		// increments by 1 the position of all those accounts
 		// that are on and above (>=) the position of where I want to add the new account
-		$qb = $this->accountMapper->getQueryBuilder();
-		$qb->select('*')
-			->from($this->accountMapper->getTableName())
-			->where($qb->expr()->gte("position", $qb->createNamedParameter($pos)))
-			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($this->userId)));
+		$accountsGtePos = $this->accountMapper->findAllAccountsPosGteThan($pos, $this->userId);
 
-		$accountsSamePosition = $this->accountMapper->callFindEntities($qb);
-
-		foreach($accountsSamePosition as $accountSamePosition) {
-			$accountSamePosition->setPosition(++$pos);
-			$this->accountMapper->update($accountSamePosition);
+		foreach($accountsGtePos as $accountGtePos) {
+			$accountGtePos->setPosition(++$pos);
+			$this->accountMapper->update($accountGtePos);
 		}
 
 		// decreases the position of the new account 

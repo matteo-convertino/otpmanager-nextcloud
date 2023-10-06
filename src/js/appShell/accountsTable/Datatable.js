@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import { Text, ActionIcon, Group, Box, Stack } from "@mantine/core";
 import {
@@ -13,8 +13,9 @@ import { DataTable } from "mantine-datatable";
 import { openDeleteModal } from "../../modals/DeleteOtpAccount";
 import { copy } from "../../utils/copy";
 import { updateCounter } from "../../utils/updateCounter";
+import { UserSettingContext } from "./../../utils/UserSettingProvider";
 
-const PAGE_SIZES = [10, 20, 30];
+const PAGE_SIZES = ["10", "20", "30", "All"];
 
 const isTouchDevice =
   "ontouchstart" in window ||
@@ -31,8 +32,8 @@ export default function CustomDatatable({
   setShowEditOtpAccount,
   sortStatus,
   setSortStatus,
-  showCodes,
 }) {
+  const [userSetting, setUserSetting] = useContext(UserSettingContext);
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
   const [isUpdatingCounter, setUpdateCounterState] = useState(false);
   const [page, setPage] = useState(1);
@@ -40,11 +41,17 @@ export default function CustomDatatable({
   const [to, setTo] = useState(pageSize);
 
   useEffect(() => {
+    if(accounts == null) return;
+    
+    userSetting.recordsPerPage == "All" ? setPageSize(accounts.length) : setPageSize(userSetting.recordsPerPage);
+  }, [userSetting.recordsPerPage, accounts]);
+
+  useEffect(() => {
     if (accounts != null) {
       let from = (page - 1) * pageSize;
 
       setFrom(from);
-      setTo(from + pageSize);
+      setTo(from + parseInt(pageSize));
     } else {
       setFrom(0);
       setTo(pageSize);
@@ -82,7 +89,8 @@ export default function CustomDatatable({
               >
                 <Text
                   sx={{
-                    display: showCodes || isTouchDevice ? "none" : "block",
+                    display:
+                      userSetting.showCodes || isTouchDevice ? "none" : "block",
                   }}
                   id="hiddenCode"
                 >
@@ -91,18 +99,19 @@ export default function CustomDatatable({
                 <Group
                   spacing={0}
                   id="code"
-                  sx={{ display: showCodes || isTouchDevice ? "flex" : "none" }}
+                  sx={{
+                    display:
+                      userSetting.showCodes || isTouchDevice ? "flex" : "none",
+                  }}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    copy(account.code);
+                  }}
                 >
                   <Text>{account.code}</Text>
                   <ActionIcon>
-                    <IconCopy
-                      size={18}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        copy(account.code);
-                      }}
-                    />
+                    <IconCopy size={18} />
                   </ActionIcon>
                 </Group>
               </Box>
@@ -166,7 +175,13 @@ export default function CustomDatatable({
       page={page}
       onPageChange={(p) => setPage(p)}
       recordsPerPageOptions={PAGE_SIZES}
-      onRecordsPerPageChange={setPageSize}
+      onRecordsPerPageChange={(p) => {
+        setUserSetting(
+          userSetting.copyWith({ recordsPerPage: p })
+        );
+        setPage(1);
+        p == "All" ? setPageSize(accounts.length) : setPageSize(p);
+      }}
       emptyState={
         <Stack align="center" spacing="xs">
           <IconDatabaseOff size={40} />
