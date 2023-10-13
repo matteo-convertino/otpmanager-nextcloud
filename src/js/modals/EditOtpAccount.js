@@ -44,7 +44,7 @@ export function EditOtpAccount({
     if (otp != null) {
       form.setFieldValue("name", otp.name);
       form.setFieldValue("issuer", otp.issuer);
-      form.setFieldValue("secret", otp.secret);
+      form.setFieldValue("secret", otp.decryptedSecret);
       form.setFieldValue("type", otp.type);
       form.setFieldValue("period", otp.period.toString());
       form.setFieldValue("algorithm", getAlgorithm(otp.algorithm));

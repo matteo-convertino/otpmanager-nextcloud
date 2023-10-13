@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 // SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -15,8 +16,10 @@ use Throwable;
 /**
  * @template-extends QBMapper<Account>
  */
-class AccountMapper extends QBMapper {
-	public function __construct(IDBConnection $db) {
+class AccountMapper extends QBMapper
+{
+	public function __construct(IDBConnection $db)
+	{
 		parent::__construct($db, Application::ACCOUNTS_DB, Account::class);
 	}
 
@@ -24,20 +27,21 @@ class AccountMapper extends QBMapper {
 	 * @throws \OCP\AppFramework\Db\MultipleObjectsReturnedException
 	 * @throws DoesNotExistException
 	 */
-	public function find(string $column, string|int $value, string $userId): ?Account {
+	public function find(string $column, string|int $value, string $userId): ?Account
+	{
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->eq($column, $qb->createNamedParameter($value)))
 			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
-		
+
 		try {
 			$account = $this->findEntity($qb);
 		} catch (Throwable) {
 			$account = null;
 		}
-		 
+
 		return $account;
 	}
 
@@ -45,7 +49,8 @@ class AccountMapper extends QBMapper {
 	 * @param string $userId
 	 * @return array
 	 */
-	public function findAll(string $userId): array {
+	public function findAll(string $userId): array
+	{
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -56,7 +61,23 @@ class AccountMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findAllAccountsPosGtThan(int $pos, string $userId): array {
+	/**
+	 * @param string $userId
+	 * @return array
+	 */
+	public function findAllWithDeleted(string $userId): array
+	{
+		/* @var $qb IQueryBuilder */
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+			->orderBy("position", "desc");
+		return $this->findEntities($qb);
+	}
+
+	public function findAllAccountsPosGtThan(int $pos, string $userId): array
+	{
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -66,7 +87,8 @@ class AccountMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function findAllAccountsPosGteThan(int $pos, string $userId): array {
+	public function findAllAccountsPosGteThan(int $pos, string $userId): array
+	{
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -75,12 +97,4 @@ class AccountMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
 		return $this->findEntities($qb);
 	}
-
-	/*public function callFindEntities(IQueryBuilder $qb) : Array {
-		return $this->findEntities($qb);
-	}
-
-	public function getQueryBuilder() : IQueryBuilder {
-		return $this->db->getQueryBuilder();
-	}*/
 }

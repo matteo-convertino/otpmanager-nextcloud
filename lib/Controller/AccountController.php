@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 // SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -7,23 +8,29 @@ namespace OCA\OtpManager\Controller;
 
 use OCA\OtpManager\Db\Account;
 use OCA\OtpManager\Db\AccountMapper;
+use OCA\OtpManager\Utils\Encryption;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\Http\Response;
 use OCP\IRequest;
-use Throwable;
 
-class AccountController extends Controller {
+class AccountController extends Controller
+{
 
 	private AccountMapper $accountMapper;
-    private ?string $userId;
+	private Encryption $encryption;
+	private ?string $userId;
 
 	public function __construct(
-		string $AppName, 
-		IRequest $request, 
-		AccountMapper $accountMapper, 
+		string $AppName,
+		IRequest $request,
+		AccountMapper $accountMapper,
+		Encryption $encryption,
 		?string $UserId = null
-	){
+	) {
 		parent::__construct($AppName, $request);
 		$this->accountMapper = $accountMapper;
+		$this->encryption = $encryption;
 		$this->userId = $UserId;
 	}
 
@@ -31,58 +38,62 @@ class AccountController extends Controller {
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	public function get($id) {
-		return $this->accountMapper->find("id", $id, $this->userId);		
+	public function get($id)
+	{
+		return $this->accountMapper->find("id", $id, $this->userId);
 	}
 
 	/**
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	public function getAll() {
+	public function getAll()
+	{
 		$accounts = $this->accountMapper->findAll($this->userId);
 		$data = ["accounts" => $accounts];
-		
+
 		return $data;
 	}
 
-	private function validateFields($data) {
+	private function validateFields($data)
+	{
 		$errors = [];
 
-		if(!array_key_exists("name", $data) || strlen($data["name"]) == 0 || strlen($data["name"]) > 64)
+		if (!array_key_exists("name", $data) || strlen($data["name"]) == 0 || strlen($data["name"]) > 64)
 			$errors["name"] = "Name must be 1-64 characters long";
 
-		if(!array_key_exists("issuer", $data) || strlen($data["issuer"]) > 64) 
+		if (!array_key_exists("issuer", $data) || strlen($data["issuer"]) > 64)
 			$errors["issuer"] = "Issuer must be shorter than 64 characters";
 
-		if(!array_key_exists("type", $data) || !in_array($data["type"], ["totp", "hotp"]))
+		if (!array_key_exists("type", $data) || !in_array($data["type"], ["totp", "hotp"]))
 			$errors["type"] = "Type of code must be one of those listed";
 
-		if(!array_key_exists("period", $data) || !in_array($data["period"], ["30", "45", "60"]))
+		if (!array_key_exists("period", $data) || !in_array($data["period"], ["30", "45", "60"]))
 			$errors["period"] = "Interval must be one of those listed";
 
-		if(!array_key_exists("algorithm", $data) || !in_array($data["algorithm"], ["SHA1", "SHA256", "SHA512", "0", "1", "2"]))
-			$errors["algorithm"] = "Algorithm must be one of those listed";			
+		if (!array_key_exists("algorithm", $data) || !in_array($data["algorithm"], ["SHA1", "SHA256", "SHA512", "0", "1", "2"]))
+			$errors["algorithm"] = "Algorithm must be one of those listed";
 
-		if(!array_key_exists("digits", $data) || !in_array($data["digits"], ["4", "6"]))
+		if (!array_key_exists("digits", $data) || !in_array($data["digits"], ["4", "6"]))
 			$errors["digits"] = "Digits must be one of those listed";
 
 		$regexBase32 = '/^[A-Z2-7]+=*$/i';
 
-		if(!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
+		if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
 			$errors["secret"] = "Secret key must be 16-256 characters long";
-		else if(!preg_match($regexBase32, $data["secret"]))
+		else if (!preg_match($regexBase32, $data["secret"]))
 			$errors["secret"] = "Secret key is not Base32-encodable";
 
 		return $errors;
 	}
 
-	private function convertAlgorithmToInt($algorithm) {
-		if($algorithm == "SHA1") {
+	private function convertAlgorithmToInt($algorithm)
+	{
+		if ($algorithm == "SHA1") {
 			return 0;
-		} else if($algorithm == "SHA256") {
+		} else if ($algorithm == "SHA256") {
 			return 1;
-		} else if($algorithm == "SHA512") {
+		} else if ($algorithm == "SHA512") {
 			return 2;
 		}
 
@@ -92,18 +103,22 @@ class AccountController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function create($data) {
+	public function create($data)
+	{
 		$errors = $this->validateFields($data);
 
-		if(count($errors) > 0) {
+		if (count($errors) > 0) {
 			return $errors;
 		} else {
 			$data["secret"] = strtoupper($data["secret"]);
+			$encrypted_secret = $this->encryption->encrypt($data["secret"], $this->userId);
+			if ($encrypted_secret === false) return (new Response())->setStatus(403);
+
 			$data["algorithm"] = $this->convertAlgorithmToInt($data["algorithm"]);
 
-			$account = $this->accountMapper->find("secret", $data["secret"], $this->userId);
+			$account = $this->accountMapper->find("secret", $encrypted_secret, $this->userId);
 
-			if($account != null && $account->getDeletedAt() == null) {
+			if ($account != null && $account->getDeletedAt() == null) {
 				$errors["secret"] = "This secret key already exists";
 				return $errors;
 			}
@@ -111,14 +126,14 @@ class AccountController extends Controller {
 			$position = 0;
 			$accountsSortedByPos = $this->accountMapper->findAll($this->userId);
 
-			if(count($accountsSortedByPos) > 0) {
+			if (count($accountsSortedByPos) > 0) {
 				$position = $accountsSortedByPos[0]->getPosition() + 1;
 			}
 
-			if($account == null) {
+			if ($account == null) {
 				$account = new Account();
-
-				$account->setSecret($data["secret"]);
+				
+				$account->setSecret($encrypted_secret);
 				$account->setName($data["name"]);
 				$account->setIssuer($data["issuer"]);
 				$account->setDigits($data["digits"]);
@@ -130,7 +145,7 @@ class AccountController extends Controller {
 				$account->setUserId($this->userId);
 				$account->setCreatedAt(date("Y-m-d H:i:s"));
 				$account->setUpdatedAt(date("Y-m-d H:i:s"));
-	
+
 				$this->accountMapper->insert($account);
 			} else {
 				$account->setName($data["name"]);
@@ -146,7 +161,7 @@ class AccountController extends Controller {
 
 				$this->accountMapper->update($account);
 			}
-			
+
 			return "OK";
 		}
 	}
@@ -154,20 +169,21 @@ class AccountController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function update($data) {
+	public function update($data)
+	{
 		$errors = $this->validateFields($data);
 
-		if(count($errors) > 0) {
+		if (count($errors) > 0) {
 			return $errors;
 		} else {
 			$data["algorithm"] = $this->convertAlgorithmToInt($data["algorithm"]);
 
 			$account = $this->accountMapper->find("secret", $data["secret"], $this->userId);
 
-			if($account == null) {
+			if ($account == null) {
 				$errors["msg"] = "This account does not exists";
 				return $errors;
-			} else if($account->getDeletedAt() != null) {
+			} else if ($account->getDeletedAt() != null) {
 				$errors["msg"] = "This account has been deleted";
 				return $errors;
 			}
@@ -178,11 +194,11 @@ class AccountController extends Controller {
 			$account->setType($data["type"]);
 			$account->setPeriod($data["period"]);
 			$account->setAlgorithm($data["algorithm"]);
-			if(isset($data["counter"])) $account->setCounter($data["counter"]);
+			if (isset($data["counter"])) $account->setCounter($data["counter"]);
 			$account->setUpdatedAt(date("Y-m-d H:i:s"));
 
 			$this->accountMapper->update($account);
-			
+
 			return "OK";
 		}
 	}
@@ -190,16 +206,17 @@ class AccountController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 */
-	public function delete($id) {
+	public function delete($id)
+	{
 		$account = $this->accountMapper->find("id", $id, $this->userId);
 
-		if($account == null) {
+		if ($account == null) {
 			return null;
 		} else {
 			// decrease by 1 the position of all accounts after it
 			$accountsGreaterPos = $this->accountMapper->findAllAccountsPosGtThan($account->getPosition(), $this->userId);
-			
-			foreach($accountsGreaterPos as $accountGreaterPos) {
+
+			foreach ($accountsGreaterPos as $accountGreaterPos) {
 				$accountGreaterPos->setPosition($accountGreaterPos->getPosition() - 1);
 				$this->accountMapper->update($accountGreaterPos);
 			}
@@ -212,14 +229,15 @@ class AccountController extends Controller {
 		}
 	}
 
-	private function adjustPosition(int $pos) {
+	private function adjustPosition(int $pos)
+	{
 		$accountPosition = $pos;
 
 		// increments by 1 the position of all those accounts
 		// that are on and above (>=) the position of where I want to add the new account
 		$accountsGtePos = $this->accountMapper->findAllAccountsPosGteThan($pos, $this->userId);
 
-		foreach($accountsGtePos as $accountGtePos) {
+		foreach ($accountsGtePos as $accountGtePos) {
 			$accountGtePos->setPosition(++$pos);
 			$this->accountMapper->update($accountGtePos);
 		}
@@ -228,9 +246,9 @@ class AccountController extends Controller {
 		// if it is distant from the other accounts (if his position is > the last position)
 		$accountsSortedByPos = $this->accountMapper->findAll($this->userId);
 
-		if(count($accountsSortedByPos) > 0) {
+		if (count($accountsSortedByPos) > 0) {
 			$lastPosition = $accountsSortedByPos[0]->getPosition();
-			if($accountPosition > $lastPosition - 1) {
+			if ($accountPosition > $lastPosition - 1) {
 				return $lastPosition + 1;
 			}
 		}
@@ -242,7 +260,8 @@ class AccountController extends Controller {
 	 *     - loop local accounts by searching in DB
 	 *     - loop server accounts by searching through local accounts
 	 */
-	private function compareAccounts(array $localAccounts) {
+	private function compareAccounts(array $localAccounts)
+	{
 		$ris = ["toAdd" => [], "toDelete" => [], "toEdit" => []];
 
 		// local accounts | server accounts
@@ -252,14 +271,14 @@ class AccountController extends Controller {
 		//    - deleted on local: local account is not in DB || there is in DB and "deleted_at" != null
 		//	  - deleted on server: "deleted" => true
 		//    - edited on server: "toUpdate" => true && it is not deleted on DB
-		foreach($localAccounts as $localAccount) {
+		foreach ($localAccounts as $localAccount) {
 			$serverAccount = $this->accountMapper->find("secret", $localAccount["secret"], $this->userId);
-			
+
 			if ($localAccount["isNew"]) {
 				$position = $this->adjustPosition($localAccount["position"]);
 
-				if($serverAccount != null) {
-					if($serverAccount->getDeletedAt() != null) {
+				if ($serverAccount != null) {
+					if ($serverAccount->getDeletedAt() != null) {
 						$serverAccount->setName($localAccount["name"]);
 						$serverAccount->setIssuer($localAccount["issuer"]);
 						$serverAccount->setDigits($localAccount["digits"]);
@@ -295,13 +314,13 @@ class AccountController extends Controller {
 				}
 			} else if ($serverAccount == null || $serverAccount->getDeletedAt() != null) {
 				array_push($ris["toDelete"], $localAccount["id"]);
-			} else if($localAccount["deleted"]) {
+			} else if ($localAccount["deleted"]) {
 				$serverAccount->setPosition(null);
 				$serverAccount->setDeletedAt(date("Y-m-d H:i:s"));
 				$this->accountMapper->update($serverAccount);
 			}
 
-			if($localAccount["toUpdate"] && $serverAccount->getDeletedAt() == null) {
+			if ($localAccount["toUpdate"] && $serverAccount->getDeletedAt() == null) {
 				$account = $serverAccount;
 
 				$account->setSecret($localAccount["secret"]);
@@ -327,9 +346,9 @@ class AccountController extends Controller {
 			$found = false;
 			$toEdit = false;
 
-			foreach($localAccounts as $localAccount) {
+			foreach ($localAccounts as $localAccount) {
 				if ($serverAccount->getSecret() == $localAccount["secret"]) {
-					
+
 					if ($serverAccount->getName() != $localAccount["name"]) $toEdit = true;
 					else if ($serverAccount->getIssuer() != $localAccount["issuer"]) $toEdit = true;
 					else if ($serverAccount->getDigits() != $localAccount["digits"]) $toEdit = true;
@@ -338,7 +357,7 @@ class AccountController extends Controller {
 					else if ($serverAccount->getAlgorithm() != $localAccount["algorithm"]) $toEdit = true;
 					else if ($serverAccount->getCounter() != $localAccount["counter"]) $toEdit = true;
 					else if ($serverAccount->getPosition() != $localAccount["position"]) $toEdit = true;
-					
+
 					$found = true;
 					break;
 				}
@@ -347,7 +366,7 @@ class AccountController extends Controller {
 			if (!$found) {
 				array_push($ris["toAdd"], $serverAccount);
 			} else {
-				if($toEdit) array_push($ris["toEdit"], $serverAccount);
+				if ($toEdit) array_push($ris["toEdit"], $serverAccount);
 			}
 		}
 
@@ -358,7 +377,27 @@ class AccountController extends Controller {
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	public function sync(array $data) {
+	public function sync(array $data)
+	{
 		return $this->compareAccounts($data["accounts"]);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 */
+	public function import(array $data, string | null $password)
+	{
+		if (array_key_exists("iv", $data) && empty($password)) return new JSONResponse(["error" => "Password is required to decrypt accounts"], 400);
+
+		foreach ($data["accounts"] as $importedAccount) {
+			if (array_key_exists("iv", $data)) {
+				$importedAccount["secret"] = $this->encryption->decryptImported($importedAccount["secret"], $password, $data["iv"]);
+				if ($importedAccount["secret"] === false) return new JSONResponse(["error" => "Password incorrect"], 400);
+			}
+
+			$this->create($importedAccount);
+		}
+
+		return new JSONResponse();
 	}
 }

@@ -15,6 +15,8 @@ class Setting extends Entity implements JsonSerializable {
 	protected $showCodes;
 	protected $darkMode;
 	protected $recordsPerPage;
+	protected $password;
+	protected $iv;
     protected $userId;
 	
 	public function __construct() {

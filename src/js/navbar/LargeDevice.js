@@ -18,6 +18,10 @@ import {
   IconChevronLeft,
   IconSun,
   IconMoonStars,
+  IconPassword,
+  IconKey,
+  IconFileInvoice,
+  IconFileImport,
 } from "@tabler/icons-react";
 import { navbarStyles } from "./Styles";
 import { UserSettingContext } from "./../utils/UserSettingProvider";
@@ -26,6 +30,10 @@ export function NavbarLargeDevice({
   showSettings,
   setShowSettings,
   setShowApps,
+  setShowChangePassword,
+  /*setShowExportAccounts,
+  setShowImportAccounts,*/
+  setShowImportExport
 }) {
   const [active, setActive] = useState("All accounts");
   const { classes, cx } = navbarStyles();
@@ -92,9 +100,11 @@ export function NavbarLargeDevice({
           <Collapse in={showSettings}>
             <Checkbox
               checked={userSetting.showCodes}
-              onChange={(e) => setUserSetting(
-                userSetting.copyWith({ showCodes: !userSetting.showCodes })
-              )}
+              onChange={(e) =>
+                setUserSetting(
+                  userSetting.copyWith({ showCodes: !userSetting.showCodes })
+                )
+              }
               className={classes.innerLink}
               label="Show codes"
             />
@@ -107,7 +117,12 @@ export function NavbarLargeDevice({
                     userSetting.copyWith({ darkMode: !userSetting.darkMode })
                   )
                 }
-                sx={{ width: "20px", height: "20px", minWidth: "20px", minHeight: "20px" }}
+                sx={{
+                  width: "20px",
+                  height: "20px",
+                  minWidth: "20px",
+                  minHeight: "20px",
+                }}
                 title="Toggle color scheme"
               >
                 {userSetting.darkMode ? (
@@ -123,6 +138,38 @@ export function NavbarLargeDevice({
                   (userSetting.darkMode ? "light mode" : "dark mode")}
               </Text>
             </Flex>
+            <div
+              href="#"
+              className={classes.link}
+              onClick={(event) => setShowChangePassword(true)}
+            >
+              <IconKey className={classes.linkIcon} stroke={1.5} />
+              <span>Change password</span>
+            </div>
+            <div
+              href="#"
+              className={classes.link}
+              onClick={(event) => setShowImportExport(true)}
+            >
+              <IconFileInvoice className={classes.linkIcon} stroke={1.5} />
+              <span>Import / Export</span>
+            </div>
+            {/*<div
+              href="#"
+              className={classes.link}
+              onClick={(event) => setShowExportAccounts(true)}
+            >
+              <IconFileExport className={classes.linkIcon} stroke={1.5} />
+              <span>Export accounts</span>
+            </div>
+            <div
+              href="#"
+              className={classes.link}
+              onClick={(event) => setShowImportAccounts(true)}
+            >
+              <IconFileImport className={classes.linkIcon} stroke={1.5} />
+              <span>Import accounts</span>
+                </div>*/}
           </Collapse>
         </Navbar.Section>
       </Navbar>

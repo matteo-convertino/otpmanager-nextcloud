@@ -16,6 +16,9 @@ import { IconCirclePlus } from "@tabler/icons-react";
 import { AccountsTable } from "./accountsTable/AccountsTable";
 import { CreateOtpAccount } from "../modals/CreateOtpAccount";
 import { EditOtpAccount } from "../modals/EditOtpAccount";
+import { ChangePassword } from "../modals/ChangePassword";
+import { ImportExport } from "../modals/ImportExport";
+
 import { Apps } from "../modals/Apps";
 
 export function AppShellContent({
@@ -26,6 +29,14 @@ export function AppShellContent({
   setShowAside,
   showApps,
   setShowApps,
+  setShowChangePassword,
+  showChangePassword,
+  /*setShowExportAccounts,
+  showExportAccounts,
+  setShowImportAccounts,
+  showImportAccounts,*/
+  showImportExport,
+  setShowImportExport
 }) {
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showEditOtpAccount, setShowEditOtpAccount] = useState(false);
@@ -57,13 +68,16 @@ export function AppShellContent({
             >
               <IconCirclePlus />
             </ActionIcon>
-          </Breadcrumbs> 
-        </Flex> 
+          </Breadcrumbs>
+        </Flex>
       </Header>
 
       <Group
         sx={(theme) => ({
-          background: theme.colorScheme === 'dark' ? "rgba(0, 0, 0, .8)" : "rgba(255, 255, 255, .8)",
+          background:
+            theme.colorScheme === "dark"
+              ? "rgba(0, 0, 0, .8)"
+              : "rgba(255, 255, 255, .8)",
           padding: "16px",
           paddingBottom: "calc(var(--body-container-margin)*2 + 16px)",
           paddingRight: "calc(var(--body-container-margin)*2 + 16px)",
@@ -93,6 +107,33 @@ export function AppShellContent({
         otp={otp}
         showEditOtpAccount={showEditOtpAccount}
         setShowEditOtpAccount={setShowEditOtpAccount}
+        setAccounts={setAccounts}
+        setFetchState={setFetchState}
+      />
+
+      <ChangePassword
+        showChangePassword={showChangePassword}
+        setShowChangePassword={setShowChangePassword}
+        setAccounts={setAccounts}
+        setFetchState={setFetchState}
+      />
+
+      {/*<ExportAccounts
+        setShowExportAccounts={setShowExportAccounts}
+        showExportAccounts={showExportAccounts}
+        accounts={accounts}
+      />
+
+      <ImportAccounts
+        setShowImportAccounts={setShowImportAccounts}
+        showImportAccounts={showImportAccounts}
+        setAccounts={setAccounts}
+        setFetchState={setFetchState}
+      />*/}
+      <ImportExport 
+        showImportExport={showImportExport}
+        setShowImportExport={setShowImportExport}
+        accounts={accounts}
         setAccounts={setAccounts}
         setFetchState={setFetchState}
       />

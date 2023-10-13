@@ -9,7 +9,7 @@ import {
   Checkbox,
   Box,
   Flex,
-  ActionIcon
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconList,
@@ -19,6 +19,9 @@ import {
   IconSettings,
   IconSun,
   IconMoonStars,
+  IconKey,
+  IconFileExport,
+  IconFileImport,
 } from "@tabler/icons-react";
 import { navbarStyles } from "./Styles";
 import { UserSettingContext } from "./../utils/UserSettingProvider";
@@ -29,6 +32,9 @@ export function NavbarSmallDevice({
   showSettings,
   setShowSettings,
   setShowApps,
+  setShowChangePassword,
+  setShowExportAccounts,
+  setShowImportAccounts,
 }) {
   const [active, setActive] = useState("All accounts");
   const { classes, cx } = navbarStyles();
@@ -110,39 +116,74 @@ export function NavbarSmallDevice({
             </Group>
 
             <Collapse in={showSettings}>
-            <Checkbox
-              checked={userSetting.showCodes}
-              onChange={(e) => setUserSetting(
-                userSetting.copyWith({ showCodes: !userSetting.showCodes })
-              )}
-              className={classes.innerLink}
-              label="Show codes"
-            />
-            <Flex className={classes.innerLink} align="center">
-              <ActionIcon
-                variant="outline"
-                color={userSetting.darkMode ? "yellow" : "blue"}
-                onClick={() =>
+              <Checkbox
+                checked={userSetting.showCodes}
+                onChange={(e) =>
                   setUserSetting(
-                    userSetting.copyWith({ darkMode: !userSetting.darkMode })
+                    userSetting.copyWith({ showCodes: !userSetting.showCodes })
                   )
                 }
-                sx={{ width: "20px", height: "20px", minWidth: "20px", minHeight: "20px" }}
-                title="Toggle color scheme"
+                className={classes.innerLink}
+                label="Show codes"
+              />
+              <Flex className={classes.innerLink} align="center">
+                <ActionIcon
+                  variant="outline"
+                  color={userSetting.darkMode ? "yellow" : "blue"}
+                  onClick={() =>
+                    setUserSetting(
+                      userSetting.copyWith({ darkMode: !userSetting.darkMode })
+                    )
+                  }
+                  sx={{
+                    width: "20px",
+                    height: "20px",
+                    minWidth: "20px",
+                    minHeight: "20px",
+                  }}
+                  title="Toggle color scheme"
+                >
+                  {userSetting.darkMode ? (
+                    <IconSun style={{ width: 16 }} />
+                  ) : (
+                    <IconMoonStars style={{ width: 16 }} />
+                  )}
+                </ActionIcon>
+                <Text
+                  sx={{
+                    fontSize: "14px",
+                    color: "#C1C2C5",
+                    marginLeft: "12px",
+                  }}
+                >
+                  {"Switch to " +
+                    (userSetting.darkMode ? "light mode" : "dark mode")}
+                </Text>
+              </Flex>
+              <div
+                href="#"
+                className={classes.link}
+                onClick={(event) => setShowChangePassword(true)}
               >
-                {userSetting.darkMode ? (
-                  <IconSun style={{ width: 16 }} />
-                ) : (
-                  <IconMoonStars style={{ width: 16 }} />
-                )}
-              </ActionIcon>
-              <Text
-                sx={{ fontSize: "14px", color: "#C1C2C5", marginLeft: "12px" }}
+                <IconKey className={classes.linkIcon} stroke={1.5} />
+                <span>Change password</span>
+              </div>
+              <div
+                href="#"
+                className={classes.link}
+                onClick={(event) => setShowExportAccounts(true)}
               >
-                {"Switch to " +
-                  (userSetting.darkMode ? "light mode" : "dark mode")}
-              </Text>
-            </Flex>
+                <IconFileExport className={classes.linkIcon} stroke={1.5} />
+                <span>Export accounts</span>
+              </div>
+              <div
+                href="#"
+                className={classes.link}
+                onClick={(event) => setShowImportAccounts(true)}
+              >
+                <IconFileImport className={classes.linkIcon} stroke={1.5} />
+                <span>Import accounts</span>
+              </div>
             </Collapse>
           </div>
         </Stack>

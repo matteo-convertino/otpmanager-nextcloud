@@ -16,6 +16,10 @@ export default function MainAppShell({ children }) {
   const [showAside, setShowAside] = useState(false);
   const [showNavbarSmallDevice, setShowNavbarSmallDevice] = useState(false);
   const [showApps, setShowApps] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showImportExport, setShowImportExport] = useState(false);
+  /*const [showExportAccounts, setShowExportAccounts] = useState(false);
+  const [showImportAccounts, setShowImportAccounts] = useState(false);*/
 
   // user settings
   const [showSettings, setShowSettings] = useState(false);
@@ -30,6 +34,10 @@ export default function MainAppShell({ children }) {
         showSettings={showSettings}
         setShowSettings={setShowSettings}
         setShowApps={setShowApps}
+        setShowChangePassword={setShowChangePassword}
+        /*setShowExportAccounts={setShowExportAccounts}
+        setShowImportAccounts={setShowImportAccounts}*/
+        setShowImportExport={setShowImportExport}
       />
 
       <AppShell
@@ -40,8 +48,11 @@ export default function MainAppShell({ children }) {
           <NavbarLargeDevice
             showSettings={showSettings}
             setShowSettings={setShowSettings}
-
+            setShowChangePassword={setShowChangePassword}
             setShowApps={setShowApps}
+            /*setShowExportAccounts={setShowExportAccounts}
+            setShowImportAccounts={setShowImportAccounts}*/
+            setShowImportExport={setShowImportExport}
           />
         }
         styles={{
@@ -58,7 +69,15 @@ export default function MainAppShell({ children }) {
           setShowAside={setShowAside}
           showApps={showApps}
           setShowApps={setShowApps}
-        /> 
+          setShowChangePassword={setShowChangePassword}
+          showChangePassword={showChangePassword}
+          /*showExportAccounts={showExportAccounts}
+          setShowExportAccounts={setShowExportAccounts}
+          showImportAccounts={showImportAccounts}
+          setShowImportAccounts={setShowImportAccounts}*/
+          showImportExport={showImportExport}
+          setShowImportExport={setShowImportExport}
+        />
         {children}
       </AppShell>
     </>
