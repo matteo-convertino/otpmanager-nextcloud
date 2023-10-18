@@ -1,11 +1,11 @@
-import React from "react";
-import { HOTP } from "otpauth";
+import { showNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { showNotification } from "@mantine/notifications";
+import { HOTP } from "otpauth";
+import React from "react";
 
-import { getAlgorithm } from "./getAlgorithm";
 import { IconX } from "@tabler/icons-react";
+import { getAlgorithm } from "./getAlgorithm";
 
 export async function updateCounter(account, setUpdateCounterState) {
   setUpdateCounterState(true);
@@ -26,7 +26,7 @@ export async function updateCounter(account, setUpdateCounterState) {
       algorithm: getAlgorithm(account.algorithm),
       digits: account.digits,
       counter: account.counter,
-      secret: account.secret,
+      secret: account.decryptedSecret,
     });
 
     account.code = hotp.generate();

@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 
 import { Modal } from "@mantine/core";
-import { useForm, hasLength } from "@mantine/form";
-import { IconCheck, IconX, IconEdit } from "@tabler/icons-react";
+import { hasLength, useForm } from "@mantine/form";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { showNotification, updateNotification } from "@mantine/notifications";
+import { IconCheck, IconEdit, IconX } from "@tabler/icons-react";
 import { getAlgorithm } from "../utils/getAlgorithm";
 import ModalContent from "./CreateEditContent";
 
@@ -73,6 +73,8 @@ export function EditOtpAccount({
       disallowClose: true,
     });
 
+    values.secret = otp.secret;
+
     const response = await axios.put(generateUrl("/apps/otpmanager/accounts"), {
       data: values,
     });
@@ -121,7 +123,7 @@ export function EditOtpAccount({
       onClose={() => setShowEditOtpAccount(false)}
       title="Edit Account"
     >
-      <form onSubmit={form.onSubmit((values) => editAccount(values))}>
+      <form onSubmit={form.onSubmit((values) => editAccount(JSON.parse(JSON.stringify(values))))}>
         <ModalContent
           form={form}
           textSubmitButton="Edit"

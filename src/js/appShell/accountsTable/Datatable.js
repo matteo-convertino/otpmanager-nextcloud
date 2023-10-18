@@ -41,9 +41,11 @@ export default function CustomDatatable({
   const [to, setTo] = useState(pageSize);
 
   useEffect(() => {
-    if(accounts == null) return;
-    
-    userSetting.recordsPerPage == "All" ? setPageSize(accounts.length) : setPageSize(userSetting.recordsPerPage);
+    if (accounts == null) return;
+
+    userSetting.recordsPerPage == "All"
+      ? setPageSize(accounts.length)
+      : setPageSize(userSetting.recordsPerPage);
   }, [userSetting.recordsPerPage, accounts]);
 
   useEffect(() => {
@@ -176,9 +178,7 @@ export default function CustomDatatable({
       onPageChange={(p) => setPage(p)}
       recordsPerPageOptions={PAGE_SIZES}
       onRecordsPerPageChange={(p) => {
-        setUserSetting(
-          userSetting.copyWith({ recordsPerPage: p })
-        );
+        setUserSetting(userSetting.copyWith({ recordsPerPage: p }));
         setPage(1);
         p == "All" ? setPageSize(accounts.length) : setPageSize(p);
       }}

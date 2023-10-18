@@ -1,30 +1,29 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import {
-  Text,
-  Drawer,
-  Stack,
-  Group,
-  Collapse,
-  Checkbox,
-  Box,
-  Flex,
   ActionIcon,
+  Box,
+  Checkbox,
+  Collapse,
+  Drawer,
+  Flex,
+  Group,
+  Stack,
+  Text,
 } from "@mantine/core";
 import {
-  IconList,
   IconApps,
-  IconChevronRight,
   IconChevronLeft,
-  IconSettings,
-  IconSun,
-  IconMoonStars,
+  IconChevronRight,
+  IconFileInvoice,
   IconKey,
-  IconFileExport,
-  IconFileImport,
+  IconList,
+  IconMoonStars,
+  IconSettings,
+  IconSun
 } from "@tabler/icons-react";
-import { navbarStyles } from "./Styles";
 import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { navbarStyles } from "./Styles";
 
 export function NavbarSmallDevice({
   showNavbarSmallDevice,
@@ -33,8 +32,7 @@ export function NavbarSmallDevice({
   setShowSettings,
   setShowApps,
   setShowChangePassword,
-  setShowExportAccounts,
-  setShowImportAccounts,
+  setShowImportExport,
 }) {
   const [active, setActive] = useState("All accounts");
   const { classes, cx } = navbarStyles();
@@ -171,18 +169,10 @@ export function NavbarSmallDevice({
               <div
                 href="#"
                 className={classes.link}
-                onClick={(event) => setShowExportAccounts(true)}
+                onClick={(event) => setShowImportExport(true)}
               >
-                <IconFileExport className={classes.linkIcon} stroke={1.5} />
-                <span>Export accounts</span>
-              </div>
-              <div
-                href="#"
-                className={classes.link}
-                onClick={(event) => setShowImportAccounts(true)}
-              >
-                <IconFileImport className={classes.linkIcon} stroke={1.5} />
-                <span>Import accounts</span>
+                <IconFileInvoice className={classes.linkIcon} stroke={1.5} />
+                <span>Import / Export</span>
               </div>
             </Collapse>
           </div>

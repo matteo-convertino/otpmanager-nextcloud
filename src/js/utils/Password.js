@@ -1,38 +1,26 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useDisclosure } from "@mantine/hooks";
+import React, { useContext } from "react";
 
 import {
-  MantineProvider,
-  createEmotionCache,
-  Loader,
-  Center,
   AppShell,
-  Group,
-  Text,
-  Popover,
-  PasswordInput,
-  Progress,
-  Flex,
   Box,
   Button,
   Card,
   Divider,
+  Flex,
+  Loader,
   Stack,
+  Text
 } from "@mantine/core";
-import { IconCheck, IconX } from "@tabler/icons-react";
 import {
-  NotificationsProvider,
-  cleanNotifications,
   showNotification,
-  updateNotification,
+  updateNotification
 } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { ModalsProvider } from "@mantine/modals";
-import { useForm } from "@mantine/form";
-import { UserSettingContext } from "./utils/UserSettingProvider";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import CryptoES from "crypto-es";
-import PasswordForm from "./utils/PasswordForm"
+import PasswordForm from "./PasswordForm";
+import { UserSettingContext } from "./UserSettingProvider";
 
 export const Password = ({ exists, setAuth }) => {
   const [userSetting, setUserSetting] = useContext(UserSettingContext);
@@ -80,7 +68,6 @@ export const Password = ({ exists, setAuth }) => {
       .catch((error) => {
         if (error.response) {
           if (error.response.status == 400) {
-            console.log("400");
             updateNotification({
               id: "update-password",
               color: "red",
@@ -100,7 +87,6 @@ export const Password = ({ exists, setAuth }) => {
             autoClose: 2000,
           });
         } else {
-          console.log(error);
           updateNotification({
             id: "update-password",
             color: "red",
@@ -114,16 +100,7 @@ export const Password = ({ exists, setAuth }) => {
   }
 
   return (
-    <AppShell
-      padding="0"
-      fixed={false}
-      layout="alt"
-      /*styles={{
-      main: {
-        width: smallScreen ? "100vw" : "calc(100vw - 300px)",
-      },
-    }}*/
-    >
+    <AppShell padding="0" fixed={false} layout="alt">
       <Flex
         justify="center"
         align="center"
@@ -155,10 +132,7 @@ export const Password = ({ exists, setAuth }) => {
               <Box>
                 <Divider my="md" />
                 <Flex justify="flex-end">
-                  <Button
-                    type="submit"
-                    form="form"
-                  >
+                  <Button type="submit" form="form">
                     Submit
                   </Button>
                 </Flex>

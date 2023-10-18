@@ -1,14 +1,13 @@
 import React, { useContext } from "react";
 
-import { Modal, Group, Button, Stack } from "@mantine/core";
-import { useForm, hasLength } from "@mantine/form";
-import { IconCheck, IconX, IconPlus, IconKey } from "@tabler/icons-react";
+import { Button, Group, Modal, Stack } from "@mantine/core";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { showNotification, updateNotification } from "@mantine/notifications";
+import { IconCheck, IconKey, IconX } from "@tabler/icons-react";
+import CryptoES from "crypto-es";
 import PasswordForm from "./../utils/PasswordForm";
 import { UserSettingContext } from "./../utils/UserSettingProvider";
-import CryptoES from "crypto-es";
 
 export function ChangePassword({
   showChangePassword,
@@ -20,7 +19,6 @@ export function ChangePassword({
 
   function closeModal() {
     setShowChangePassword(false);
-    //form.reset();
   }
 
   async function changePassword(values) {
@@ -53,8 +51,6 @@ export function ChangePassword({
             password: CryptoES.SHA256(values.password).toString(),
           })
         );
-        console.log("Aaa");
-        console.log(response.data["iv"]);
         closeModal();
         setAccounts(null);
         setFetchState(true);
@@ -62,7 +58,6 @@ export function ChangePassword({
       .catch((error) => {
         if (error.response) {
           if (error.response.status == 400) {
-            console.log("400");
             updateNotification({
               id: "change-password",
               color: "red",
@@ -82,7 +77,6 @@ export function ChangePassword({
             autoClose: 2000,
           });
         } else {
-          console.log(error);
           updateNotification({
             id: "change-password",
             color: "red",

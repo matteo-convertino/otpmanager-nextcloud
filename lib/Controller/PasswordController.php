@@ -6,14 +6,11 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Controller;
 
-use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Db\Setting;
 use OCA\OtpManager\Db\SettingMapper;
 use OCA\OtpManager\Utils\Encryption;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\JSONResponse;
-use OCP\AppFramework\Http\Response;
 use OCP\IRequest;
 
 
@@ -103,8 +100,10 @@ class PasswordController extends Controller
 
         $setting = $this->settingMapper->find($this->userId);
 
+        //return new JSONResponse(["a" => hash_equals($setting->getPassword(), hash("sha256", $oldPassword)), "b" => $oldPassword, "c" => $setting->getPassword(), "d" => hash("sha256", $oldPassword)]);
+
         if (is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
-        else if (hash_equals($setting->getPassword(), hash("sha256", $oldPassword, true))) return new JSONResponse(["error" => "The old password is incorrect"], 400);
+        else if (!hash_equals($setting->getPassword(), hash("sha256", $oldPassword))) return new JSONResponse(["error" => "The old password is incorrect"], 400);
 
         $newPassword = hash("sha256", $newPassword);
 
@@ -121,11 +120,12 @@ class PasswordController extends Controller
 
     /**
      * @NoAdminRequired
+     * @NoCSRFRequired
      */
     public function check(string $password): JSONResponse
     {
         $setting = $this->settingMapper->find($this->userId);
-        if (is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
+        if (is_null($setting) || is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
 
         if (hash_equals($setting->getPassword(), hash("sha256", $password))) {
             return new JSONResponse(["iv" => $setting->getIv()]);

@@ -18,8 +18,6 @@ export default function MainAppShell({ children }) {
   const [showApps, setShowApps] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showImportExport, setShowImportExport] = useState(false);
-  /*const [showExportAccounts, setShowExportAccounts] = useState(false);
-  const [showImportAccounts, setShowImportAccounts] = useState(false);*/
 
   // user settings
   const [showSettings, setShowSettings] = useState(false);
@@ -35,8 +33,6 @@ export default function MainAppShell({ children }) {
         setShowSettings={setShowSettings}
         setShowApps={setShowApps}
         setShowChangePassword={setShowChangePassword}
-        /*setShowExportAccounts={setShowExportAccounts}
-        setShowImportAccounts={setShowImportAccounts}*/
         setShowImportExport={setShowImportExport}
       />
 
@@ -50,8 +46,6 @@ export default function MainAppShell({ children }) {
             setShowSettings={setShowSettings}
             setShowChangePassword={setShowChangePassword}
             setShowApps={setShowApps}
-            /*setShowExportAccounts={setShowExportAccounts}
-            setShowImportAccounts={setShowImportAccounts}*/
             setShowImportExport={setShowImportExport}
           />
         }
@@ -71,10 +65,6 @@ export default function MainAppShell({ children }) {
           setShowApps={setShowApps}
           setShowChangePassword={setShowChangePassword}
           showChangePassword={showChangePassword}
-          /*showExportAccounts={showExportAccounts}
-          setShowExportAccounts={setShowExportAccounts}
-          showImportAccounts={showImportAccounts}
-          setShowImportAccounts={setShowImportAccounts}*/
           showImportExport={showImportExport}
           setShowImportExport={setShowImportExport}
         />

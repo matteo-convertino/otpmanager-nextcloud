@@ -1,6 +1,6 @@
 import React from "react";
 
-import { showNotification, updateNotification } from "@mantine/notifications";
+import { showNotification } from "@mantine/notifications";
 import { IconCheck } from "@tabler/icons-react";
 
 const unsecuredCopyToClipboard = (text) => {
@@ -26,7 +26,6 @@ const copy = (content) => {
   if (window.isSecureContext && navigator.clipboard) {
     navigator.clipboard.writeText(content);
   } else {
-    //console.log('unsecure copy')
     unsecuredCopyToClipboard(content);
   }
   showNotification({

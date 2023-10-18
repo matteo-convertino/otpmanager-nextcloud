@@ -2,14 +2,20 @@ import { TOTP, HOTP } from "otpauth";
 import { getAlgorithm } from "./getAlgorithm";
 import CryptoES from "crypto-es";
 
-export function generateCodes(newAccounts, setTimer, setAccounts, password, iv) {
+export function generateCodes(
+  newAccounts,
+  setTimer,
+  setAccounts,
+  password,
+  iv
+) {
   for (let i = 0; i < newAccounts.length; i++) {
     const account = newAccounts[i];
 
     if (account.decryptedSecret === undefined) {
       const key = CryptoES.enc.Hex.parse(password);
       const parsedIv = CryptoES.enc.Hex.parse(iv);
-      const dec = CryptoES.AES.decrypt(account.secret, key, {iv:  parsedIv});
+      const dec = CryptoES.AES.decrypt(account.secret, key, { iv: parsedIv });
 
       account.decryptedSecret = dec.toString(CryptoES.enc.Utf8);
     }
@@ -49,7 +55,8 @@ export function generateCodes(newAccounts, setTimer, setAccounts, password, iv) 
 
   setTimer(
     setTimeout(
-      () => generateCodes(newAccounts, setTimer, setAccounts, password, iv, false),
+      () =>
+        generateCodes(newAccounts, setTimer, setAccounts, password, iv, false),
       timeLeft
     )
   );

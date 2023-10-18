@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import { Box } from "@mantine/core";
 
-import { MantineProvider, createEmotionCache } from "@mantine/core";
-import { NotificationsProvider } from "@mantine/notifications";
+import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
-import { Password } from "./Password";
+import { NotificationsProvider } from "@mantine/notifications";
+import { Password } from "./utils/Password";
 
 import { UserSettingContext } from "./utils/UserSettingProvider";
 

@@ -1,17 +1,11 @@
 import React, { useContext } from "react";
 
-import { Modal, Group, Button, Stack, Text, Box } from "@mantine/core";
-import { useForm, hasLength } from "@mantine/form";
-import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { Box, Button, Group, Text } from "@mantine/core";
 import {
-  IconCheck,
-  IconX,
-  IconPlus,
-  IconKey,
-  IconFileExport,
   IconLock,
-  IconLockOpen,
+  IconLockOpen
 } from "@tabler/icons-react";
+import { UserSettingContext } from "./../utils/UserSettingProvider";
 
 export function ExportAccounts({ accounts }) {
   const [userSetting, setUserSetting] = useContext(UserSettingContext);
@@ -47,7 +41,6 @@ export function ExportAccounts({ accounts }) {
       ? "accounts_encrypted_secret.json"
       : "accounts_plain_secret.json";
 
-    console.log(link.href);
     link.click();
   }
 
@@ -57,11 +50,11 @@ export function ExportAccounts({ accounts }) {
       <Box>
         <Text sx={{ display: "inline" }}>
           Choose based on your needs whether to export them securely
-        </Text>
+        </Text>{" "}
         <Text sx={{ display: "inline" }} fw={700}>
           with your encrypted secret key
-        </Text>
-        or
+        </Text>{" "}
+        or{" "}
         <Text sx={{ display: "inline" }} fw={700}>
           totally unencrypted
         </Text>

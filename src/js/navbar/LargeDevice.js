@@ -1,39 +1,35 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import {
+  ActionIcon,
+  Box,
+  Checkbox,
+  Collapse,
+  Flex,
+  Group,
   Navbar,
   Text,
-  Checkbox,
-  Group,
-  Collapse,
-  Box,
-  ActionIcon,
-  Flex,
 } from "@mantine/core";
 import {
-  IconList,
   IconApps,
-  IconSettings,
-  IconChevronRight,
   IconChevronLeft,
-  IconSun,
-  IconMoonStars,
-  IconPassword,
-  IconKey,
+  IconChevronRight,
   IconFileInvoice,
-  IconFileImport,
+  IconKey,
+  IconList,
+  IconMoonStars,
+  IconSettings,
+  IconSun
 } from "@tabler/icons-react";
-import { navbarStyles } from "./Styles";
 import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { navbarStyles } from "./Styles";
 
 export function NavbarLargeDevice({
   showSettings,
   setShowSettings,
   setShowApps,
   setShowChangePassword,
-  /*setShowExportAccounts,
-  setShowImportAccounts,*/
-  setShowImportExport
+  setShowImportExport,
 }) {
   const [active, setActive] = useState("All accounts");
   const { classes, cx } = navbarStyles();
@@ -154,22 +150,6 @@ export function NavbarLargeDevice({
               <IconFileInvoice className={classes.linkIcon} stroke={1.5} />
               <span>Import / Export</span>
             </div>
-            {/*<div
-              href="#"
-              className={classes.link}
-              onClick={(event) => setShowExportAccounts(true)}
-            >
-              <IconFileExport className={classes.linkIcon} stroke={1.5} />
-              <span>Export accounts</span>
-            </div>
-            <div
-              href="#"
-              className={classes.link}
-              onClick={(event) => setShowImportAccounts(true)}
-            >
-              <IconFileImport className={classes.linkIcon} stroke={1.5} />
-              <span>Import accounts</span>
-                </div>*/}
           </Collapse>
         </Navbar.Section>
       </Navbar>

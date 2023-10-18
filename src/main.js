@@ -22,10 +22,9 @@ const myCache = createEmotionCache({
 });
 
 function App() {
- 
   return (
     <>
-     <UserSettingContextProvider>
+      <UserSettingContextProvider>
         <OtpLayout myCache={myCache} emotionRoot={emotionRoot}>
           <AppShell />
         </OtpLayout>

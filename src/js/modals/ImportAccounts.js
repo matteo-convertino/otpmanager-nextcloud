@@ -1,31 +1,20 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import {
-  Modal,
-  Group,
   Button,
-  Stack,
-  Text,
-  Box,
   FileInput,
-  SegmentedControl,
-  Center,
-  PasswordInput,
+  Group,
+  PasswordInput
 } from "@mantine/core";
-import { useForm, hasLength } from "@mantine/form";
-import {
-  IconCheck,
-  IconX,
-  IconPlus,
-  IconKey,
-  IconFileExport,
-  IconLock,
-  IconLockOpen,
-  IconFileImport,
-} from "@tabler/icons-react";
+import { useForm } from "@mantine/form";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { showNotification, updateNotification } from "@mantine/notifications";
+import {
+  IconCheck,
+  IconFileImport,
+  IconX
+} from "@tabler/icons-react";
 
 export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
   const [file, setFile] = useState(null);
@@ -34,17 +23,6 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
     initialValues: {
       password: "",
     },
-
-    /*validate: {
-      oldPassword: (value) =>
-        !isChanging || value.length !== 0
-          ? null
-          : "Old password cannot be empty",
-      password: (value) =>
-        strength == 100 ? null : "Not all requirements are satisfied",
-      confirmPassword: (value, values) =>
-        exists || value === values.password ? null : "Passwords did not match",
-    },*/
   });
 
   function importAccounts() {
@@ -67,7 +45,6 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
             password: form.values.password,
           })
           .then((response) => {
-            console.log(response.data);
             updateNotification({
               id: "import-accounts",
               color: "teal",
@@ -83,7 +60,6 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
           .catch((error) => {
             if (error.response) {
               if (error.response.status == 400) {
-                console.log("400");
                 updateNotification({
                   id: "import-accounts",
                   color: "red",
@@ -103,7 +79,6 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
                 autoClose: 2000,
               });
             } else {
-              console.log(error);
               updateNotification({
                 id: "import-accounts",
                 color: "red",

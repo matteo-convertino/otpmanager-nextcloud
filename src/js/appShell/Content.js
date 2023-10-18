@@ -31,12 +31,8 @@ export function AppShellContent({
   setShowApps,
   setShowChangePassword,
   showChangePassword,
-  /*setShowExportAccounts,
-  showExportAccounts,
-  setShowImportAccounts,
-  showImportAccounts,*/
   showImportExport,
-  setShowImportExport
+  setShowImportExport,
 }) {
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showEditOtpAccount, setShowEditOtpAccount] = useState(false);
@@ -118,19 +114,7 @@ export function AppShellContent({
         setFetchState={setFetchState}
       />
 
-      {/*<ExportAccounts
-        setShowExportAccounts={setShowExportAccounts}
-        showExportAccounts={showExportAccounts}
-        accounts={accounts}
-      />
-
-      <ImportAccounts
-        setShowImportAccounts={setShowImportAccounts}
-        showImportAccounts={showImportAccounts}
-        setAccounts={setAccounts}
-        setFetchState={setFetchState}
-      />*/}
-      <ImportExport 
+      <ImportExport
         showImportExport={showImportExport}
         setShowImportExport={setShowImportExport}
         accounts={accounts}

@@ -11,7 +11,6 @@ use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Utils\Encryption;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
-use OCP\AppFramework\Http\Response;
 use OCP\IRequest;
 
 class AccountController extends Controller
@@ -78,8 +77,12 @@ class AccountController extends Controller
 			$errors["digits"] = "Digits must be one of those listed";
 
 		$regexBase32 = '/^[A-Z2-7]+=*$/i';
+		
+		$data["secret"] = $this->encryption->decrypt($data["secret"], $this->userId);
 
-		if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
+		if($data["secret"] === false) 
+			$errors["secret"] = "Not able to decrypt secret key";
+		else if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
 			$errors["secret"] = "Secret key must be 16-256 characters long";
 		else if (!preg_match($regexBase32, $data["secret"]))
 			$errors["secret"] = "Secret key is not Base32-encodable";
@@ -104,19 +107,15 @@ class AccountController extends Controller
 	 * @NoAdminRequired
 	 */
 	public function create($data)
-	{
+	{	
 		$errors = $this->validateFields($data);
 
 		if (count($errors) > 0) {
 			return $errors;
 		} else {
-			$data["secret"] = strtoupper($data["secret"]);
-			$encrypted_secret = $this->encryption->encrypt($data["secret"], $this->userId);
-			if ($encrypted_secret === false) return (new Response())->setStatus(403);
-
 			$data["algorithm"] = $this->convertAlgorithmToInt($data["algorithm"]);
 
-			$account = $this->accountMapper->find("secret", $encrypted_secret, $this->userId);
+			$account = $this->accountMapper->find("secret", $data["secret"], $this->userId);
 
 			if ($account != null && $account->getDeletedAt() == null) {
 				$errors["secret"] = "This secret key already exists";
@@ -133,7 +132,7 @@ class AccountController extends Controller
 			if ($account == null) {
 				$account = new Account();
 				
-				$account->setSecret($encrypted_secret);
+				$account->setSecret($data["secret"]);
 				$account->setName($data["name"]);
 				$account->setIssuer($data["issuer"]);
 				$account->setDigits($data["digits"]);
@@ -274,7 +273,13 @@ class AccountController extends Controller
 		foreach ($localAccounts as $localAccount) {
 			$serverAccount = $this->accountMapper->find("secret", $localAccount["secret"], $this->userId);
 
-			if ($localAccount["isNew"]) {
+			if ($localAccount["deleted"]) {
+				if($serverAccount != null) {
+					$serverAccount->setPosition(null);
+					$serverAccount->setDeletedAt(date("Y-m-d H:i:s"));
+					$this->accountMapper->update($serverAccount);
+				}
+			} else if ($localAccount["isNew"]) {
 				$position = $this->adjustPosition($localAccount["position"]);
 
 				if ($serverAccount != null) {
@@ -314,10 +319,6 @@ class AccountController extends Controller
 				}
 			} else if ($serverAccount == null || $serverAccount->getDeletedAt() != null) {
 				array_push($ris["toDelete"], $localAccount["id"]);
-			} else if ($localAccount["deleted"]) {
-				$serverAccount->setPosition(null);
-				$serverAccount->setDeletedAt(date("Y-m-d H:i:s"));
-				$this->accountMapper->update($serverAccount);
 			}
 
 			if ($localAccount["toUpdate"] && $serverAccount->getDeletedAt() == null) {
@@ -377,9 +378,9 @@ class AccountController extends Controller
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	public function sync(array $data)
+	public function sync(array $accounts)
 	{
-		return $this->compareAccounts($data["accounts"]);
+		return $this->compareAccounts($accounts);
 	}
 
 	/**
@@ -387,6 +388,7 @@ class AccountController extends Controller
 	 */
 	public function import(array $data, string | null $password)
 	{
+		if(!array_key_exists("accounts", $data)) return new JSONResponse(["error" => "Invalid JSON file"], 400);
 		if (array_key_exists("iv", $data) && empty($password)) return new JSONResponse(["error" => "Password is required to decrypt accounts"], 400);
 
 		foreach ($data["accounts"] as $importedAccount) {
@@ -394,6 +396,10 @@ class AccountController extends Controller
 				$importedAccount["secret"] = $this->encryption->decryptImported($importedAccount["secret"], $password, $data["iv"]);
 				if ($importedAccount["secret"] === false) return new JSONResponse(["error" => "Password incorrect"], 400);
 			}
+
+			$importedAccount["secret"] = strtoupper($importedAccount["secret"]);
+			$importedAccount["secret"] = $this->encryption->encrypt($importedAccount["secret"], $this->userId);
+			if ($importedAccount === false) return new JsonResponse([], 403);
 
 			$this->create($importedAccount);
 		}

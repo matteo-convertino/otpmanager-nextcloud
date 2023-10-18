@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import { Modal } from "@mantine/core";
-import { useForm, hasLength } from "@mantine/form";
-import { IconCheck, IconX, IconPlus } from "@tabler/icons-react";
+import { hasLength, useForm } from "@mantine/form";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { showNotification, updateNotification } from "@mantine/notifications";
+import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import CryptoES from "crypto-es";
+import { UserSettingContext } from "./../utils/UserSettingProvider";
 import ModalContent from "./CreateEditContent";
 
 export function CreateOtpAccount({
@@ -14,6 +16,8 @@ export function CreateOtpAccount({
   setAccounts,
   setFetchState,
 }) {
+  const [userSetting, setUserSetting] = useContext(UserSettingContext);
+
   const form = useForm({
     initialValues: {
       name: "",
@@ -52,6 +56,14 @@ export function CreateOtpAccount({
       autoClose: false,
       disallowClose: true,
     });
+
+    const key = CryptoES.enc.Hex.parse(userSetting.password);
+    const parsedIv = CryptoES.enc.Hex.parse(userSetting.iv);
+    const encryptedSecret = CryptoES.AES.encrypt(values.secret, key, {
+      iv: parsedIv,
+    });
+
+    values.secret = encryptedSecret.toString();
 
     const response = await axios.post(
       generateUrl("/apps/otpmanager/accounts"),
@@ -95,7 +107,7 @@ export function CreateOtpAccount({
       onClose={() => closeModal()}
       title="Add New Account"
     >
-      <form onSubmit={form.onSubmit((values) => createAccount(values))}>
+      <form onSubmit={form.onSubmit((values) => createAccount(JSON.parse(JSON.stringify(values))))}>
         <ModalContent
           form={form}
           textSubmitButton="Add"

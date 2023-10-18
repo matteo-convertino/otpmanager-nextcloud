@@ -1,11 +1,11 @@
-import React, { createContext, useState, useEffect } from "react";
-import { UserSetting } from "../model/UserSetting";
+import { showNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import { showNotification } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
+import React, { createContext, useEffect, useState } from "react";
+import { UserSetting } from "../model/UserSetting";
 
-const initState = new UserSetting(false, null, null);
+const initState = new UserSetting(false, null, "10");
 
 const UserSettingContext = createContext(initState);
 

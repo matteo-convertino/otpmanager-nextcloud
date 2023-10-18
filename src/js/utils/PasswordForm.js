@@ -1,35 +1,16 @@
-import React, { useState, useEffect } from "react";
 import { useDisclosure } from "@mantine/hooks";
+import React, { useState } from "react";
 
 import {
-  MantineProvider,
-  createEmotionCache,
-  Loader,
-  Center,
-  AppShell,
-  Group,
-  Text,
-  Popover,
-  PasswordInput,
-  Progress,
-  Flex,
   Box,
-  Button,
-  Card,
-  Divider,
-  Stack,
+  Flex,
+  PasswordInput,
+  Popover,
+  Progress,
+  Text
 } from "@mantine/core";
-import { IconCheck, IconX } from "@tabler/icons-react";
-import {
-  NotificationsProvider,
-  cleanNotifications,
-  showNotification,
-  updateNotification,
-} from "@mantine/notifications";
-import axios from "@nextcloud/axios";
-import { generateUrl } from "@nextcloud/router";
-import { ModalsProvider } from "@mantine/modals";
 import { useForm } from "@mantine/form";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 function PasswordRequirement({ meets, label }) {
   return (
@@ -119,14 +100,7 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
                 label="Current Password"
                 mb="md"
                 placeholder="Insert your current password"
-                //value={form.values.oldPassword}
-                /*onChange={(event) =>
-                      event.target.value.length <= 6 &&
-                      form.setFieldValue("oldPassword", event.target.value)
-                    }*/
                 {...form.getInputProps("oldPassword")}
-                //visible={visible}
-                //onVisibilityChange={toggle}
               />
             )}
             <Popover.Target>
@@ -141,11 +115,6 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
                   placeholder={
                     "Insert your" + (isChanging ? " new " : " ") + "password"
                   }
-                  //value={form.values.password}
-                  /*onChange={(event) =>
-                    event.target.value.length <= 6 &&
-                    form.setFieldValue("password", event.target.value)
-                  }*/
                   visible={visible}
                   onVisibilityChange={toggle}
                   {...form.getInputProps("password")}
@@ -154,10 +123,7 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
             </Popover.Target>
             <Popover.Dropdown>
               <Progress color={color} value={strength} size={5} mb="xs" />
-              {/*<PasswordRequirement
-                label="Must contains 6 characters"
-                meets={form.values.password.length == 6}
-                />*/}
+
               {checks}
             </Popover.Dropdown>
           </Popover>
@@ -168,12 +134,7 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
               placeholder={
                 "Confirm your" + (isChanging ? " new " : " ") + "password"
               }
-              //value={form.values.confirmPassword}
               mt="md"
-              /*onChange={(event) =>
-                event.target.value.length <= 6 &&
-                form.setFieldValue("confirmPassword", event.target.value)
-              }*/
               visible={visible}
               onVisibilityChange={toggle}
               {...form.getInputProps("confirmPassword")}
