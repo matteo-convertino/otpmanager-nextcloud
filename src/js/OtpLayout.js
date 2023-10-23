@@ -5,6 +5,7 @@ import { Box } from "@mantine/core";
 import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
+import { generateUrl } from "@nextcloud/router";
 import { Password } from "./utils/Password";
 
 import { UserSettingContext } from "./utils/UserSettingProvider";
@@ -31,7 +32,7 @@ export const OtpLayout = ({ children, myCache, emotionRoot }) => {
   const [auth, setAuth] = useState(false);
 
   useEffect(() => {
-    fetch("/apps/otpmanager/password")
+    fetch(generateUrl("/apps/otpmanager/password"))
       .then((response) => response.json())
       .then((response) => setPassword(response))
       .catch((error) => setPassword(null));

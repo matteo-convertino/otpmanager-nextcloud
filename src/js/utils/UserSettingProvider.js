@@ -1,6 +1,6 @@
 import { showNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
-import { generateUrl } from "@nextcloud/router";
+import { generateUrl }  from "@nextcloud/router";
 import { IconX } from "@tabler/icons-react";
 import React, { createContext, useEffect, useState } from "react";
 import { UserSetting } from "../model/UserSetting";
@@ -34,7 +34,7 @@ const UserSettingContextProvider = ({ children }) => {
   }, [state]);
 
   useEffect(() => {
-    fetch("/apps/otpmanager/settings")
+    fetch(generateUrl("/apps/otpmanager/settings"))
       .then((response) => response.json())
       .then((result) => setState(UserSetting.fromJson(result)))
       .catch((error) => setState(initState));
