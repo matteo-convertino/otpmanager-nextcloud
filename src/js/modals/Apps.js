@@ -43,7 +43,7 @@ export function Apps({ showApps, setShowApps }) {
             image={otpManager}
             badgeText="iOS"
             buttonText="Install from Apple Store"
-            buttonDisabled={true}
+            link="https://apps.apple.com/us/app/nextcloud-otp-manager/id6471510170"
           />
 
           <AppCard
