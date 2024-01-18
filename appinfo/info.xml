@@ -33,7 +33,7 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
 * [Official iOS App](https://apps.apple.com/us/app/nextcloud-otp-manager/id6471510170)
 ]]>
   </description>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <licence>agpl</licence>
   <author mail="matteo@convertino.cloud" homepage="https://www.convertino.cloud">Matteo Convertino</author>
   <namespace>OtpManager</namespace>
@@ -42,7 +42,7 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
   <repository>https://github.com/matteo-convertino/otpmanager-nextcloud</repository>
   <screenshot>https://raw.githubusercontent.com/matteo-convertino/otpmanager-nextcloud/c683075330a6d6839cbaa5e8b847eae44d250903/img/screenshots/1.png</screenshot>
   <dependencies>
-    <nextcloud min-version="26" max-version="27" />
+    <nextcloud min-version="26" max-version="28" />
   </dependencies>
   <navigations>
     <navigation>
