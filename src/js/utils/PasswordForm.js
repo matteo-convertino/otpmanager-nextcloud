@@ -7,7 +7,8 @@ import {
   PasswordInput,
   Popover,
   Progress,
-  Text
+  Text,
+  Switch
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCheck, IconX } from "@tabler/icons-react";
@@ -59,6 +60,7 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
       oldPassword: "",
       password: "",
       confirmPassword: "",
+      savePassword: false,
     },
 
     validate: {
@@ -139,6 +141,13 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
               onVisibilityChange={toggle}
               {...form.getInputProps("confirmPassword")}
             />
+          )}
+          {!isChanging && exists && (
+          <Switch
+            label="Remember password"
+            mt="md"
+            {...form.getInputProps("savePassword")}
+          />
           )}
         </Flex>
       </form>

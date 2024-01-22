@@ -64,6 +64,9 @@ export const Password = ({ exists, setAuth }) => {
             password: CryptoES.SHA256(values.password).toString(),
           })
         );
+        if (values.savePassword) {
+          localStorage.otpmanager_cachedPassword = values.password
+        }
       })
       .catch((error) => {
         if (error.response) {
@@ -97,6 +100,10 @@ export const Password = ({ exists, setAuth }) => {
           });
         }
       });
+  }
+
+  if (exists && localStorage.otpmanager_cachedPassword) {
+    updatePassword({password: localStorage.otpmanager_cachedPassword})
   }
 
   return (
