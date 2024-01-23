@@ -20,7 +20,8 @@ import {
   IconList,
   IconMoonStars,
   IconSettings,
-  IconSun
+  IconSun,
+  IconLockOff
 } from "@tabler/icons-react";
 import { UserSettingContext } from "./../utils/UserSettingProvider";
 import { navbarStyles } from "./Styles";
@@ -38,6 +39,7 @@ export function NavbarSmallDevice({
   const { classes, cx } = navbarStyles();
   const ChevronIcon = !showSettings ? IconChevronRight : IconChevronLeft;
   const [userSetting, setUserSetting] = useContext(UserSettingContext);
+  const [passwordSaved, setPasswordSaved] = useState(Boolean(localStorage.otpmanager_cachedPassword));
 
   return (
     <>
@@ -158,6 +160,33 @@ export function NavbarSmallDevice({
                     (userSetting.darkMode ? "light mode" : "dark mode")}
                 </Text>
               </Flex>
+
+              <Flex className={classes.innerLink} align="center">
+                <ActionIcon
+                  variant="outline"
+                  color="red"
+                  onClick={(e) =>
+                    {localStorage.removeItem("otpmanager_cachedPassword")
+                    setPasswordSaved(false)}
+                  }
+                  disabled={!passwordSaved}
+                  sx={{
+                    width: "20px",
+                    height: "20px",
+                    minWidth: "20px",
+                    minHeight: "20px",
+                  }}
+                  title="Remove saved password"
+                >
+                  <IconLockOff style={{ width: 16 }} />
+                </ActionIcon>
+                <Text
+                  sx={{ fontSize: "14px", color: "#C1C2C5", marginLeft: "12px" }}
+                >
+                  {"Remove saved password"}
+                </Text>
+              </Flex>
+
               <div
                 href="#"
                 className={classes.link}
