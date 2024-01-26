@@ -1,5 +1,5 @@
 import { useDisclosure } from "@mantine/hooks";
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 import {
   Box,
@@ -54,6 +54,7 @@ function getStrength(password) {
 export default function PasswordForm({ exists, onSubmit, isChanging }) {
   const [popoverOpened, setPopoverOpened] = useState(false);
   const [visible, { toggle }] = useDisclosure(false);
+  const autoFocus = useCallback((inputElement) => inputElement && inputElement.focus(), []);
 
   const form = useForm({
     initialValues: {
@@ -119,6 +120,7 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
                   }
                   visible={visible}
                   onVisibilityChange={toggle}
+                  ref={autoFocus}
                   {...form.getInputProps("password")}
                 />
               </Box>
