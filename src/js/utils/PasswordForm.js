@@ -8,7 +8,7 @@ import {
   Popover,
   Progress,
   Text,
-  Switch
+  Checkbox,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { IconCheck, IconX } from "@tabler/icons-react";
@@ -143,11 +143,11 @@ export default function PasswordForm({ exists, onSubmit, isChanging }) {
             />
           )}
           {!isChanging && exists && (
-          <Switch
-            label="Remember password"
-            mt="md"
-            {...form.getInputProps("savePassword")}
-          />
+            <Checkbox
+              label="Remember password"
+              mt="md"
+              {...form.getInputProps("savePassword")}
+            />
           )}
         </Flex>
       </form>
