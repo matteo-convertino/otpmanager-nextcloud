@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import {
   AppShell,
@@ -9,12 +9,9 @@ import {
   Flex,
   Loader,
   Stack,
-  Text
+  Text,
 } from "@mantine/core";
-import {
-  showNotification,
-  updateNotification
-} from "@mantine/notifications";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
 import { IconCheck, IconX } from "@tabler/icons-react";
@@ -64,6 +61,9 @@ export const Password = ({ exists, setAuth }) => {
             password: CryptoES.SHA256(values.password).toString(),
           })
         );
+        if (values.savePassword) {
+          localStorage.setItem("otpmanager_cached_password", values.password);
+        }
       })
       .catch((error) => {
         if (error.response) {
@@ -98,6 +98,14 @@ export const Password = ({ exists, setAuth }) => {
         }
       });
   }
+
+  useEffect(() => {
+    if (exists && localStorage.getItem("otpmanager_cached_password")) {
+      updatePassword({
+        password: localStorage.getItem("otpmanager_cached_password"),
+      });
+    }
+  }, [exists]);
 
   return (
     <AppShell padding="0" fixed={false} layout="alt">
