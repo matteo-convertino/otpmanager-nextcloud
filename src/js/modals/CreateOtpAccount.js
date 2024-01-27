@@ -30,14 +30,14 @@ export function CreateOtpAccount({
     },
 
     validate: {
-      name: hasLength({ min: 1, max: 64 }, "Name must be 1-64 characters long"),
+      name: hasLength({ min: 1, max: 256 }, "Name must be 1-256 characters long"),
       issuer: hasLength(
-        { min: 0, max: 64 },
-        "Issuer must be shorter than 64 characters"
+        { min: 0, max: 256 },
+        "Issuer must be shorter than 256 characters"
       ),
       secret: hasLength(
-        { min: 1, max: 256 },
-        "Secret must be 1-256 characters long"
+        { min: 1, max: 512 },
+        "Secret must be 1-512 characters long"
       ),
     },
   });

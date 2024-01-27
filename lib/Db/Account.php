@@ -20,6 +20,7 @@ class Account extends Entity implements JsonSerializable {
 	protected $period;
 	protected $algorithm;
 	protected $counter;
+	protected $icon;
 	protected $position;
 	protected $userId;
 	protected $createdAt;
@@ -46,6 +47,7 @@ class Account extends Entity implements JsonSerializable {
 			'period' => $this->period,
 			'algorithm' => $this->algorithm,
 			'counter' => $this->counter,
+			'icon' => $this->icon,
 			'position' => $this->position,
 			'user_id' => $this->userId,
 			'created_at' => $this->createdAt,

@@ -58,11 +58,11 @@ class AccountController extends Controller
 	{
 		$errors = [];
 
-		if (!array_key_exists("name", $data) || strlen($data["name"]) == 0 || strlen($data["name"]) > 64)
-			$errors["name"] = "Name must be 1-64 characters long";
+		if (!array_key_exists("name", $data) || strlen($data["name"]) == 0 || strlen($data["name"]) > 256)
+			$errors["name"] = "Name must be 1-256 characters long";
 
-		if (!array_key_exists("issuer", $data) || strlen($data["issuer"]) > 64)
-			$errors["issuer"] = "Issuer must be shorter than 64 characters";
+		if (!array_key_exists("issuer", $data) || strlen($data["issuer"]) > 256)
+			$errors["issuer"] = "Issuer must be shorter than 256 characters";
 
 		if (!array_key_exists("type", $data) || !in_array($data["type"], ["totp", "hotp"]))
 			$errors["type"] = "Type of code must be one of those listed";
@@ -82,8 +82,8 @@ class AccountController extends Controller
 
 		if($data["secret"] === false) 
 			$errors["secret"] = "Not able to decrypt secret key";
-		else if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 256)
-			$errors["secret"] = "Secret key must be 16-256 characters long";
+		else if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 512)
+			$errors["secret"] = "Secret key must be 16-512 characters long";
 		else if (!preg_match($regexBase32, $data["secret"]))
 			$errors["secret"] = "Secret key is not Base32-encodable";
 
@@ -291,6 +291,7 @@ class AccountController extends Controller
 						$serverAccount->setPeriod($localAccount["period"]);
 						$serverAccount->setAlgorithm($localAccount["algorithm"]);
 						$serverAccount->setCounter($localAccount["counter"]);
+						$serverAccount->setIcon($localAccount["icon"] ?? "default");
 						$serverAccount->setPosition($position);
 						$serverAccount->setDeletedAt(null);
 						$serverAccount->setUpdatedAt(date("Y-m-d H:i:s"));
@@ -310,6 +311,7 @@ class AccountController extends Controller
 					$account->setPeriod($localAccount["period"]);
 					$account->setAlgorithm($localAccount["algorithm"]);
 					$account->setCounter($localAccount["counter"]);
+					$account->setIcon($localAccount["icon"] ?? "default");
 					$account->setPosition($position);
 					$account->setUserId($this->userId);
 					$account->setCreatedAt(date("Y-m-d H:i:s"));
@@ -332,6 +334,7 @@ class AccountController extends Controller
 				$account->setPeriod($localAccount["period"]);
 				$account->setAlgorithm($localAccount["algorithm"]);
 				$account->setCounter($localAccount["counter"]);
+				$account->setIcon($localAccount["icon"] ?? "default");
 				$account->setPosition($localAccount["position"]);
 				$account->setUpdatedAt(date("Y-m-d H:i:s"));
 
@@ -357,6 +360,7 @@ class AccountController extends Controller
 					else if ($serverAccount->getPeriod() != $localAccount["period"]) $toEdit = true;
 					else if ($serverAccount->getAlgorithm() != $localAccount["algorithm"]) $toEdit = true;
 					else if ($serverAccount->getCounter() != $localAccount["counter"]) $toEdit = true;
+					else if ($serverAccount->getIcon() != ($localAccount["icon"] ?? "default")) $toEdit = true;
 					else if ($serverAccount->getPosition() != $localAccount["position"]) $toEdit = true;
 
 					$found = true;
