@@ -75,7 +75,7 @@ Here are the different API functions:
 ### Account
 | URL | What it does |
 | --- | ------------ |
-| /accounts | This is a GET request, and this is the path to view all accounts in a JSON format. You can also see the secrets of accounts there. (That needs to be fixed, as you can see that when not logged into the plugin.) |
+| /accounts | This is a GET request, and this is the path to view all accounts in a JSON format. You can also see the secrets of accounts there. |
 | /accounts/sync | This is a POST request, currently i do not know what this does. i am guessing it is to do with the mobile app. |
 | /accounts | This is a POST request, and this is adding new OTP codes. |
 | /accounts/{id} | This is a GET request, and this shows the details of the account with the specified ID. (Replace {id} with the ID of the OTP you are trying to look at, that can be found in /accounts.) |
