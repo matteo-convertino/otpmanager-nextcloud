@@ -83,6 +83,21 @@ Here are the different API functions:
 | /accounts/{id} | This is a DELETE request, this deletes accounts by there id, replace {id} with the id of the account you want to delete. |
 | /accounts/import | This imports accounts from a JSON file you exported. |
 
+### Settings
+| URL | What it does |
+| --- | ------------ |
+| /settings | This is a GET request, and shows settings for the current nextcloud user. |
+| /settings | This is a POST request, and saves the settings the current nextcloud user has set. |
+| /settings/key | I currently don't know what this one does, as it causes an internal server error. |
+
+### Password
+| URL | What it does |
+| --- | ------------ |
+| /password | This is a GET request, and shows if the current nextcloud user has a password on the plugin. |
+| /password | This is a POST request, and creates a password for the plugin for the current nextcloud user. |
+| /password | This is a PUT request, and updates the password for the plugin for the current nextcloud user. |
+| /password/check | This is a POST request, and checks if the given password is the same as the one set by the current nextcloud user. |
+
 ## Contributors ✨
 
 Special thanks go to these wonderful people:
