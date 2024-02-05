@@ -66,6 +66,19 @@ make composer
 - [ ] [Folders to organize many OTP-entries](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/12)
 - [ ] [[Feature Request] Ability to share OTPs](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/13)
 
+# API Documentation
+The URL to the API is: https://nextcloud-url/apps/otpmanager/<api-function>
+Here are the different API functions:
+/ : This is the main page of the Plugin, this is where you noramlly go to login and get your OTP logins.
+### Account
+/accounts : This is a GET request, and this is the path to view all accounts in a JSON format. You can also see the secrets of accounts there. (That needs to be fixed, as you can see that when not logged into the plugin.)
+/accounts/sync : This is a POST request, currently i do not know what this does. i am guessing it is to do with the mobile app.
+/accounts : This is a POST request, and this is adding new OTP codes.
+/accounts/{id} : This is a GET request, and this shows the details of the account with the specified ID. (Replace {id} with the ID of the OTP you are trying to look at, that can be found in /accounts.)
+/accounts : This is a PUT request, currently i do not know what this does. i am guessing it is something to do with updating OTPs.
+/accounts/{id} : This is a DELETE request, this deletes accounts by there id, replace {id} with the id of the account you want to delete.
+/accounts/import : This imports accounts from a JSON file you exported.
+
 ## Contributors ✨
 
 Special thanks go to these wonderful people:
