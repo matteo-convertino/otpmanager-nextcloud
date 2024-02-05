@@ -67,36 +67,32 @@ make composer
 - [ ] [[Feature Request] Ability to share OTPs](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/13)
 
 # API Documentation
-The URL to the API is: https://nextcloud-url/apps/otpmanager/<api-function>
-Here are the different API functions:
-| URL | What it does |
-| --- | ------------ |
-|  /  | This is the main page of the Plugin, this is where you noramlly go to login and get your OTP logins. |
+The base URL to the API is: https://your-nextcloud-url/apps/otpmanager/
+
 ### Account
-| URL | What it does |
-| --- | ------------ |
-| /accounts | This is a GET request, and this is the path to view all accounts in a JSON format. You can also see the secrets of accounts there. |
-| /accounts/sync | This is a POST request, currently i do not know what this does. i am guessing it is to do with the mobile app. |
-| /accounts | This is a POST request, and this is adding new OTP codes. |
-| /accounts/{id} | This is a GET request, and this shows the details of the account with the specified ID. (Replace {id} with the ID of the OTP you are trying to look at, that can be found in /accounts.) |
-| /accounts | This is a PUT request, currently i do not know what this does. i am guessing it is something to do with updating OTPs. |
-| /accounts/{id} | This is a DELETE request, this deletes accounts by there id, replace {id} with the id of the account you want to delete. |
-| /accounts/import | This imports accounts from a JSON file you exported. |
+| URL | Method | Description |
+| --- | ------ | ------------|
+| /accounts | GET | View all OTP accounts in a JSON format |
+| /accounts/sync | POST | Allows you to synchronize OTP accounts with the server |
+| /accounts | POST | Add new OTP account |
+| /accounts/{id} | GET | Show the details of the OTP account with the specified ID |
+| /accounts | PUT | Update OTP account |
+| /accounts/{id} | DELETE | Remove OTP account with the specified ID |
+| /accounts/import | POST | Import OTP accounts from a JSON file you exported |
 
 ### Settings
-| URL | What it does |
-| --- | ------------ |
-| /settings | This is a GET request, and shows settings for the current nextcloud user. |
-| /settings | This is a POST request, and saves the settings the current nextcloud user has set. |
-| /settings/key | I currently don't know what this one does, as it causes an internal server error. |
+| URL | Method | Description |
+| --- | ------ | ----------- |
+| /settings | GET | Show settings for the current nextcloud user |
+| /settings | POST | Save settings for the current nextcloud user |
 
 ### Password
-| URL | What it does |
-| --- | ------------ |
-| /password | This is a GET request, and shows if the current nextcloud user has a password on the plugin. |
-| /password | This is a POST request, and creates a password for the plugin for the current nextcloud user. |
-| /password | This is a PUT request, and updates the password for the plugin for the current nextcloud user. |
-| /password/check | This is a POST request, and checks if the given password is the same as the one set by the current nextcloud user. |
+| URL | Method | Description |
+| --- | ------ | ----------- |
+| /password | GET | Show if the current nextcloud user has set the password |
+| /password | POST | Create a password for the current nextcloud user |
+| /password | PUT | Update the password for the current nextcloud user |
+| /password/check | POST | Check if the given password is correct |
 
 ## Contributors ✨
 
