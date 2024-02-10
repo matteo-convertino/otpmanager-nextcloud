@@ -83,7 +83,7 @@ The base URL to the API is: https://your-nextcloud-url/apps/otpmanager/
 ### Settings
 | URL | Method | Description | Example Responce |
 | --- | ------ | ----------- | ---------------- |
-| /settings | GET | Show settings for the current nextcloud user | {"id":code id,"show_codes":false,"dark_mode":true,"records_per_page":"10","user_id":"username"} |
+| /settings | GET | Show settings for the current nextcloud user | ```{"id":code id,"show_codes":false,"dark_mode":true,"records_per_page":"10","user_id":"username"}``` |
 | /settings | POST | Save settings for the current nextcloud user | Add soon |
 
 ### Password
