@@ -103,6 +103,7 @@ Special thanks go to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/davideserio"><img src="https://avatars.githubusercontent.com/u/90445202?v=4" width="100px;" alt="Davide Serio"/><br /><sub><b>Davide Serio</b></sub></a><br /></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/srijansaxena11"><img src="https://avatars.githubusercontent.com/u/34964694?v=4" width="100px;" alt="Srijan Saxena"/><br /><sub><b>Srijan Saxena</b></sub></a><br /></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/meichthys"><img src="https://avatars.githubusercontent.com/u/10717998?v=4" width="100px;" alt="Meichthys"/><br /><sub><b>Meichthys</b></sub></a><br /></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/beatles1"><img src="https://avatars.githubusercontent.com/u/1923058?v=4" width="100px;" alt=" Edward Bowden"/><br /><sub><b>Edward Bowden</b></sub></a><br /></td>
     </tr>
   </tbody>
 </table>
