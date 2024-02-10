@@ -70,7 +70,7 @@ make composer
 The base URL to the API is: https://your-nextcloud-url/apps/otpmanager/
 
 ### Account
-| URL | Method | Description | Example Responce|
+| URL | Method | Description | Example Responce |
 | --- | ------ | ------------| --------------- |
 | /accounts | GET | View all OTP accounts in a JSON format | {"accounts":[{"id":code id,"secret":"your-secret","name":"website","issuer":"","digits":6,"type":"totp","period":30,"algorithm":0,"counter":null,"icon":"default","position":0,"user_id":"username","created_at":"time created","updated_at":"time last updated","deleted_at":null}]} |
 | /accounts/sync | POST | Allows you to synchronize OTP accounts with the server | Add soon |
@@ -81,14 +81,14 @@ The base URL to the API is: https://your-nextcloud-url/apps/otpmanager/
 | /accounts/import | POST | Import OTP accounts from a JSON file you exported | Add Soon |
 
 ### Settings
-| URL | Method | Description |
-| --- | ------ | ----------- |
+| URL | Method | Description | Example Responce |
+| --- | ------ | ----------- | ---------------- |
 | /settings | GET | Show settings for the current nextcloud user | {"id":code id,"show_codes":false,"dark_mode":true,"records_per_page":"10","user_id":"username"} |
 | /settings | POST | Save settings for the current nextcloud user | Add soon |
 
 ### Password
-| URL | Method | Description |
-| --- | ------ | ----------- |
+| URL | Method | Description | Example Responce |
+| --- | ------ | ----------- | ---------------- |
 | /password | GET | Show if the current nextcloud user has set the password | true |
 | /password | POST | Create a password for the current nextcloud user | Add Soon |
 | /password | PUT | Update the password for the current nextcloud user | Add Soon |
