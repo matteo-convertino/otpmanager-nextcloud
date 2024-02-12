@@ -48,7 +48,7 @@ class AccountController extends Controller
 	 */
 	public function getAll()
 	{
-		$accounts = $this->accountMapper->findAll($this->userId);
+		$accounts = $this->accountMapper->findAllByUser($this->userId);
 		$data = ["accounts" => $accounts];
 
 		return $data;
@@ -76,17 +76,8 @@ class AccountController extends Controller
 		if (!array_key_exists("digits", $data) || !in_array($data["digits"], ["4", "6"]))
 			$errors["digits"] = "Digits must be one of those listed";
 
-		$regexBase32 = '/^[A-Z2-7]+=*$/i';
-		
-		$data["secret"] = $this->encryption->decrypt($data["secret"], $this->userId);
-
-		if($data["secret"] === false) 
-			$errors["secret"] = "Not able to decrypt secret key";
-		else if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 512)
+		if (!array_key_exists("secret", $data) || strlen($data["secret"]) < 16 || strlen($data["secret"]) > 512)
 			$errors["secret"] = "Secret key must be 16-512 characters long";
-		else if (!preg_match($regexBase32, $data["secret"]))
-			$errors["secret"] = "Secret key is not Base32-encodable";
-
 		return $errors;
 	}
 
@@ -123,7 +114,7 @@ class AccountController extends Controller
 			}
 
 			$position = 0;
-			$accountsSortedByPos = $this->accountMapper->findAll($this->userId);
+			$accountsSortedByPos = $this->accountMapper->findAllByUser($this->userId);
 
 			if (count($accountsSortedByPos) > 0) {
 				$position = $accountsSortedByPos[0]->getPosition() + 1;
@@ -228,6 +219,14 @@ class AccountController extends Controller
 		}
 	}
 
+	/**
+	 * @NoAdminRequired
+	 */
+	/*public function destroy($id)
+	{
+		return $this->accountMapper->destroy($id, $this->userId);
+	}*/
+	
 	private function adjustPosition(int $pos)
 	{
 		$accountPosition = $pos;
@@ -243,7 +242,7 @@ class AccountController extends Controller
 
 		// decreases the position of the new account 
 		// if it is distant from the other accounts (if his position is > the last position)
-		$accountsSortedByPos = $this->accountMapper->findAll($this->userId);
+		$accountsSortedByPos = $this->accountMapper->findAllByUser($this->userId);
 
 		if (count($accountsSortedByPos) > 0) {
 			$lastPosition = $accountsSortedByPos[0]->getPosition();
@@ -346,7 +345,7 @@ class AccountController extends Controller
 		// check if there are accounts that have to be:
 		//	  - added on local: it is not in local side
 		//    - edited on local: it is in local side && some fields have been edited (ex: another device have edited the name of google account)
-		foreach ($this->accountMapper->findAll($this->userId) as $serverAccount) {
+		foreach ($this->accountMapper->findAllByUser($this->userId) as $serverAccount) {
 			$found = false;
 			$toEdit = false;
 
@@ -390,19 +389,19 @@ class AccountController extends Controller
 	/**
 	 * @NoAdminRequired
 	 */
-	public function import(array $data, string | null $password)
+	public function import(array $data, string | null $passwordUsedOnExport, string $currentPassword)
 	{
-		if(!array_key_exists("accounts", $data)) return new JSONResponse(["error" => "Invalid JSON file"], 400);
-		if (array_key_exists("iv", $data) && empty($password)) return new JSONResponse(["error" => "Password is required to decrypt accounts"], 400);
+		if (!array_key_exists("accounts", $data)) return new JSONResponse(["error" => "Invalid JSON file"], 400);
+		if (array_key_exists("iv", $data) && empty($passwordUsedOnExport)) return new JSONResponse(["error" => "Password is required to decrypt accounts"], 400);
 
 		foreach ($data["accounts"] as $importedAccount) {
 			if (array_key_exists("iv", $data)) {
-				$importedAccount["secret"] = $this->encryption->decryptImported($importedAccount["secret"], $password, $data["iv"]);
+				$importedAccount["secret"] = $this->encryption->decryptImported($importedAccount["secret"], $passwordUsedOnExport, $data["iv"]);
 				if ($importedAccount["secret"] === false) return new JSONResponse(["error" => "Password incorrect"], 400);
 			}
 
 			$importedAccount["secret"] = strtoupper($importedAccount["secret"]);
-			$importedAccount["secret"] = $this->encryption->encrypt($importedAccount["secret"], $this->userId);
+			$importedAccount["secret"] = $this->encryption->encrypt($importedAccount["secret"], $currentPassword, $this->userId);
 			if ($importedAccount === false) return new JsonResponse([], 403);
 
 			$this->create($importedAccount);

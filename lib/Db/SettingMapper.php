@@ -38,4 +38,11 @@ class SettingMapper extends QBMapper {
 		
 		return $setting;
 	}
+
+	public function findAll(): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->getTableName());
+		
+		return $this->findEntities($qb);
+	}
 }

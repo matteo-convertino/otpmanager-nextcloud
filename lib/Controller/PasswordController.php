@@ -83,7 +83,7 @@ class PasswordController extends Controller
 
         $this->encryption->encryptAccounts($password, $iv, $this->userId);
 
-        $setting->setPassword($password);
+        $setting->setPassword(password_hash($password, PASSWORD_DEFAULT));
         $setting->setIv($iv);
         $this->settingMapper->update($setting);
 
@@ -100,18 +100,16 @@ class PasswordController extends Controller
 
         $setting = $this->settingMapper->find($this->userId);
 
-        //return new JSONResponse(["a" => hash_equals($setting->getPassword(), hash("sha256", $oldPassword)), "b" => $oldPassword, "c" => $setting->getPassword(), "d" => hash("sha256", $oldPassword)]);
-
         if (is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
-        else if (!hash_equals($setting->getPassword(), hash("sha256", $oldPassword))) return new JSONResponse(["error" => "The old password is incorrect"], 400);
+        else if(!password_verify(hash("sha256", $oldPassword), $setting->getPassword())) return new JSONResponse(["error" => "The old password is incorrect"], 400);
 
         $newPassword = hash("sha256", $newPassword);
 
         $newIv = bin2hex(random_bytes(16));
 
-        $this->encryption->changeAccountsEncryption($setting->getPassword(), $newPassword, $setting->getIv(), $newIv, $this->userId);
+        $this->encryption->changeAccountsEncryption(hash("sha256", $oldPassword), $newPassword, $setting->getIv(), $newIv, $this->userId);
 
-        $setting->setPassword($newPassword);
+        $setting->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
         $setting->setIv($newIv);
         $this->settingMapper->update($setting);
 
@@ -127,7 +125,7 @@ class PasswordController extends Controller
         $setting = $this->settingMapper->find($this->userId);
         if (is_null($setting) || is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
 
-        if (hash_equals($setting->getPassword(), hash("sha256", $password))) {
+        if (password_verify(hash("sha256", $password), $setting->getPassword())) {
             return new JSONResponse(["iv" => $setting->getIv()]);
         } else {
             return new JSONResponse(["error" => "Incorrect password"], 400);

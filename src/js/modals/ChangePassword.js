@@ -48,9 +48,13 @@ export function ChangePassword({
         setUserSetting(
           userSetting.copyWith({
             iv: response.data["iv"],
-            password: CryptoES.SHA256(values.password).toString(),
+            password: values.password,
+            passwordHash: CryptoES.SHA256(values.password).toString(),
           })
         );
+        if (localStorage.getItem("otpmanager_cached_password") !== null) {
+          localStorage.setItem("otpmanager_cached_password", values.password);
+        }
         closeModal();
         setAccounts(null);
         setFetchState(true);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import {
   Button,
@@ -18,9 +18,11 @@ import {
   IconX,
   IconInfoCircle,
 } from "@tabler/icons-react";
+import { UserSettingContext } from "./../utils/UserSettingProvider";
 
 export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
   const [file, setFile] = useState(null);
+  const [userSetting, setUserSetting] = useContext(UserSettingContext);
 
   const form = useForm({
     initialValues: {
@@ -45,7 +47,8 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
         axios
           .post(generateUrl("/apps/otpmanager/accounts/import"), {
             data: JSON.parse(fileReader.result),
-            password: form.values.password,
+            passwordUsedOnExport: form.values.password,
+            currentPassword: userSetting.password,
           })
           .then((response) => {
             updateNotification({

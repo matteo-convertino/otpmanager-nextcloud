@@ -48,7 +48,7 @@ class AccountMapper extends QBMapper
 	 * @param string $userId
 	 * @return array
 	 */
-	public function findAll(string $userId): array
+	public function findAllByUser(string $userId): array
 	{
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
@@ -75,6 +75,17 @@ class AccountMapper extends QBMapper
 		return $this->findEntities($qb);
 	}
 
+	/**
+	 * @return array
+	 */
+	public function findAll(): array
+	{
+		/* @var $qb IQueryBuilder */
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->getTableName());
+		return $this->findEntities($qb);
+	}
+
 	public function findAllAccountsPosGtThan(int $pos, string $userId): array
 	{
 		/* @var $qb IQueryBuilder */
@@ -95,5 +106,20 @@ class AccountMapper extends QBMapper
 			->where($qb->expr()->gte("position", $qb->createNamedParameter($pos)))
 			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
 		return $this->findEntities($qb);
+	}
+
+	public function destroy(int $accountId, string $userId): ?Account
+	{
+		$account = $this->find("id", $accountId, $userId);
+
+		if($account != null) {
+			try {
+				$account = $this->delete($account);;
+			} catch (Throwable) {
+				$account = null;
+			}	
+		}
+		
+		return $account;
 	}
 }

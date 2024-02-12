@@ -21,15 +21,17 @@ return [
 		['name' => 'account#get', 'url' => '/accounts/{id}', 'verb' => 'GET'],
 		['name' => 'account#update', 'url' => '/accounts', 'verb' => 'PUT'],
 		['name' => 'account#delete', 'url' => '/accounts/{id}', 'verb' => 'DELETE'],
+		// ['name' => 'account#destroy', 'url' => '/accounts/destroy/{id}', 'verb' => 'DELETE'],
 		['name' => 'account#import', 'url' => '/accounts/import', 'verb' => 'POST'],
 
 		['name' => 'setting#get', 'url' => '/settings', 'verb' => 'GET'],
 		['name' => 'setting#save', 'url' => '/settings', 'verb' => 'POST'],
-		['name' => 'setting#getRandomKey', 'url' => '/settings/key', 'verb' => 'GET'],
 
 		['name' => 'password#get', 'url' => '/password', 'verb' => 'GET'],
 		['name' => 'password#create', 'url' => '/password', 'verb' => 'POST'],
 		['name' => 'password#update', 'url' => '/password', 'verb' => 'PUT'],
 		['name' => 'password#check', 'url' => '/password/check', 'verb' => 'POST'],
+
+		// ['name' => 'info#get', 'url' => '/info', 'verb' => 'GET'],
 	]
 ];

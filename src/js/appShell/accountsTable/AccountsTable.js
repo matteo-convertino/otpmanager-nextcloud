@@ -42,9 +42,8 @@ export function AccountsTable({
           response,
           setTimer,
           setAccounts,
-          userSetting.password,
+          userSetting.passwordHash,
           userSetting.iv,
-          true
         );
 
         setFetchState(false);

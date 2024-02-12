@@ -22,13 +22,13 @@ class Encryption
         $this->settingMapper = $settingMapper;
     }
 
-    public function encrypt($data, $userId): string | false
+    public function encrypt($data, $password, $userId): string | false
     {
         $setting = $this->settingMapper->find($userId);
 
         if (is_null($setting->getPassword())) return false;
 
-        $encrypted = openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin($setting->getPassword()), 0, hex2bin($setting->getIv()));
+        $encrypted = openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin(hash("sha256", $password)), 0, hex2bin($setting->getIv()));
 
         if ($encrypted === false) return false;
 

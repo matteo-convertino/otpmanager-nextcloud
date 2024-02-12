@@ -6,14 +6,14 @@ export function generateCodes(
   newAccounts,
   setTimer,
   setAccounts,
-  password,
+  passwordHash,
   iv
 ) {
   for (let i = 0; i < newAccounts.length; i++) {
     const account = newAccounts[i];
 
     if (account.decryptedSecret === undefined) {
-      const key = CryptoES.enc.Hex.parse(password);
+      const key = CryptoES.enc.Hex.parse(passwordHash);
       const parsedIv = CryptoES.enc.Hex.parse(iv);
       const dec = CryptoES.AES.decrypt(account.secret, key, { iv: parsedIv });
 
@@ -56,7 +56,7 @@ export function generateCodes(
   setTimer(
     setTimeout(
       () =>
-        generateCodes(newAccounts, setTimer, setAccounts, password, iv, false),
+        generateCodes(newAccounts, setTimer, setAccounts, passwordHash, iv),
       timeLeft
     )
   );

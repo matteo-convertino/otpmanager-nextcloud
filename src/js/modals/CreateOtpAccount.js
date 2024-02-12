@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import { Modal } from "@mantine/core";
-import { hasLength, useForm } from "@mantine/form";
+import { hasLength, useForm, matches } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
@@ -38,7 +38,7 @@ export function CreateOtpAccount({
       secret: hasLength(
         { min: 1, max: 512 },
         "Secret must be 1-512 characters long"
-      ),
+      ) && matches(/^[A-Z2-7]+=*$/i, 'Secret key is not Base32-encodable'),
     },
   });
 
@@ -57,13 +57,11 @@ export function CreateOtpAccount({
       disallowClose: true,
     });
 
-    const key = CryptoES.enc.Hex.parse(userSetting.password);
+    const key = CryptoES.enc.Hex.parse(userSetting.passwordHash);
     const parsedIv = CryptoES.enc.Hex.parse(userSetting.iv);
-    const encryptedSecret = CryptoES.AES.encrypt(values.secret, key, {
+    values.secret = CryptoES.AES.encrypt(values.secret, key, {
       iv: parsedIv,
-    });
-
-    values.secret = encryptedSecret.toString();
+    }).toString();
 
     const response = await axios.post(
       generateUrl("/apps/otpmanager/accounts"),
