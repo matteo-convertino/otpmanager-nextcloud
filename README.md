@@ -66,6 +66,35 @@ make composer
 - [ ] [Folders to organize many OTP-entries](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/12)
 - [ ] [[Feature Request] Ability to share OTPs](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/13)
 
+# API Documentation
+The base URL to the API is: https://your-nextcloud-url/apps/otpmanager/
+
+### Account
+#### I know the CSRF check failed responces are not the acutal responces and i do not know why it is heppening or how to fix it
+| URL | Method | Description | Example Responce |
+| --- | ------ | ------------| --------------- |
+| /accounts | GET | View all OTP accounts in a JSON format | ```{"accounts":[{"id":code id,"secret":"your-secret","name":"website","issuer":"","digits":6,"type":"totp","period":30,"algorithm":0,"counter":null,"icon":"default","position":0,"user_id":"username","created_at":"time created","updated_at":"time last updated","deleted_at":null}]}``` |
+| /accounts/sync | POST | Allows you to synchronize OTP accounts with the server | ```null``` (yes i got null with insomnia) |
+| /accounts | POST | Add new OTP account | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+| /accounts/{id} | GET | Show the details of the OTP account with the specified ID | ```{"id":code id,"secret":"your-secret","name":"website","issuer":"","digits":6,"type":"totp","period":30,"algorithm":0,"counter":null,"icon":"default","position":0,"user_id":"username","created_at":"time created","updated_at":"time last updated","deleted_at":null}``` |
+| /accounts | PUT | Update OTP account | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+| /accounts/{id} | DELETE | Remove OTP account with the specified ID | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+| /accounts/import | POST | Import OTP accounts from a JSON file you exported | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+
+### Settings
+| URL | Method | Description | Example Responce |
+| --- | ------ | ----------- | ---------------- |
+| /settings | GET | Show settings for the current nextcloud user | ```{"id":code id,"show_codes":false,"dark_mode":true,"records_per_page":"10","user_id":"username"}``` |
+| /settings | POST | Save settings for the current nextcloud user | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+
+### Password
+| URL | Method | Description | Example Responce |
+| --- | ------ | ----------- | ---------------- |
+| /password | GET | Show if the current nextcloud user has set the password | ```true``` |
+| /password | POST | Create a password for the current nextcloud user | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+| /password | PUT | Update the password for the current nextcloud user | ```{"message": "CSRF check failed"}``` (yes i got that with insomnia) |
+| /password/check | POST | Check if the given password is correct | Internal Server Error |
+
 ## Contributors ✨
 
 Special thanks go to these wonderful people:
