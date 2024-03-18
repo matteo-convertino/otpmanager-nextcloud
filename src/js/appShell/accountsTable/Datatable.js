@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { Text, ActionIcon, Group, Box, Stack } from "@mantine/core";
+import { Text, ActionIcon, Group, Box, Stack, Avatar } from "@mantine/core";
 import {
   IconTrash,
   IconEdit,
   IconReload,
   IconCopy,
   IconDatabaseOff,
+  IconShare,
+  IconLockOpen,
 } from "@tabler/icons-react";
 import { DataTable } from "mantine-datatable";
 
 import { openDeleteModal } from "../../modals/DeleteOtpAccount";
 import { copy } from "../../utils/copy";
 import { updateCounter } from "../../utils/updateCounter";
-import { UserSettingContext } from "./../../utils/UserSettingProvider";
+import { UserSettingContext } from "./../../context/UserSettingProvider";
+import { generateUrl } from "@nextcloud/router";
 
 const PAGE_SIZES = ["10", "20", "30", "All"];
 
@@ -28,10 +31,12 @@ export default function CustomDatatable({
   accounts,
   setAccounts,
   setOtp,
-  setShowAside,
+  setShowAsideInfo,
+  setShowAsideShare,
   setShowEditOtpAccount,
   sortStatus,
   setSortStatus,
+  setSharedAccountToUnlock,
 }) {
   const [userSetting, setUserSetting] = useContext(UserSettingContext);
   const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
@@ -70,9 +75,9 @@ export default function CustomDatatable({
       highlightOnHover
       withBorder
       sx={{ backgroundColor: "", marginTop: "0px" }}
-      onCellClick={({ record, recordIndex, column, columnIndex }) => {
-        setOtp(record);
-        setShowAside(true);
+      onRowClick={(otp, rowIndex, event) => {
+        setOtp(otp);
+        setShowAsideInfo(true);
       }}
       columns={[
         { accessor: "position", sortable: true, width: 70, title: "#" },
@@ -81,44 +86,64 @@ export default function CustomDatatable({
         {
           accessor: "code",
           width: 150,
-          render: (account) => (
-            <>
-              <Box
-                sx={{
-                  "&:hover>#hiddenCode": { display: "none" },
-                  "&:hover>#code": { display: "flex" },
-                }}
-              >
-                <Text
+          render: (account) => {
+            return (
+              <>
+                <Box
                   sx={{
-                    display:
-                      userSetting.showCodes || isTouchDevice ? "none" : "block",
-                  }}
-                  id="hiddenCode"
-                >
-                  ******
-                </Text>
-                <Group
-                  spacing={0}
-                  id="code"
-                  sx={{
-                    display:
-                      userSetting.showCodes || isTouchDevice ? "flex" : "none",
-                  }}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    copy(account.code);
+                    "&:hover>#hiddenCode": { display: "none" },
+                    "&:hover>#code": { display: "flex" },
                   }}
                 >
-                  <Text>{account.code}</Text>
-                  <ActionIcon>
-                    <IconCopy size={18} />
-                  </ActionIcon>
-                </Group>
-              </Box>
-            </>
-          ),
+                  <Text
+                    sx={{
+                      display:
+                        userSetting.showCodes ||
+                        isTouchDevice ||
+                        account.unlocked === 0
+                          ? "none"
+                          : "block",
+                    }}
+                    id="hiddenCode"
+                  >
+                    ******
+                  </Text>
+                  <Group
+                    spacing={0}
+                    id="code"
+                    sx={{
+                      display:
+                        userSetting.showCodes ||
+                        isTouchDevice ||
+                        account.unlocked === 0
+                          ? "flex"
+                          : "none",
+                    }}
+                    onClick={(event) => {
+                      if (
+                        account.unlocked === undefined ||
+                        account.unlocked === 1 ||
+                        (account.type == "hotp" && account.counter > 0)
+                      ) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        copy(account.code);
+                      }
+                    }}
+                  >
+                    <Text>{account.code}</Text>
+                    {(account.unlocked === undefined ||
+                      account.unlocked === 1 ||
+                      (account.type == "hotp" && account.counter > 0)) && (
+                      <ActionIcon>
+                        <IconCopy size={18} />
+                      </ActionIcon>
+                    )}
+                  </Group>
+                </Box>
+              </>
+            );
+          },
         },
         {
           accessor: "actions",
@@ -127,16 +152,57 @@ export default function CustomDatatable({
           render: (account) => (
             <>
               <Group spacing={4} position="right" noWrap>
-                {account.type == "hotp" && (
+               
+
+                {account.unlocked === 0 && (
+                  <ActionIcon
+                    //styles={{ color: "#114477" }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSharedAccountToUnlock(account);
+                      //unlockAccount(account, setUpdateCounterState);
+                    }}
+                  >
+                    <IconLockOpen size={18} />
+                  </ActionIcon>
+                )}
+
+                {account.type == "hotp" && account.unlocked !== 0 && (
                   <ActionIcon
                     //styles={{ color: "#114477" }}
                     disabled={isUpdatingCounter}
                     onClick={(event) => {
                       event.stopPropagation();
-                      updateCounter(account, setUpdateCounterState);
+                      updateCounter(
+                        account,
+                        account.user_id,
+                        setUpdateCounterState
+                      );
                     }}
                   >
                     <IconReload size={18} />
+                  </ActionIcon>
+                )}
+
+                {account.unlocked === 1 && (
+                  <Avatar
+                    src={generateUrl("/avatar/" + account.user_id + "/64")}
+                    alt={account.user_id}
+                    radius="xl"
+                    size="sm"
+                  />
+                )}
+
+                {account.unlocked === undefined && (
+                  <ActionIcon
+                    //color="gray"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setOtp(account);
+                      setShowAsideShare(true);
+                    }}
+                  >
+                    <IconShare size={18} />
                   </ActionIcon>
                 )}
 

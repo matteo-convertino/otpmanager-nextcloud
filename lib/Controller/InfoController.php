@@ -29,8 +29,8 @@ class InfoController extends Controller
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	/*public function get()
+	public function get()
 	{
 		return $this->appManager->getAppVersion($this->appName, useCache: false);
-	}*/
+	}
 }

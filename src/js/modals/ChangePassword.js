@@ -7,7 +7,7 @@ import { generateUrl } from "@nextcloud/router";
 import { IconCheck, IconKey, IconX } from "@tabler/icons-react";
 import CryptoES from "crypto-es";
 import PasswordForm from "./../utils/PasswordForm";
-import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { SecretContext } from "./../context/SecretProvider";
 
 export function ChangePassword({
   showChangePassword,
@@ -15,7 +15,7 @@ export function ChangePassword({
   setAccounts,
   setFetchState,
 }) {
-  const [userSetting, setUserSetting] = useContext(UserSettingContext);
+  const [secret, setSecret] = useContext(SecretContext);
 
   function closeModal() {
     setShowChangePassword(false);
@@ -45,8 +45,8 @@ export function ChangePassword({
           icon: <IconCheck size={16} />,
           autoClose: 2000,
         });
-        setUserSetting(
-          userSetting.copyWith({
+        setSecret(
+          secret.copyWith({
             iv: response.data["iv"],
             password: values.password,
             passwordHash: CryptoES.SHA256(values.password).toString(),

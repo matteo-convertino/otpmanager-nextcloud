@@ -15,14 +15,16 @@ return [
 	'routes' => [
 		['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 		
+		['name' => 'sync#update', 'url' => '/accounts/sync', 'verb' => 'POST'],
+
 		['name' => 'account#getAll', 'url' => '/accounts', 'verb' => 'GET'],
-		['name' => 'account#sync', 'url' => '/accounts/sync', 'verb' => 'POST'],
 		['name' => 'account#create', 'url' => '/accounts', 'verb' => 'POST'],
 		['name' => 'account#get', 'url' => '/accounts/{id}', 'verb' => 'GET'],
 		['name' => 'account#update', 'url' => '/accounts', 'verb' => 'PUT'],
 		['name' => 'account#delete', 'url' => '/accounts/{id}', 'verb' => 'DELETE'],
 		// ['name' => 'account#destroy', 'url' => '/accounts/destroy/{id}', 'verb' => 'DELETE'],
 		['name' => 'account#import', 'url' => '/accounts/import', 'verb' => 'POST'],
+		['name' => 'account#updateCounter', 'url' => '/accounts/update-counter', 'verb' => 'POST'],
 
 		['name' => 'setting#get', 'url' => '/settings', 'verb' => 'GET'],
 		['name' => 'setting#save', 'url' => '/settings', 'verb' => 'POST'],
@@ -32,6 +34,14 @@ return [
 		['name' => 'password#update', 'url' => '/password', 'verb' => 'PUT'],
 		['name' => 'password#check', 'url' => '/password/check', 'verb' => 'POST'],
 
+		['name' => 'sharedAccount#getByUser', 'url' => '/share', 'verb' => 'GET'],
+		['name' => 'sharedAccount#getByAccount', 'url' => '/share/{id}', 'verb' => 'GET'],
+		['name' => 'sharedAccount#create', 'url' => '/share', 'verb' => 'POST'],
+		['name' => 'sharedAccount#update', 'url' => '/share', 'verb' => 'PUT'],
+		['name' => 'sharedAccount#unlock', 'url' => '/share/unlock', 'verb' => 'POST'],
+		['name' => 'sharedAccount#delete', 'url' => '/share/{accountId}', 'verb' => 'DELETE'],
+		['name' => 'sharedAccount#getUsers', 'url' => '/get-users/{accountId}', 'verb' => 'GET'],
+		['name' => 'sharedAccount#updateCounter', 'url' => '/share/update-counter', 'verb' => 'POST'],
 		// ['name' => 'info#get', 'url' => '/info', 'verb' => 'GET'],
 	]
 ];

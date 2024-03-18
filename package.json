@@ -35,6 +35,7 @@
     "crypto-es": "^2.0.4",
     "dayjs": "^1.11.10",
     "mantine-datatable": "^1.7.39",
+    "moment": "^2.30.1",
     "otpauth": "^9.0.2"
   },
   "browserslist": [

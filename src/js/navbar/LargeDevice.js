@@ -22,7 +22,7 @@ import {
   IconSun,
   IconLockOff,
 } from "@tabler/icons-react";
-import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { UserSettingContext } from "./../context/UserSettingProvider";
 import { navbarStyles } from "./Styles";
 
 export function NavbarLargeDevice({

@@ -18,11 +18,11 @@ import {
   IconX,
   IconInfoCircle,
 } from "@tabler/icons-react";
-import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { SecretContext } from "./../context/SecretProvider";
 
 export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
   const [file, setFile] = useState(null);
-  const [userSetting, setUserSetting] = useContext(UserSettingContext);
+  const [secret, setSecret] = useContext(SecretContext);
 
   const form = useForm({
     initialValues: {
@@ -48,7 +48,7 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
           .post(generateUrl("/apps/otpmanager/accounts/import"), {
             data: JSON.parse(fileReader.result),
             passwordUsedOnExport: form.values.password,
-            currentPassword: userSetting.password,
+            currentPassword: secret.passwordHash,
           })
           .then((response) => {
             updateNotification({

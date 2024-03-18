@@ -5,10 +5,10 @@ import {
   IconLock,
   IconLockOpen
 } from "@tabler/icons-react";
-import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { SecretContext } from "./../context/SecretProvider";
 
 export function ExportAccounts({ accounts }) {
-  const [userSetting, setUserSetting] = useContext(UserSettingContext);
+  const [secret, setSecret] = useContext(SecretContext);
 
   function exportAccounts(encrypt) {
     let accountsToExport = accounts.map((e) => ({ ...e }));
@@ -29,7 +29,7 @@ export function ExportAccounts({ accounts }) {
     const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
       JSON.stringify(
         encrypt
-          ? { accounts: accountsToExport, iv: userSetting.iv }
+          ? { accounts: accountsToExport, iv: secret.iv }
           : { accounts: accountsToExport }
       )
     )}`;

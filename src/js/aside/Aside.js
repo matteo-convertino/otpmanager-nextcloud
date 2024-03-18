@@ -1,9 +1,9 @@
 import React from "react";
 
-import { Drawer, Text } from "@mantine/core";
-import { AsideContent } from "./Content";
+import { Drawer, Text, Divider } from "@mantine/core";
+//import { AsideContent } from "./Content";
 
-export default function Aside({ children, showAside, setShowAside, otp }) {
+export default function Aside({ children, showAside, setShowAside, title, otp }) {
   return (
     <Drawer
       padding="md"
@@ -13,17 +13,24 @@ export default function Aside({ children, showAside, setShowAside, otp }) {
       onClose={() => setShowAside(false)}
       title={
         <Text fw={700} fz="lg">
-          Account Details
+          {title}
         </Text>
       }
       styles={{
         drawer: {
           top: "50px",
         },
+        body: {
+          height: "calc(100% - 50px)",
+          display: "flex",
+          flexDirection: "column"
+        }
       }}
     >
-      <AsideContent otp={otp} />
-      {children}
+      {/*<AsideContent otp={otp} />*/}
+      <Divider mb="lg" />
+      
+        {children}
     </Drawer>
   );
 }

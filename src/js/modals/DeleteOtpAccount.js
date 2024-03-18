@@ -18,33 +18,62 @@ export function openDeleteModal(account, setAccounts, setFetchState, setPage) {
       disallowClose: true,
     });
 
-    const response = await axios.delete(
-      generateUrl("/apps/otpmanager/accounts/" + account.id)
-    );
-    if (response.data == "OK") {
-      updateNotification({
-        id: "delete-account",
-        color: "teal",
-        title: "Account deleted",
-        message:
-          account.issuer + " (" + account.name + ") deleted with success",
-        icon: <IconCheck size={16} />,
-        autoClose: 2000,
-      });
-    } else {
-      updateNotification({
-        id: "delete-account",
-        color: "red",
-        title: "Error",
-        message: "Something went wrong while deleting the account",
-        icon: <IconX size={16} />,
-        autoClose: 2000,
-      });
-    }
+    const url =
+      account.unlocked === undefined
+        ? "/apps/otpmanager/accounts/" + account.id
+        : "/apps/otpmanager/share/" + account.account_id;
 
-    setPage(1);
-    setAccounts(null);
-    setFetchState(true);
+    axios
+      .delete(generateUrl(url))
+      .then((response) => {
+        updateNotification({
+          id: "delete-account",
+          color: "teal",
+          title: "Account deleted",
+          message:
+            (account.issuer != ""
+              ? account.issuer + " (" + account.name + ")"
+              : account.name) + " deleted with success",
+          icon: <IconCheck size={16} />,
+          autoClose: 2000,
+        })
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status == 400) {
+            updateNotification({
+              id: "delete-account",
+              color: "red",
+              title: "Request Error",
+              message: error.response.data["error"],
+              icon: <IconX size={16} />,
+              autoClose: 2000,
+            });
+          }
+        } else if (error.request) {
+          updateNotification({
+            id: "delete-account",
+            color: "red",
+            title: "Timeout Error",
+            message: "The nextcloud server took too long to respond",
+            icon: <IconX size={16} />,
+            autoClose: 2000,
+          });
+        } else {
+          updateNotification({
+            id: "delete-account",
+            color: "red",
+            title: "Generic Error",
+            message: "Something went wrong",
+            icon: <IconX size={16} />,
+            autoClose: 2000,
+          });
+        }
+      }).finally(() => {
+        setPage(1);
+        setAccounts(null);
+        setFetchState(true);
+      });
   }
 
   return openConfirmModal({

@@ -7,19 +7,27 @@ import React from "react";
 import { IconX } from "@tabler/icons-react";
 import { getAlgorithm } from "./getAlgorithm";
 
-export async function updateCounter(account, setUpdateCounterState) {
+export async function updateCounter(account, userId, setUpdateCounterState) {
   setUpdateCounterState(true);
 
   // reset counter to this value if it throws an error
-  let oldValue = account.counter;
+  //let oldValue = account.counter;
 
-  account.counter += 1;
+  //account.counter += 1;
 
-  const response = await axios.put(generateUrl("/apps/otpmanager/accounts"), {
-    data: account,
+  const url =
+  account.unlocked === undefined
+    ? "/apps/otpmanager/accounts/update-counter"
+    : "/apps/otpmanager/share/update-counter";
+
+  const response = await axios.post(generateUrl(url), {
+    secret: account.secret,
+    userId: userId
   });
 
-  if (response.data == "OK") {
+  // if (response.data == "OK") {
+    account.counter = response.data;
+
     let hotp = new HOTP({
       issuer: account.issuer,
       label: account.name,
@@ -30,8 +38,8 @@ export async function updateCounter(account, setUpdateCounterState) {
     });
 
     account.code = hotp.generate();
-  } else {
-    account.counter = oldValue;
+  /*} else {
+    //account.counter = oldValue;
     showNotification({
       color: "red",
       title: "Error",
@@ -42,6 +50,6 @@ export async function updateCounter(account, setUpdateCounterState) {
       icon: <IconX size={16} />,
       autoClose: 2000,
     });
-  }
+  }*/
   setUpdateCounterState(false);
 }

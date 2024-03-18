@@ -17,10 +17,10 @@ import { generateUrl } from "@nextcloud/router";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import CryptoES from "crypto-es";
 import PasswordForm from "./PasswordForm";
-import { UserSettingContext } from "./UserSettingProvider";
+import { SecretContext } from "../context/SecretProvider";
 
 export const Password = ({ exists, setAuth }) => {
-  const [userSetting, setUserSetting] = useContext(UserSettingContext);
+  const [secret, setSecret] = useContext(SecretContext);
 
   function updatePassword(values) {
     showNotification({
@@ -55,8 +55,8 @@ export const Password = ({ exists, setAuth }) => {
           autoClose: 2000,
         });
         setAuth(true);
-        setUserSetting(
-          userSetting.copyWith({
+        setSecret(
+          secret.copyWith({
             iv: response.data["iv"],
             password: values.password,
             passwordHash: CryptoES.SHA256(values.password).toString(),

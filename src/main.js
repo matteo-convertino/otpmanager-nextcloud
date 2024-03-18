@@ -5,7 +5,8 @@ import { createEmotionCache } from "@mantine/core";
 import { OtpLayout } from "./js/OtpLayout";
 import AppShell from "./js/appShell/AppShell";
 
-import { UserSettingContextProvider } from "./js/utils/UserSettingProvider";
+import { UserSettingContextProvider } from "./js/context/UserSettingProvider";
+import { SecretContextProvider } from "./js/context/SecretProvider";
 
 //creates the shadow dom
 const element = document.createElement("div");
@@ -25,9 +26,11 @@ function App() {
   return (
     <>
       <UserSettingContextProvider>
-        <OtpLayout myCache={myCache} emotionRoot={emotionRoot}>
-          <AppShell />
-        </OtpLayout>
+        <SecretContextProvider>
+          <OtpLayout myCache={myCache} emotionRoot={emotionRoot}>
+            <AppShell />
+          </OtpLayout>
+        </SecretContextProvider>
       </UserSettingContextProvider>
     </>
   );

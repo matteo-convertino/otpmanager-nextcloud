@@ -8,7 +8,7 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { generateUrl } from "@nextcloud/router";
 import { Password } from "./utils/Password";
 
-import { UserSettingContext } from "./utils/UserSettingProvider";
+import { UserSettingContext } from "./context/UserSettingProvider";
 
 // get nextcloud theme
 var nextcloudTheme = "dark";

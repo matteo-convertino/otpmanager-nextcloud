@@ -11,15 +11,20 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 use OCA\OtpManager\AppInfo\Application;
 use Throwable;
+use \OCP\ILogger;
 
 /**
  * @template-extends QBMapper<Account>
  */
 class AccountMapper extends QBMapper
 {
-	public function __construct(IDBConnection $db)
+	private ILogger $logger;
+
+	public function __construct(IDBConnection $db, ILogger $logger)
 	{
 		parent::__construct($db, Application::ACCOUNTS_DB, Account::class);
+
+		$this->logger = $logger;
 	}
 
 	/**
@@ -28,7 +33,6 @@ class AccountMapper extends QBMapper
 	 */
 	public function find(string $column, string|int $value, string $userId): ?Account
 	{
-		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -50,14 +54,38 @@ class AccountMapper extends QBMapper
 	 */
 	public function findAllByUser(string $userId): array
 	{
-		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->isNull('deleted_at'))
 			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
 			->orderBy("position", "desc");
+			
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * @param string $userId
+	 * @return array
+	 */
+	public function findMaxPosition(string $userId): int
+	{
+		$qb = $this->db->getQueryBuilder();
+		$qb->selectAlias($qb->func()->max("position"), "position")
+			->from($this->getTableName())
+			->where($qb->expr()->isNull('deleted_at'))
+			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+
+		try {
+			$account = $this->findEntity($qb);
+			$position = $account->getPosition();
+
+			$position = is_null($position) ? -1 : $position;
+		} catch (Throwable) {
+			$position = -1;
+		}
+	
+		return $position;
 	}
 
 	/**
@@ -66,7 +94,6 @@ class AccountMapper extends QBMapper
 	 */
 	public function findAllWithDeleted(string $userId): array
 	{
-		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -80,7 +107,6 @@ class AccountMapper extends QBMapper
 	 */
 	public function findAll(): array
 	{
-		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->getTableName());
 		return $this->findEntities($qb);
@@ -88,7 +114,6 @@ class AccountMapper extends QBMapper
 
 	public function findAllAccountsPosGtThan(int $pos, string $userId): array
 	{
-		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -99,7 +124,6 @@ class AccountMapper extends QBMapper
 
 	public function findAllAccountsPosGteThan(int $pos, string $userId): array
 	{
-		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
 			->from($this->getTableName())
@@ -114,12 +138,26 @@ class AccountMapper extends QBMapper
 
 		if($account != null) {
 			try {
-				$account = $this->delete($account);;
+				$account = $this->delete($account);
 			} catch (Throwable) {
 				$account = null;
 			}	
 		}
 		
 		return $account;
+	}
+
+	public function safeDelete(Account $account): void {
+		// decrease by 1 the position of all accounts after it
+		$accountsGreaterPos = $this->findAllAccountsPosGtThan($account->getPosition(), $account->getUserId());
+
+		foreach ($accountsGreaterPos as $a) {
+			$a->setPosition($a->getPosition() - 1);
+			$this->update($a);
+		}
+
+		$account->setDeletedAt(date("Y-m-d H:i:s"));
+		$account->setPosition(null);
+		$this->update($account);
 	}
 }

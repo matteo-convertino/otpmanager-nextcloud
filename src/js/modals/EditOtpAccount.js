@@ -28,7 +28,10 @@ export function EditOtpAccount({
     },
 
     validate: {
-      name: hasLength({ min: 1, max: 256 }, "Name must be 1-256 characters long"),
+      name: hasLength(
+        { min: 1, max: 256 },
+        "Name must be 1-256 characters long"
+      ),
       issuer: hasLength(
         { min: 0, max: 256 },
         "Issuer must be shorter than 256 characters"
@@ -52,17 +55,6 @@ export function EditOtpAccount({
     }
   }, [otp]);
 
-  // prevent that modal crash when otp is null (first page load)
-  if (otp == null) {
-    return (
-      <Modal
-        opened={showEditOtpAccount}
-        onClose={() => setShowEditOtpAccount(false)}
-        title={"Edit Account "}
-      ></Modal>
-    );
-  }
-
   async function editAccount(values) {
     showNotification({
       id: "edit-account",
@@ -75,7 +67,12 @@ export function EditOtpAccount({
 
     values.secret = otp.secret;
 
-    const response = await axios.put(generateUrl("/apps/otpmanager/accounts"), {
+    const url =
+      otp.unlocked === undefined
+        ? "/apps/otpmanager/accounts"
+        : "/apps/otpmanager/share";
+
+    const response = await axios.put(generateUrl(url), {
       data: values,
     });
 
@@ -123,12 +120,17 @@ export function EditOtpAccount({
       onClose={() => setShowEditOtpAccount(false)}
       title="Edit Account"
     >
-      <form onSubmit={form.onSubmit((values) => editAccount(JSON.parse(JSON.stringify(values))))}>
+      <form
+        onSubmit={form.onSubmit((values) =>
+          editAccount(JSON.parse(JSON.stringify(values)))
+        )}
+      >
         <ModalContent
           form={form}
           textSubmitButton="Edit"
           iconSumbitButton={<IconEdit size="18px" />}
           isSecretKeyDisabled={true}
+          isSharedAccount={otp != null && otp.unlocked !== undefined}
         />
       </form>
     </Modal>

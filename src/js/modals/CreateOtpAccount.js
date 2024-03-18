@@ -7,7 +7,7 @@ import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
 import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import CryptoES from "crypto-es";
-import { UserSettingContext } from "./../utils/UserSettingProvider";
+import { SecretContext } from "./../context/SecretProvider";
 import ModalContent from "./CreateEditContent";
 
 export function CreateOtpAccount({
@@ -16,7 +16,7 @@ export function CreateOtpAccount({
   setAccounts,
   setFetchState,
 }) {
-  const [userSetting, setUserSetting] = useContext(UserSettingContext);
+  const [secret, setSecret] = useContext(SecretContext);
 
   const form = useForm({
     initialValues: {
@@ -57,8 +57,8 @@ export function CreateOtpAccount({
       disallowClose: true,
     });
 
-    const key = CryptoES.enc.Hex.parse(userSetting.passwordHash);
-    const parsedIv = CryptoES.enc.Hex.parse(userSetting.iv);
+    const key = CryptoES.enc.Hex.parse(secret.passwordHash);
+    const parsedIv = CryptoES.enc.Hex.parse(secret.iv);
     values.secret = CryptoES.AES.encrypt(values.secret, key, {
       iv: parsedIv,
     }).toString();
@@ -111,6 +111,7 @@ export function CreateOtpAccount({
           textSubmitButton="Add"
           iconSumbitButton={<IconPlus size="18px" />}
           isSecretKeyDisabled={false}
+          isSharedAccount={false}
         />
       </form>
     </Modal>

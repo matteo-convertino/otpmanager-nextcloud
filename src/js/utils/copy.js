@@ -33,7 +33,7 @@ const copy = (content) => {
     color: "teal",
     icon: <IconCheck size={16} />,
     message: "Copied to Clipboard",
-    autoClose: true,
+    autoClose: 2000,
     disallowClose: false,
   });
 };

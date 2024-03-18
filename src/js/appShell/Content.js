@@ -18,6 +18,7 @@ import { CreateOtpAccount } from "../modals/CreateOtpAccount";
 import { EditOtpAccount } from "../modals/EditOtpAccount";
 import { ChangePassword } from "../modals/ChangePassword";
 import { ImportExport } from "../modals/ImportExport";
+import { UnlockSharedAccount } from "../modals/UnlockSharedAccount";
 
 import { Apps } from "../modals/Apps";
 
@@ -26,7 +27,8 @@ export function AppShellContent({
   setOtp,
   showNavbarSmallDevice,
   setShowNavbarSmallDevice,
-  setShowAside,
+  setShowAsideInfo,
+  setShowAsideShare,
   showApps,
   setShowApps,
   setShowChangePassword,
@@ -36,6 +38,7 @@ export function AppShellContent({
 }) {
   const [showCreateAccount, setShowCreateAccount] = useState(false);
   const [showEditOtpAccount, setShowEditOtpAccount] = useState(false);
+  const [sharedAccountToUnlock, setSharedAccountToUnlock] = useState(null);
   const [accounts, setAccounts] = useState(null);
   const [isFetching, setFetchState] = useState(true);
 
@@ -88,7 +91,9 @@ export function AppShellContent({
           isFetching={isFetching}
           setFetchState={setFetchState}
           setShowEditOtpAccount={setShowEditOtpAccount}
-          setShowAside={setShowAside}
+          setShowAsideInfo={setShowAsideInfo}
+          setShowAsideShare={setShowAsideShare}
+          setSharedAccountToUnlock={setSharedAccountToUnlock}
         />
       </Group>
 
@@ -118,6 +123,13 @@ export function AppShellContent({
         showImportExport={showImportExport}
         setShowImportExport={setShowImportExport}
         accounts={accounts}
+        setAccounts={setAccounts}
+        setFetchState={setFetchState}
+      />
+
+      <UnlockSharedAccount
+        sharedAccountToUnlock={sharedAccountToUnlock}
+        setSharedAccountToUnlock={setSharedAccountToUnlock}
         setAccounts={setAccounts}
         setFetchState={setFetchState}
       />

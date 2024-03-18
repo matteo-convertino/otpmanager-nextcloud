@@ -22,31 +22,31 @@ class Encryption
         $this->settingMapper = $settingMapper;
     }
 
-    public function encrypt($data, $password, $userId): string | false
+    public function encrypt($data, $password, $userId, $isAlreadyHashed = false): string | false
     {
         $setting = $this->settingMapper->find($userId);
 
         if (is_null($setting->getPassword())) return false;
 
-        $encrypted = openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin(hash("sha256", $password)), 0, hex2bin($setting->getIv()));
+        $password = $isAlreadyHashed ? $password : hash("sha256", $password);
 
-        if ($encrypted === false) return false;
-
-        return $encrypted;
+        return openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin($password), 0, hex2bin($setting->getIv()));
     }
 
-    public function decrypt($data, $userId): string | false
+    /*public function decrypt($data, $userId): string | false
     {
         $setting = $this->settingMapper->find($userId);
 
         if (is_null($setting->getPassword())) return false;
 
         return openssl_decrypt($data, $this::CIPHER_ALGO, hex2bin($setting->getPassword()), 0, hex2bin($setting->getIv()));
-    }
+    }*/
 
-    public function decryptImported($data, $password, $iv): string | false
+    public function decrypt($data, $password, $iv, $isAlreadyHashed = false): string | false
     {
-        return openssl_decrypt($data, $this::CIPHER_ALGO, hex2bin(hash("sha256", $password)), 0, hex2bin($iv));
+        $password = $isAlreadyHashed ? $password : hash("sha256", $password);
+
+        return openssl_decrypt($data, $this::CIPHER_ALGO, hex2bin($password), 0, hex2bin($iv));
     }
 
     public function encryptAccounts($password, $iv, $userId)

@@ -8,12 +8,15 @@ import { NavbarSmallDevice } from "./../navbar/SmallDevice";
 import { AppShellContent } from "./Content";
 
 import Aside from "./../aside/Aside";
+import AsideInfo from "./../aside/Info";
+import AsideShare from "./../aside/Share";
 
 export default function MainAppShell({ children }) {
   const smallScreen = useMediaQuery("(max-width: 991px)");
 
   const [otp, setOtp] = useState(null);
-  const [showAside, setShowAside] = useState(false);
+  const [showAsideInfo, setShowAsideInfo] = useState(false);
+  const [showAsideShare, setShowAsideShare] = useState(false);
   const [showNavbarSmallDevice, setShowNavbarSmallDevice] = useState(false);
   const [showApps, setShowApps] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -24,7 +27,13 @@ export default function MainAppShell({ children }) {
 
   return (
     <>
-      <Aside showAside={showAside} setShowAside={setShowAside} otp={otp} />
+      <Aside showAside={showAsideInfo} setShowAside={setShowAsideInfo} otp={otp} title="Account Details">
+        <AsideInfo otp={otp} />
+      </Aside>
+
+      <Aside showAside={showAsideShare} setShowAside={setShowAsideShare} otp={otp} title="Account Sharing">
+        <AsideShare otp={otp} />
+      </Aside>
 
       <NavbarSmallDevice
         showNavbarSmallDevice={showNavbarSmallDevice}
@@ -60,7 +69,8 @@ export default function MainAppShell({ children }) {
           setOtp={setOtp}
           showNavbarSmallDevice={showNavbarSmallDevice}
           setShowNavbarSmallDevice={setShowNavbarSmallDevice}
-          setShowAside={setShowAside}
+          setShowAsideInfo={setShowAsideInfo}
+          setShowAsideShare={setShowAsideShare}
           showApps={showApps}
           setShowApps={setShowApps}
           setShowChangePassword={setShowChangePassword}
