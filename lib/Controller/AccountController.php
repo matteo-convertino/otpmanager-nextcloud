@@ -54,7 +54,7 @@ class AccountController extends Controller
 	public function getAll()
 	{
 		$accounts = $this->accountMapper->findAllByUser($this->userId);
-		$sharedAccounts = $this->sharedAccountMapper->findAllByReceiver($this->userId);
+		$sharedAccounts = $this->sharedAccountMapper->findAllByReceiverJoin($this->userId);
 
 		$data = [
 			"accounts" => $accounts,
@@ -81,7 +81,7 @@ class AccountController extends Controller
 	 * @NoAdminRequired
 	 */
 	public function create($data)
-	{	
+	{
 		$errors = AccountForm::validate($data);
 
 		if (count($errors) > 0) {
@@ -103,7 +103,7 @@ class AccountController extends Controller
 
 			if ($account == null) {
 				$account = new Account();
-				
+
 				$account->setSecret($data["secret"]);
 				$account->setName($data["name"]);
 				$account->setIssuer($data["issuer"]);
@@ -111,7 +111,7 @@ class AccountController extends Controller
 				$account->setType($data["type"]);
 				$account->setPeriod($data["period"]);
 				$account->setAlgorithm($data["algorithm"]);
-				$account->setCounter($data["type"] == "totp" ? null : 0);
+				$account->setCounter($data["type"] == "totp" ? null : -1);
 				$account->setPosition($position);
 				$account->setUserId($this->userId);
 				$account->setCreatedAt(date("Y-m-d H:i:s"));
@@ -165,7 +165,7 @@ class AccountController extends Controller
 			$account->setType($data["type"]);
 			$account->setPeriod($data["period"]);
 			$account->setAlgorithm($data["algorithm"]);
-			//if (isset($data["counter"])) $account->setCounter($data["counter"]);
+			if ($account->getCounter() == null) $account->setCounter(-1);
 			$account->setUpdatedAt(date("Y-m-d H:i:s"));
 
 			$this->accountMapper->update($account);
@@ -181,22 +181,14 @@ class AccountController extends Controller
 	{
 		$account = $this->accountMapper->find("id", $id, $this->userId);
 
-		if($account == null) return new JSONResponse(["error" => "There was an error while deleting your account"], 500);
+		if ($account == null) return new JSONResponse(["error" => "There was an error while deleting your account"], 500);
 
 		// delete shares
 		$this->sharedAccountMapper->destroy($account);
 
-		$this->accountMapper->safeDelete($account); 
+		$this->accountMapper->safeDelete($account);
 	}
 
-	/**
-	 * @NoAdminRequired
-	 */
-	/*public function destroy($id)
-	{
-		return $this->accountMapper->destroy($id, $this->userId);
-	}*/
-	
 	/**
 	 * @NoAdminRequired
 	 */
@@ -219,21 +211,5 @@ class AccountController extends Controller
 		}
 
 		return new JSONResponse();
-	}
-
-	/**
-	 * @NoAdminRequired
-	 */
-	public function updateCounter(string $secret)
-	{
-		$account = $this->accountMapper->find("secret", $secret, $this->userId);
-
-		if($account == null) return new JSONResponse(["error" => "This account does not exists"], 400);
-		if($account->getType() == "totp")  return new JSONResponse(["error" => "You cannot update counter of a TOTP account"], 400);
-
-		$account->setCounter($account->getCounter() + 1);
-		$this->accountMapper->update($account);
-
-		return $account->getCounter();
 	}
 }

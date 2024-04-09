@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 // SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -10,7 +11,8 @@ use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 
 
-class Account extends Entity implements JsonSerializable {
+class Account extends Entity implements JsonSerializable
+{
 
 	protected $secret;
 	protected $name;
@@ -26,17 +28,19 @@ class Account extends Entity implements JsonSerializable {
 	protected $createdAt;
 	protected $updatedAt;
 	protected $deletedAt;
-	
-	public function __construct() {
-        $this->addType('id', 'integer');
+
+	public function __construct()
+	{
+		$this->addType('id', 'integer');
 		$this->addType('digits', 'integer');
 		$this->addType('period', 'integer');
 		$this->addType('algorithm', 'integer');
 		$this->addType('counter', 'integer');
 		$this->addType('position', 'integer');
-    }
+	}
 
-	public function jsonSerialize(): array {
+	public function jsonSerialize(): array
+	{
 		return [
 			'id' => $this->id,
 			'secret' => $this->secret,

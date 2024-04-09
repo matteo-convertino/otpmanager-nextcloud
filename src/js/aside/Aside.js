@@ -1,9 +1,13 @@
 import React from "react";
 
 import { Drawer, Text, Divider } from "@mantine/core";
-//import { AsideContent } from "./Content";
 
-export default function Aside({ children, showAside, setShowAside, title, otp }) {
+export default function Aside({
+  children,
+  showAside,
+  setShowAside,
+  title,
+}) {
   return (
     <Drawer
       padding="md"
@@ -23,14 +27,12 @@ export default function Aside({ children, showAside, setShowAside, title, otp })
         body: {
           height: "calc(100% - 50px)",
           display: "flex",
-          flexDirection: "column"
-        }
+          flexDirection: "column",
+        },
       }}
     >
-      {/*<AsideContent otp={otp} />*/}
       <Divider mb="lg" />
-      
-        {children}
+      {children}
     </Drawer>
   );
 }

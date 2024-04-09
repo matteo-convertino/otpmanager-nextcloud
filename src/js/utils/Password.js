@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
-import { generateUrl } from "@nextcloud/router";
+import { generateUrl, generateOcsUrl } from "@nextcloud/router";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import CryptoES from "crypto-es";
 import PasswordForm from "./PasswordForm";
@@ -36,11 +36,9 @@ export const Password = ({ exists, setAuth }) => {
 
     axios
       .post(
-        generateUrl(
-          exists
-            ? "/apps/otpmanager/password/check"
-            : "/apps/otpmanager/password"
-        ),
+        exists
+          ? generateOcsUrl("/apps/otpmanager/password/check")
+          : generateUrl("/apps/otpmanager/password"),
         {
           password: values.password,
         }

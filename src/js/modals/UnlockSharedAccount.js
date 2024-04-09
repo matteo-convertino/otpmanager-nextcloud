@@ -3,7 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { Button, Group, Modal, Stack, PasswordInput, Flex } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
-import { generateUrl } from "@nextcloud/router";
+import { generateOcsUrl } from "@nextcloud/router";
 import { IconCheck, IconKey, IconX } from "@tabler/icons-react";
 import CryptoES from "crypto-es";
 import PasswordForm from "./../utils/PasswordForm";
@@ -44,7 +44,7 @@ export function UnlockSharedAccount({
     });
 
     axios
-      .post(generateUrl("/apps/otpmanager/share/unlock"), {
+      .post(generateOcsUrl("/apps/otpmanager/share/unlock"), {
         accountId: sharedAccountToUnlock.account_id,
         currentPassword: secret.passwordHash,
         tempPassword: values.tempPassword,

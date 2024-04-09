@@ -6,20 +6,24 @@ namespace OCA\OtpManager\Utils;
 
 use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Db\SettingMapper;
+use OCA\OtpManager\Db\SharedAccountMapper;
 
 class Encryption
 {
     private AccountMapper $accountMapper;
     private SettingMapper $settingMapper;
+    private SharedAccountMapper $sharedAccountMapper;
 
     private const CIPHER_ALGO = "aes-256-cbc";
 
     public function __construct(
         AccountMapper $accountMapper,
         SettingMapper $settingMapper,
+        SharedAccountMapper $sharedAccountMapper,
     ) {
         $this->accountMapper = $accountMapper;
         $this->settingMapper = $settingMapper;
+        $this->sharedAccountMapper = $sharedAccountMapper;
     }
 
     public function encrypt($data, $password, $userId, $isAlreadyHashed = false): string | false
@@ -32,15 +36,6 @@ class Encryption
 
         return openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin($password), 0, hex2bin($setting->getIv()));
     }
-
-    /*public function decrypt($data, $userId): string | false
-    {
-        $setting = $this->settingMapper->find($userId);
-
-        if (is_null($setting->getPassword())) return false;
-
-        return openssl_decrypt($data, $this::CIPHER_ALGO, hex2bin($setting->getPassword()), 0, hex2bin($setting->getIv()));
-    }*/
 
     public function decrypt($data, $password, $iv, $isAlreadyHashed = false): string | false
     {
@@ -69,6 +64,17 @@ class Encryption
             $account->setSecret(openssl_encrypt($secret, $this::CIPHER_ALGO, hex2bin($newPassword), 0, hex2bin($newIv)));
 
             $this->accountMapper->update($account);
+        }
+
+        $sharedAccounts = $this->sharedAccountMapper->findAllByReceiver($userId);
+
+        foreach ($sharedAccounts as $sharedAccount) {
+            if ($sharedAccount->getUnlocked()) {
+                $secret = openssl_decrypt($sharedAccount->getSecret(), $this::CIPHER_ALGO, hex2bin($oldPassword), 0, hex2bin($oldIv));
+                $sharedAccount->setSecret(openssl_encrypt($secret, $this::CIPHER_ALGO, hex2bin($newPassword), 0, hex2bin($newIv)));
+
+                $this->sharedAccountMapper->update($sharedAccount);
+            }
         }
     }
 }

@@ -26869,33 +26869,6 @@ function isNotEmpty(error) {
 
 /***/ }),
 
-/***/ "./node_modules/@mantine/form/esm/validators/matches/matches.js":
-/*!**********************************************************************!*\
-  !*** ./node_modules/@mantine/form/esm/validators/matches/matches.js ***!
-  \**********************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   matches: () => (/* binding */ matches)
-/* harmony export */ });
-function matches(regexp, error) {
-  const _error = error || true;
-  return (value) => {
-    if (typeof value !== "string") {
-      return _error;
-    }
-    return regexp.test(value) ? null : _error;
-  };
-}
-
-
-//# sourceMappingURL=matches.js.map
-
-
-/***/ }),
-
 /***/ "./node_modules/@mantine/hooks/esm/use-click-outside/use-click-outside.js":
 /*!********************************************************************************!*\
   !*** ./node_modules/@mantine/hooks/esm/use-click-outside/use-click-outside.js ***!
@@ -41128,14 +41101,12 @@ function MainAppShell(_ref) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_aside_Aside__WEBPACK_IMPORTED_MODULE_4__["default"], {
     showAside: showAsideInfo,
     setShowAside: setShowAsideInfo,
-    otp: otp,
     title: "Account Details"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_aside_Info__WEBPACK_IMPORTED_MODULE_5__["default"], {
     otp: otp
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_aside_Aside__WEBPACK_IMPORTED_MODULE_4__["default"], {
     showAside: showAsideShare,
     setShowAside: setShowAsideShare,
-    otp: otp,
     title: "Account Sharing"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_aside_Share__WEBPACK_IMPORTED_MODULE_6__["default"], {
     otp: otp
@@ -41500,9 +41471,15 @@ function CustomDatatable(_ref) {
       backgroundColor: "",
       marginTop: "0px"
     },
-    onRowClick: (otp, rowIndex, event) => {
-      setOtp(otp);
-      setShowAsideInfo(true);
+    onRowClick: (account, rowIndex, event) => {
+      if (account.unlocked === 0) {
+        setSharedAccountToUnlock(account);
+      } else if (account.type == "hotp" && account.counter < 0) {
+        (0,_utils_updateCounter__WEBPACK_IMPORTED_MODULE_4__.updateCounter)(account, account.user_id, setUpdateCounterState);
+      } else {
+        setOtp(account);
+        setShowAsideInfo(true);
+      }
     },
     columns: [{
       accessor: "position",
@@ -41519,7 +41496,7 @@ function CustomDatatable(_ref) {
       width: 400
     }, {
       accessor: "code",
-      width: 150,
+      width: 300,
       render: account => {
         return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_7__.Box, {
           sx: {
@@ -41542,13 +41519,14 @@ function CustomDatatable(_ref) {
             display: userSetting.showCodes || isTouchDevice || account.unlocked === 0 ? "flex" : "none"
           },
           onClick: event => {
-            if (account.unlocked === undefined || account.unlocked === 1 || account.type == "hotp" && account.counter > 0) {
+            console.log(account);
+            if ((account.unlocked === undefined || account.unlocked === 1) && (account.type == "hotp" && account.counter >= 0 || account.type == "totp")) {
               event.preventDefault();
               event.stopPropagation();
               (0,_utils_copy__WEBPACK_IMPORTED_MODULE_3__.copy)(account.code);
             }
           }
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_8__.Text, null, account.code), (account.unlocked === undefined || account.unlocked === 1 || account.type == "hotp" && account.counter > 0) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_11__["default"], {
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_8__.Text, null, account.code), (account.unlocked === undefined || account.unlocked === 1) && (account.type == "hotp" && account.counter >= 0 || account.type == "totp") && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_11__["default"], {
           size: 18
         })))));
       }
@@ -41562,19 +41540,14 @@ function CustomDatatable(_ref) {
         spacing: 4,
         position: "right",
         noWrap: true
-      }, account.unlocked === 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon
-      //styles={{ color: "#114477" }}
-      , {
+      }, account.unlocked === 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, {
         onClick: event => {
           event.stopPropagation();
           setSharedAccountToUnlock(account);
-          //unlockAccount(account, setUpdateCounterState);
         }
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_12__["default"], {
         size: 18
-      })), account.type == "hotp" && account.unlocked !== 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon
-      //styles={{ color: "#114477" }}
-      , {
+      })), account.type == "hotp" && account.unlocked !== 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, {
         disabled: isUpdatingCounter,
         onClick: event => {
           event.stopPropagation();
@@ -41665,15 +41638,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _mantine_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @mantine/core */ "./node_modules/@mantine/core/esm/Divider/Divider.js");
 
 
-//import { AsideContent } from "./Content";
-
 function Aside(_ref) {
   let {
     children,
     showAside,
     setShowAside,
-    title,
-    otp
+    title
   } = _ref;
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_1__.Drawer, {
     padding: "md",
@@ -41937,9 +41907,6 @@ function AsideShare(_ref2) {
   const [users, setUsers] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [fetchUsers, setFetchUsers] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   const [fetchActiveShares, setFetchActiveShares] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
-
-  // const [userSetting, setUserSetting] = useContext(UserSettingContext);
-
   function showError(response) {
     (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_8__.updateNotification)({
       id: "share-account",
@@ -42520,6 +42487,7 @@ function CreateEditContent(_ref) {
     rightSection: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_4__["default"], null)
   }, form.getInputProps("issuer"))), !isSharedAccount && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_2__.TextInput, _extends({
     label: "Secret key",
+    disabled: isSecretKeyDisabled,
     withAsterisk: true,
     rightSection: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_5__["default"], null)
   }, form.getInputProps("secret"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_6__.Grid, {
@@ -42609,17 +42577,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _mantine_core__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @mantine/core */ "./node_modules/@mantine/core/esm/Modal/Modal.js");
+/* harmony import */ var _mantine_core__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @mantine/core */ "./node_modules/@mantine/core/esm/Modal/Modal.js");
 /* harmony import */ var _mantine_form__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @mantine/form */ "./node_modules/@mantine/form/esm/use-form.js");
 /* harmony import */ var _mantine_form__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @mantine/form */ "./node_modules/@mantine/form/esm/validators/has-length/has-length.js");
-/* harmony import */ var _mantine_form__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @mantine/form */ "./node_modules/@mantine/form/esm/validators/matches/matches.js");
-/* harmony import */ var _mantine_notifications__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @mantine/notifications */ "./node_modules/@mantine/notifications/esm/events.js");
+/* harmony import */ var _mantine_notifications__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @mantine/notifications */ "./node_modules/@mantine/notifications/esm/events.js");
 /* harmony import */ var _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nextcloud/axios */ "./node_modules/@nextcloud/axios/dist/index.js");
 /* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.js");
-/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconCheck.js");
-/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconX.js");
-/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconPlus.js");
-/* harmony import */ var crypto_es__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! crypto-es */ "./node_modules/crypto-es/lib/index.js");
+/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconCheck.js");
+/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconX.js");
+/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconPlus.js");
+/* harmony import */ var crypto_es__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! crypto-es */ "./node_modules/crypto-es/lib/index.js");
 /* harmony import */ var _context_SecretProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../context/SecretProvider */ "./src/js/context/SecretProvider.js");
 /* harmony import */ var _CreateEditContent__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CreateEditContent */ "./src/js/modals/CreateEditContent.js");
 
@@ -42639,7 +42606,7 @@ function CreateOtpAccount(_ref) {
     setAccounts,
     setFetchState
   } = _ref;
-  const [secret, setSecret] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_context_SecretProvider__WEBPACK_IMPORTED_MODULE_3__.SecretContext);
+  const [secretContext, setSecretContext] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_context_SecretProvider__WEBPACK_IMPORTED_MODULE_3__.SecretContext);
   const form = (0,_mantine_form__WEBPACK_IMPORTED_MODULE_5__.useForm)({
     initialValues: {
       name: "",
@@ -42659,10 +42626,15 @@ function CreateOtpAccount(_ref) {
         min: 0,
         max: 256
       }, "Issuer must be shorter than 256 characters"),
-      secret: (0,_mantine_form__WEBPACK_IMPORTED_MODULE_6__.hasLength)({
-        min: 1,
-        max: 512
-      }, "Secret must be 1-512 characters long") && (0,_mantine_form__WEBPACK_IMPORTED_MODULE_7__.matches)(/^[A-Z2-7]+=*$/i, 'Secret key is not Base32-encodable')
+      secret: value => {
+        if (value.length < 16 || value.length > 512) {
+          return "Secret must be 16-512 characters long";
+        }
+        if (!value.match(/^[A-Z2-7]+=*$/i)) {
+          return "Secret key is not Base32-encodable";
+        }
+        return null;
+      }
     }
   });
   function closeModal() {
@@ -42670,7 +42642,7 @@ function CreateOtpAccount(_ref) {
     form.reset();
   }
   async function createAccount(values) {
-    (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_8__.showNotification)({
+    (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_7__.showNotification)({
       id: "create-account",
       loading: true,
       title: "Creating account",
@@ -42678,21 +42650,21 @@ function CreateOtpAccount(_ref) {
       autoClose: false,
       disallowClose: true
     });
-    const key = crypto_es__WEBPACK_IMPORTED_MODULE_9__["default"].enc.Hex.parse(secret.passwordHash);
-    const parsedIv = crypto_es__WEBPACK_IMPORTED_MODULE_9__["default"].enc.Hex.parse(secret.iv);
-    values.secret = crypto_es__WEBPACK_IMPORTED_MODULE_9__["default"].AES.encrypt(values.secret, key, {
+    const key = crypto_es__WEBPACK_IMPORTED_MODULE_8__["default"].enc.Hex.parse(secretContext.passwordHash);
+    const parsedIv = crypto_es__WEBPACK_IMPORTED_MODULE_8__["default"].enc.Hex.parse(secretContext.iv);
+    values.secret = crypto_es__WEBPACK_IMPORTED_MODULE_8__["default"].AES.encrypt(values.secret, key, {
       iv: parsedIv
     }).toString();
     const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateUrl)("/apps/otpmanager/accounts"), {
       data: values
     });
     if (response.data == "OK") {
-      (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_8__.updateNotification)({
+      (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_7__.updateNotification)({
         id: "create-account",
         color: "teal",
         title: "Account created",
         message: (values.issuer != "" ? values.issuer + " (" + values.name + ")" : values.name) + " created with success",
-        icon: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_10__["default"], {
+        icon: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_9__["default"], {
           size: 16
         }),
         autoClose: 2000
@@ -42701,12 +42673,12 @@ function CreateOtpAccount(_ref) {
       setAccounts(null);
       setFetchState(true);
     } else {
-      (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_8__.updateNotification)({
+      (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_7__.updateNotification)({
         id: "create-account",
         color: "red",
         title: "Error",
         message: "Something went wrong while creating the account",
-        icon: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_11__["default"], {
+        icon: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_10__["default"], {
           size: 16
         }),
         autoClose: 2000
@@ -42716,7 +42688,7 @@ function CreateOtpAccount(_ref) {
       }
     }
   }
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_12__.Modal, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_11__.Modal, {
     opened: showCreateAccount,
     onClose: () => closeModal(),
     title: "Add New Account"
@@ -42725,7 +42697,7 @@ function CreateOtpAccount(_ref) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_CreateEditContent__WEBPACK_IMPORTED_MODULE_4__["default"], {
     form: form,
     textSubmitButton: "Add",
-    iconSumbitButton: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_13__["default"], {
+    iconSumbitButton: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_12__["default"], {
       size: "18px"
     }),
     isSecretKeyDisabled: false,
@@ -42906,11 +42878,7 @@ function EditOtpAccount(_ref) {
       issuer: (0,_mantine_form__WEBPACK_IMPORTED_MODULE_6__.hasLength)({
         min: 0,
         max: 256
-      }, "Issuer must be shorter than 256 characters"),
-      secret: (0,_mantine_form__WEBPACK_IMPORTED_MODULE_6__.hasLength)({
-        min: 1,
-        max: 512
-      }, "Secret must be 1-512 characters long")
+      }, "Issuer must be shorter than 256 characters")
     }
   });
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -43395,7 +43363,7 @@ function UnlockSharedAccount(_ref) {
       autoClose: false,
       disallowClose: true
     });
-    _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateUrl)("/apps/otpmanager/share/unlock"), {
+    _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateOcsUrl)("/apps/otpmanager/share/unlock"), {
       accountId: sharedAccountToUnlock.account_id,
       currentPassword: secret.passwordHash,
       tempPassword: values.tempPassword
@@ -44171,7 +44139,7 @@ const Password = _ref => {
       autoClose: false,
       disallowClose: true
     });
-    _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateUrl)(exists ? "/apps/otpmanager/password/check" : "/apps/otpmanager/password"), {
+    _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__["default"].post(exists ? (0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateOcsUrl)("/apps/otpmanager/password/check") : (0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateUrl)("/apps/otpmanager/password"), {
       password: values.password
     }).then(response => {
       (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_5__.updateNotification)({
@@ -44543,8 +44511,8 @@ function generateCodes(newAccounts, setTimer, setAccounts, passwordHash, iv) {
         });
         account.code = totp.generate();
       } else {
-        if (account.counter == 0) {
-          account.code = "Click the button to generate HOTP code";
+        if (account.counter < 0) {
+          account.code = "Click here to generate HOTP code";
         } else {
           let hotp = new otpauth__WEBPACK_IMPORTED_MODULE_0__.HOTP({
             issuer: account.issuer,
@@ -44558,7 +44526,7 @@ function generateCodes(newAccounts, setTimer, setAccounts, passwordHash, iv) {
         }
       }
     } else {
-      account.code = "Click the button to unlock your shared account";
+      account.code = "Click here to unlock your shared account";
     }
   }
   setAccounts(newAccounts);
@@ -44595,11 +44563,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   updateCounter: () => (/* binding */ updateCounter)
 /* harmony export */ });
+/* harmony import */ var _mantine_notifications__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @mantine/notifications */ "./node_modules/@mantine/notifications/esm/events.js");
 /* harmony import */ var _nextcloud_axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @nextcloud/axios */ "./node_modules/@nextcloud/axios/dist/index.js");
 /* harmony import */ var _nextcloud_router__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @nextcloud/router */ "./node_modules/@nextcloud/router/dist/index.js");
 /* harmony import */ var otpauth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! otpauth */ "./node_modules/otpauth/dist/otpauth.esm.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _tabler_icons_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @tabler/icons-react */ "./node_modules/@tabler/icons-react/dist/esm/icons/IconX.js");
 /* harmony import */ var _getAlgorithm__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./getAlgorithm */ "./src/js/utils/getAlgorithm.js");
 
 
@@ -44610,42 +44580,43 @@ __webpack_require__.r(__webpack_exports__);
 
 async function updateCounter(account, userId, setUpdateCounterState) {
   setUpdateCounterState(true);
-
-  // reset counter to this value if it throws an error
-  //let oldValue = account.counter;
-
-  //account.counter += 1;
-
   const url = account.unlocked === undefined ? "/apps/otpmanager/accounts/update-counter" : "/apps/otpmanager/share/update-counter";
-  const response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_0__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_1__.generateUrl)(url), {
-    secret: account.secret,
-    userId: userId
-  });
-
-  // if (response.data == "OK") {
-  account.counter = response.data;
-  let hotp = new otpauth__WEBPACK_IMPORTED_MODULE_2__.HOTP({
-    issuer: account.issuer,
-    label: account.name,
-    algorithm: (0,_getAlgorithm__WEBPACK_IMPORTED_MODULE_4__.getAlgorithm)(account.algorithm),
-    digits: account.digits,
-    counter: account.counter,
-    secret: account.decryptedSecret
-  });
-  account.code = hotp.generate();
-  /*} else {
-    //account.counter = oldValue;
-    showNotification({
+  await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_0__["default"].post((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_1__.generateOcsUrl)(url), {
+    secret: account.secret
+  }).then(response => {
+    if (response.status === 200) {
+      account.counter = response.data;
+      let hotp = new otpauth__WEBPACK_IMPORTED_MODULE_2__.HOTP({
+        issuer: account.issuer,
+        label: account.name,
+        algorithm: (0,_getAlgorithm__WEBPACK_IMPORTED_MODULE_4__.getAlgorithm)(account.algorithm),
+        digits: account.digits,
+        counter: account.counter,
+        secret: account.decryptedSecret
+      });
+      account.code = hotp.generate();
+    } else {
+      (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_5__.showNotification)({
+        color: "red",
+        title: "Error",
+        message: response.data.error ?? "There was an error while incrementing counter",
+        icon: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_6__["default"], {
+          size: 16
+        }),
+        autoClose: 2000
+      });
+    }
+  }).catch(e => {
+    (0,_mantine_notifications__WEBPACK_IMPORTED_MODULE_5__.showNotification)({
       color: "red",
       title: "Error",
-      message:
-        response.data.msg !== undefined
-          ? response.data.msg
-          : "Not able to generate new HOTP code for this account",
-      icon: <IconX size={16} />,
-      autoClose: 2000,
+      message: e.response.data.error ?? "There was an error while incrementing counter",
+      icon: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        size: 16
+      }),
+      autoClose: 2000
     });
-  }*/
+  });
   setUpdateCounterState(false);
 }
 
@@ -126999,4 +126970,4 @@ function App() {
 
 /******/ })()
 ;
-//# sourceMappingURL=otpmanager-main.js.map?v=4e831d4bb7dd13e793f0
+//# sourceMappingURL=otpmanager-main.js.map?v=43402a79b938d5592ce0

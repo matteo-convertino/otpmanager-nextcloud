@@ -8,10 +8,10 @@ namespace OCA\OtpManager\Controller\Validator;
 
 class SharedAccountForm
 {
-    public static function validateCreate($data)
+	public static function validateCreate($data)
 	{
 		$errors = [];
-		
+
 		if (!array_key_exists("accountSecret", $data))
 			$errors["error"] = "You must select which account to share";
 

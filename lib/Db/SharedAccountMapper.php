@@ -1,33 +1,33 @@
 <?php
+
 declare(strict_types=1);
 // SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace OCA\OtpManager\Db;
 
-use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 use OCA\OtpManager\AppInfo\Application;
+use OCA\OtpManager\Utils\AccountPositionHelper;
 use Throwable;
-use OCP\IConfig;
-use OCP\ILogger;
 
 /**
  * @template-extends QBMapper<SharedAccount>
  */
-class SharedAccountMapper extends QBMapper {
-	private ILogger $logger;
+class SharedAccountMapper extends QBMapper
+{
 	private AccountMapper $accountMapper;
 
-	public function __construct(IDBConnection $db, ILogger $logger, AccountMapper $accountMapper) {
+	public function __construct(IDBConnection $db, AccountMapper $accountMapper)
+	{
 		parent::__construct($db, Application::SHARED_ACCOUNTS_DB, SharedAccount::class);
-		
-		$this->logger = $logger;
+
 		$this->accountMapper = $accountMapper;
 	}
 
-	public function findAllByAccountAndUserId(int $accountId, string $userId): array {
+	public function findAllByAccountAndUserId(int $accountId, string $userId): array
+	{
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('sharedAccounts.*')
 			->from($this->getTableName(), "sharedAccounts")
@@ -40,7 +40,7 @@ class SharedAccountMapper extends QBMapper {
 					$qb->expr()->gte('expired_at', date('Y-m-d')),
 				)
 			);
-		
+
 		return $this->findEntities($qb);
 	}
 
@@ -50,8 +50,14 @@ class SharedAccountMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->eq($column, $qb->createNamedParameter($value)))
-			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)));
-		
+			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->isNull('expired_at'),
+					$qb->expr()->gte('expired_at', date('Y-m-d')),
+				)
+			);
+
 		try {
 			$sharedAccount = $this->findEntity($qb);
 		} catch (Throwable) {
@@ -67,7 +73,13 @@ class SharedAccountMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->eq("account_id", $qb->createNamedParameter($accountId)))
-			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)));
+			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->isNull('expired_at'),
+					$qb->expr()->gte('expired_at', date('Y-m-d')),
+				)
+			);
 
 		try {
 			$sharedAccount = $this->findEntity($qb);
@@ -78,37 +90,52 @@ class SharedAccountMapper extends QBMapper {
 		return $sharedAccount;
 	}
 
-    /**
-	 * @param string $userId
-	 * @return array
-	 */
-	public function findAllByReceiver(string $userId): array
+	public function findAllByReceiver(string $receiverId): array
+	{
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->isNull('expired_at'),
+					$qb->expr()->gte('expired_at', date('Y-m-d')),
+				)
+			);
+
+		return $this->findEntities($qb);
+	}
+
+	public function findAllByReceiverJoin(string $receiverId): array
 	{
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select("sharedAccounts.*",
+		$qb->select(
+			"sharedAccounts.*",
 			"accounts.period",
 			"accounts.digits",
 			"accounts.type",
 			"accounts.algorithm",
 			"accounts.counter",
-			"accounts.user_id")
+			"accounts.user_id"
+		)
 			->from($this->getTableName(), "sharedAccounts")
 			->innerJoin('sharedAccounts', Application::ACCOUNTS_DB, "accounts", "sharedAccounts.account_id = accounts.id")
-			->where($qb->expr()->eq('receiver_id', $qb->createNamedParameter($userId)));
+			->where($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->isNull('expired_at'),
+					$qb->expr()->gte('expired_at', date('Y-m-d')),
+				)
+			);
 
 		$result = $qb->executeQuery();
 		$rows = $result->fetchAll();
 		$result->closeCursor();
-	
+
 		return $rows;
 	}
 
-
-    /**
-	 * @param string $accountId
-	 * @return array
-	 */
 	public function findAllByAccount(string $accountId): array
 	{
 		$qb = $this->db->getQueryBuilder();
@@ -125,10 +152,6 @@ class SharedAccountMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	 /**
-	 * @param string $accountId
-	 * @return array
-	 */
 	public function findUsersAlreadyShared(string $accountId): array
 	{
 		$qb = $this->db->getQueryBuilder();
@@ -141,12 +164,12 @@ class SharedAccountMapper extends QBMapper {
 					$qb->expr()->gte('expired_at', date('Y-m-d')),
 				)
 			);
-		
+
 		$result = $qb->executeQuery();
 		$row = $result->fetchAll();
 		$result->closeCursor();
 
-		return array_map(fn($r) => $r['receiver_id'], $row);
+		return array_map(fn ($r) => $r['receiver_id'], $row);
 	}
 
 	public function findUsers(string $userId, string $accountId): array
@@ -170,11 +193,34 @@ class SharedAccountMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->gt("position", $qb->createNamedParameter($pos)))
-			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)));
+			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->isNull('expired_at'),
+					$qb->expr()->gte('expired_at', date('Y-m-d')),
+				)
+			);
 		return $this->findEntities($qb);
 	}
 
-	public function findAccountBySecret(string $receiverId, string $secret): ?Account {
+	/*public function findAllPosGteThan(int $pos, string $receiverId): array
+	{
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')
+			->from($this->getTableName())
+			->where($qb->expr()->gte("position", $qb->createNamedParameter($pos)))
+			->andWhere($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->isNull('expired_at'),
+					$qb->expr()->gte('expired_at', date('Y-m-d')),
+				)
+			);
+		return $this->findEntities($qb);
+	}*/
+
+	public function findAccountBySecret(string $receiverId, string $secret): ?Account
+	{
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('accounts.*')
@@ -188,14 +234,14 @@ class SharedAccountMapper extends QBMapper {
 					$qb->expr()->gte('expired_at', date('Y-m-d')),
 				)
 			);
-		
-			try {
-				$account = $this->accountMapper->findEntity($qb);
-			} catch (Throwable) {
-				$account = null;
-			}
-	
-			return $account;
+
+		try {
+			$account = $this->accountMapper->findEntity($qb);
+		} catch (Throwable) {
+			$account = null;
+		}
+
+		return $account;
 	}
 
 	public function destroy(Account $account): void
@@ -211,56 +257,32 @@ class SharedAccountMapper extends QBMapper {
 
 		// loop users it was shared with
 		foreach ($sharedAccounts as $sharedAccount) {
-			// decrease by 1 the position of all shared accounts after it
-			$sharedAccountsGtPos = $this->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId());
+			AccountPositionHelper::decreasePosition($this, $this->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId()));
+			AccountPositionHelper::decreasePosition($this->accountMapper, $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId()));
 
-			foreach ($sharedAccountsGtPos as $a) {
-				$a->setPosition($a->getPosition() - 1);
-				$this->update($a);
-			}
-
-			// decrease by 1 the position of all accounts after it
-			$accountsGtPos = $this->accountMapper->findAllAccountsPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId());
-
-			foreach ($accountsGtPos as $a) {
-				$a->setPosition($a->getPosition() - 1);
-				$this->accountMapper->update($a);
-			}
-			
 			$this->delete($sharedAccount);
 		}
 	}
 
 
-	public function unshare(int $accountId, string $receiverId): bool {
+	public function unshare(int $accountId, string $receiverId): bool
+	{
 		$sharedAccount = $this->find("account_id", $accountId, $receiverId);
 
-		if($sharedAccount == null) {
+		if ($sharedAccount == null) {
 			return false;
 		} else {
-			// decrease by 1 the position of all shared accounts after it
-			$sharedAccountsGtPos = $this->findAllPosGtThan($sharedAccount->getPosition(), $receiverId);
+			AccountPositionHelper::decreasePosition($this, $this->findAllPosGtThan($sharedAccount->getPosition(), $receiverId));
+			AccountPositionHelper::decreasePosition($this->accountMapper, $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $receiverId));
 
-			foreach ($sharedAccountsGtPos as $a) {
-				$a->setPosition($a->getPosition() - 1);
-				$this->update($a);
-			}
-
-			// decrease by 1 the position of all accounts after it
-			$accountsGtPos = $this->accountMapper->findAllAccountsPosGtThan($sharedAccount->getPosition(), $receiverId);
-
-			foreach ($accountsGtPos as $a) {
-				$a->setPosition($a->getPosition() - 1);
-				$this->accountMapper->update($a);
-			}
-			
 			$this->delete($sharedAccount);
 
 			return true;
 		}
 	}
 
-	public function findMaxPosition(string $receiverId): int {
+	public function findMaxPosition(string $receiverId): int
+	{
 		$qb = $this->db->getQueryBuilder();
 		$qb->selectAlias($qb->func()->max("position"), "position")
 			->from(Application::SHARED_ACCOUNTS_DB)

@@ -75,9 +75,15 @@ export default function CustomDatatable({
       highlightOnHover
       withBorder
       sx={{ backgroundColor: "", marginTop: "0px" }}
-      onRowClick={(otp, rowIndex, event) => {
-        setOtp(otp);
-        setShowAsideInfo(true);
+      onRowClick={(account, rowIndex, event) => {
+        if (account.unlocked === 0) {
+          setSharedAccountToUnlock(account);
+        } else if (account.type == "hotp" && account.counter < 0) {
+          updateCounter(account, account.user_id, setUpdateCounterState);
+        } else {
+          setOtp(account);
+          setShowAsideInfo(true);
+        }
       }}
       columns={[
         { accessor: "position", sortable: true, width: 70, title: "#" },
@@ -85,7 +91,7 @@ export default function CustomDatatable({
         { accessor: "issuer", sortable: true, width: 400 },
         {
           accessor: "code",
-          width: 150,
+          width: 300,
           render: (account) => {
             return (
               <>
@@ -120,10 +126,12 @@ export default function CustomDatatable({
                           : "none",
                     }}
                     onClick={(event) => {
+                      console.log(account);
                       if (
-                        account.unlocked === undefined ||
-                        account.unlocked === 1 ||
-                        (account.type == "hotp" && account.counter > 0)
+                        (account.unlocked === undefined ||
+                          account.unlocked === 1) &&
+                        ((account.type == "hotp" && account.counter >= 0) ||
+                          account.type == "totp")
                       ) {
                         event.preventDefault();
                         event.stopPropagation();
@@ -133,12 +141,13 @@ export default function CustomDatatable({
                   >
                     <Text>{account.code}</Text>
                     {(account.unlocked === undefined ||
-                      account.unlocked === 1 ||
-                      (account.type == "hotp" && account.counter > 0)) && (
-                      <ActionIcon>
-                        <IconCopy size={18} />
-                      </ActionIcon>
-                    )}
+                      account.unlocked === 1) &&
+                      ((account.type == "hotp" && account.counter >= 0) ||
+                        account.type == "totp") && (
+                        <ActionIcon>
+                          <IconCopy size={18} />
+                        </ActionIcon>
+                      )}
                   </Group>
                 </Box>
               </>
@@ -152,15 +161,11 @@ export default function CustomDatatable({
           render: (account) => (
             <>
               <Group spacing={4} position="right" noWrap>
-               
-
                 {account.unlocked === 0 && (
                   <ActionIcon
-                    //styles={{ color: "#114477" }}
                     onClick={(event) => {
                       event.stopPropagation();
                       setSharedAccountToUnlock(account);
-                      //unlockAccount(account, setUpdateCounterState);
                     }}
                   >
                     <IconLockOpen size={18} />
@@ -169,7 +174,6 @@ export default function CustomDatatable({
 
                 {account.type == "hotp" && account.unlocked !== 0 && (
                   <ActionIcon
-                    //styles={{ color: "#114477" }}
                     disabled={isUpdatingCounter}
                     onClick={(event) => {
                       event.stopPropagation();

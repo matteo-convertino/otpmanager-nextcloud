@@ -27,11 +27,11 @@ export default function MainAppShell({ children }) {
 
   return (
     <>
-      <Aside showAside={showAsideInfo} setShowAside={setShowAsideInfo} otp={otp} title="Account Details">
+      <Aside showAside={showAsideInfo} setShowAside={setShowAsideInfo} title="Account Details">
         <AsideInfo otp={otp} />
       </Aside>
 
-      <Aside showAside={showAsideShare} setShowAside={setShowAsideShare} otp={otp} title="Account Sharing">
+      <Aside showAside={showAsideShare} setShowAside={setShowAsideShare} title="Account Sharing">
         <AsideShare otp={otp} />
       </Aside>
 

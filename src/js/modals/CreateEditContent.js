@@ -28,6 +28,7 @@ export default function CreateEditContent({
         <>
           <TextInput
             label="Secret key"
+            disabled={isSecretKeyDisabled}
             withAsterisk
             rightSection={<IconKey />}
             {...form.getInputProps("secret")}

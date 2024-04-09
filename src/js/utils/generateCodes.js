@@ -12,15 +12,15 @@ export function generateCodes(
   for (let i = 0; i < newAccounts.length; i++) {
     const account = newAccounts[i];
 
-    if(account.unlocked === undefined || account.unlocked === 1) {
+    if (account.unlocked === undefined || account.unlocked === 1) {
       if (account.decryptedSecret === undefined) {
         const key = CryptoES.enc.Hex.parse(passwordHash);
         const parsedIv = CryptoES.enc.Hex.parse(iv);
         const dec = CryptoES.AES.decrypt(account.secret, key, { iv: parsedIv });
-  
+
         account.decryptedSecret = dec.toString(CryptoES.enc.Utf8);
       }
-  
+
       if (account.type == "totp") {
         let totp = new TOTP({
           issuer: account.issuer,
@@ -30,11 +30,11 @@ export function generateCodes(
           period: account.period,
           secret: account.decryptedSecret,
         });
-  
+
         account.code = totp.generate();
       } else {
-        if (account.counter == 0) {
-          account.code = "Click the button to generate HOTP code";
+        if (account.counter < 0) {
+          account.code = "Click here to generate HOTP code";
         } else {
           let hotp = new HOTP({
             issuer: account.issuer,
@@ -44,12 +44,12 @@ export function generateCodes(
             counter: account.counter,
             secret: account.decryptedSecret,
           });
-  
+
           account.code = hotp.generate();
         }
       }
     } else {
-      account.code = "Click the button to unlock your shared account";
+      account.code = "Click here to unlock your shared account";
     }
   }
 
@@ -59,8 +59,7 @@ export function generateCodes(
 
   setTimer(
     setTimeout(
-      () =>
-        generateCodes(newAccounts, setTimer, setAccounts, passwordHash, iv),
+      () => generateCodes(newAccounts, setTimer, setAccounts, passwordHash, iv),
       timeLeft
     )
   );

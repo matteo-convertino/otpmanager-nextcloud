@@ -48,8 +48,6 @@ export default function AsideShare({ otp }) {
   const [fetchUsers, setFetchUsers] = useState(true);
   const [fetchActiveShares, setFetchActiveShares] = useState(true);
 
-  // const [userSetting, setUserSetting] = useContext(UserSettingContext);
-
   function showError(response) {
     updateNotification({
       id: "share-account",
@@ -247,10 +245,10 @@ export default function AsideShare({ otp }) {
             {...form.getInputProps("expirationDate")}
             onChange={(date) => {
               form.setValues({
-                expirationDate: date == null ? null : moment(date).format("MM/DD/YYYY"),
-              })
-            }
-            }
+                expirationDate:
+                  date == null ? null : moment(date).format("MM/DD/YYYY"),
+              });
+            }}
           />
 
           <PasswordInput

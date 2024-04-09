@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 // SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -11,9 +12,11 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 use OCP\Util;
 
-class PageController extends Controller {
+class PageController extends Controller
+{
 
-	public function __construct(string $AppName, IRequest $request){
+	public function __construct(string $AppName, IRequest $request)
+	{
 		parent::__construct($AppName, $request);
 	}
 
@@ -21,7 +24,8 @@ class PageController extends Controller {
 	 * @NoAdminRequired
 	 * @NoCSRFRequired
 	 */
-	public function index(): TemplateResponse {
+	public function index(): TemplateResponse
+	{
 		Util::addScript($this->appName, 'otpmanager-main');
 
 		//throw new \Exception(print_r($accounts));

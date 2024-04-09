@@ -16,7 +16,7 @@ export function CreateOtpAccount({
   setAccounts,
   setFetchState,
 }) {
-  const [secret, setSecret] = useContext(SecretContext);
+  const [secretContext, setSecretContext] = useContext(SecretContext);
 
   const form = useForm({
     initialValues: {
@@ -30,15 +30,25 @@ export function CreateOtpAccount({
     },
 
     validate: {
-      name: hasLength({ min: 1, max: 256 }, "Name must be 1-256 characters long"),
+      name: hasLength(
+        { min: 1, max: 256 },
+        "Name must be 1-256 characters long"
+      ),
       issuer: hasLength(
         { min: 0, max: 256 },
         "Issuer must be shorter than 256 characters"
       ),
-      secret: hasLength(
-        { min: 1, max: 512 },
-        "Secret must be 1-512 characters long"
-      ) && matches(/^[A-Z2-7]+=*$/i, 'Secret key is not Base32-encodable'),
+      secret: (value) => {
+        if (value.length < 16 || value.length > 512) {
+          return "Secret must be 16-512 characters long";
+        }
+
+        if (!value.match(/^[A-Z2-7]+=*$/i)) {
+          return "Secret key is not Base32-encodable";
+        }
+
+        return null;
+      },
     },
   });
 
@@ -57,8 +67,8 @@ export function CreateOtpAccount({
       disallowClose: true,
     });
 
-    const key = CryptoES.enc.Hex.parse(secret.passwordHash);
-    const parsedIv = CryptoES.enc.Hex.parse(secret.iv);
+    const key = CryptoES.enc.Hex.parse(secretContext.passwordHash);
+    const parsedIv = CryptoES.enc.Hex.parse(secretContext.iv);
     values.secret = CryptoES.AES.encrypt(values.secret, key, {
       iv: parsedIv,
     }).toString();
@@ -105,7 +115,11 @@ export function CreateOtpAccount({
       onClose={() => closeModal()}
       title="Add New Account"
     >
-      <form onSubmit={form.onSubmit((values) => createAccount(JSON.parse(JSON.stringify(values))))}>
+      <form
+        onSubmit={form.onSubmit((values) =>
+          createAccount(JSON.parse(JSON.stringify(values)))
+        )}
+      >
         <ModalContent
           form={form}
           textSubmitButton="Add"

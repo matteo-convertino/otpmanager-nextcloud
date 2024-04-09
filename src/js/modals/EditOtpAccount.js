@@ -36,10 +36,6 @@ export function EditOtpAccount({
         { min: 0, max: 256 },
         "Issuer must be shorter than 256 characters"
       ),
-      secret: hasLength(
-        { min: 1, max: 512 },
-        "Secret must be 1-512 characters long"
-      ),
     },
   });
 

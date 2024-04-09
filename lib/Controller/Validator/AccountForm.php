@@ -8,7 +8,7 @@ namespace OCA\OtpManager\Controller\Validator;
 
 class AccountForm
 {
-    public static function validate($data)
+	public static function validate($data)
 	{
 		$errors = [];
 

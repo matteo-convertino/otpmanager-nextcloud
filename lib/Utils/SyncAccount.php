@@ -1,58 +1,41 @@
 <?php
 
 declare(strict_types=1);
-// SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
-// SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace OCA\OtpManager\Controller;
+namespace OCA\OtpManager\Utils;
 
-use OCA\OtpManager\Db\Account;
 use OCA\OtpManager\Db\AccountMapper;
-use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\JSONResponse;
-use OCP\IRequest;
+use OCA\OtpManager\Db\Account;
+use OCA\OtpManager\Db\SharedAccountMapper;
 
-class SyncController extends Controller
+class SyncAccount
 {
-    private AccountMapper $accountMapper;
-	private ?string $userId;
+
+	private AccountMapper $accountMapper;
+	private SharedAccountMapper $sharedAccountMapper;
+	private string $userId;
 
 	public function __construct(
-		string $AppName,
-		IRequest $request,
 		AccountMapper $accountMapper,
-		?string $UserId = null
+		string $userId,
+		SharedAccountMapper $sharedAccountMapper,
 	) {
-		parent::__construct($AppName, $request);
 		$this->accountMapper = $accountMapper;
-		$this->userId = $UserId;
+		$this->userId = $userId;
+		$this->sharedAccountMapper = $sharedAccountMapper;
 	}
 
-
-    private function adjustPosition(int $pos)
+	private function adjustPosition(int $pos)
 	{
-		$accountPosition = $pos;
+		AccountPositionHelper::increasePosition($this->accountMapper, $this->accountMapper->findAllPosGtThan($pos, $this->userId), $pos);
+		AccountPositionHelper::increasePosition($this->sharedAccountMapper, $this->sharedAccountMapper->findAllPosGtThan($pos, $this->userId), $pos);
 
-		// increments by 1 the position of all those accounts
-		// that are on and above (>=) the position of where I want to add the new account
-		$accountsGtePos = $this->accountMapper->findAllAccountsPosGteThan($pos, $this->userId);
+		$lastPosition = max(
+			$this->sharedAccountMapper->findMaxPosition($this->userId),
+			$this->accountMapper->findMaxPosition($this->userId)
+		);
 
-		foreach ($accountsGtePos as $accountGtePos) {
-			$accountGtePos->setPosition(++$pos);
-			$this->accountMapper->update($accountGtePos);
-		}
-
-		// decreases the position of the new account 
-		// if it is distant from the other accounts (if his position is > the last position)
-		$accountsSortedByPos = $this->accountMapper->findAllByUser($this->userId);
-
-		if (count($accountsSortedByPos) > 0) {
-			$lastPosition = $accountsSortedByPos[0]->getPosition();
-			if ($accountPosition > $lastPosition - 1) {
-				return $lastPosition + 1;
-			}
-		}
-		return $accountPosition;
+		return $lastPosition + 1;
 	}
 
 	/**
@@ -60,7 +43,7 @@ class SyncController extends Controller
 	 *     - loop local accounts by searching in DB
 	 *     - loop server accounts by searching through local accounts
 	 */
-	private function compareAccounts(array $localAccounts)
+	public function sync(array $localAccounts)
 	{
 		$ris = ["toAdd" => [], "toDelete" => [], "toEdit" => []];
 
@@ -75,7 +58,7 @@ class SyncController extends Controller
 			$serverAccount = $this->accountMapper->find("secret", $localAccount["secret"], $this->userId);
 
 			if ($localAccount["deleted"]) {
-				if($serverAccount != null) {
+				if ($serverAccount != null) {
 					$serverAccount->setPosition(null);
 					$serverAccount->setDeletedAt(date("Y-m-d H:i:s"));
 					$this->accountMapper->update($serverAccount);
@@ -124,7 +107,7 @@ class SyncController extends Controller
 				array_push($ris["toDelete"], $localAccount["id"]);
 			}
 
-			if ($localAccount["toUpdate"] && $serverAccount->getDeletedAt() == null) {
+			if ($localAccount["toUpdate"] && $serverAccount != null && $serverAccount->getDeletedAt() == null) {
 				$account = $serverAccount;
 
 				$account->setSecret($localAccount["secret"]);
@@ -178,27 +161,4 @@ class SyncController extends Controller
 
 		return $ris;
 	}
-
-	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 */
-	public function sync(array $data)
-	{
-		if (!array_key_exists("appVersion", $data)) return new JSONResponse(["error" => "Please update mobile app to the latest version"], 400);
-		if (!array_key_exists("accounts", $data)) return new JSONResponse(["error" => "Accounts are missing"], 400);
-		
-		$appVersion = explode(".", $data["appVersion"]);
-
-		$major = $appVersion[0];
-		$minor = $appVersion[1];
-		$patch = $appVersion[2];
-
-		if($major == 1 && $minor >= 5) {
-			return $this->compareAccounts($data["accounts"]);
-		} else {
-			return new JSONResponse(["error" => "Please update mobile app to the latest version"], 400);
-		}
-	}
-
 }

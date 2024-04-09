@@ -101,7 +101,7 @@ class PasswordController extends Controller
         $setting = $this->settingMapper->find($this->userId);
 
         if (is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
-        else if(!password_verify(hash("sha256", $oldPassword), $setting->getPassword())) return new JSONResponse(["error" => "The old password is incorrect"], 400);
+        else if (!password_verify(hash("sha256", $oldPassword), $setting->getPassword())) return new JSONResponse(["error" => "The old password is incorrect"], 400);
 
         $newPassword = hash("sha256", $newPassword);
 
@@ -114,21 +114,5 @@ class PasswordController extends Controller
         $this->settingMapper->update($setting);
 
         return new JSONResponse(["iv" => $setting->getIv()]);
-    }
-
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
-    public function check(string $password): JSONResponse
-    {
-        $setting = $this->settingMapper->find($this->userId);
-        if (is_null($setting) || is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
-
-        if (password_verify(hash("sha256", $password), $setting->getPassword())) {
-            return new JSONResponse(["iv" => $setting->getIv()]);
-        } else {
-            return new JSONResponse(["error" => "Incorrect password"], 400);
-        }
     }
 }

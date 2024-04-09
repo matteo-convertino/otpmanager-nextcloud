@@ -10,21 +10,17 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\IDBConnection;
 use OCA\OtpManager\AppInfo\Application;
+use OCA\OtpManager\Utils\AccountPositionHelper;
 use Throwable;
-use \OCP\ILogger;
 
 /**
  * @template-extends QBMapper<Account>
  */
 class AccountMapper extends QBMapper
 {
-	private ILogger $logger;
-
-	public function __construct(IDBConnection $db, ILogger $logger)
+	public function __construct(IDBConnection $db)
 	{
 		parent::__construct($db, Application::ACCOUNTS_DB, Account::class);
-
-		$this->logger = $logger;
 	}
 
 	/**
@@ -60,7 +56,7 @@ class AccountMapper extends QBMapper
 			->where($qb->expr()->isNull('deleted_at'))
 			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
 			->orderBy("position", "desc");
-			
+
 		return $this->findEntities($qb);
 	}
 
@@ -84,7 +80,7 @@ class AccountMapper extends QBMapper
 		} catch (Throwable) {
 			$position = -1;
 		}
-	
+
 		return $position;
 	}
 
@@ -105,14 +101,14 @@ class AccountMapper extends QBMapper
 	/**
 	 * @return array
 	 */
-	public function findAll(): array
+	/*public function findAll(): array
 	{
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->getTableName());
 		return $this->findEntities($qb);
-	}
+	}*/
 
-	public function findAllAccountsPosGtThan(int $pos, string $userId): array
+	public function findAllPosGtThan(int $pos, string $userId): array
 	{
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -122,7 +118,7 @@ class AccountMapper extends QBMapper
 		return $this->findEntities($qb);
 	}
 
-	public function findAllAccountsPosGteThan(int $pos, string $userId): array
+	/*public function findAllPosGteThan(int $pos, string $userId): array
 	{
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')
@@ -130,31 +126,26 @@ class AccountMapper extends QBMapper
 			->where($qb->expr()->gte("position", $qb->createNamedParameter($pos)))
 			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
 		return $this->findEntities($qb);
-	}
+	}*/
 
-	public function destroy(int $accountId, string $userId): ?Account
+	/*public function destroy(int $accountId, string $userId): ?Account
 	{
 		$account = $this->find("id", $accountId, $userId);
 
-		if($account != null) {
+		if ($account != null) {
 			try {
 				$account = $this->delete($account);
 			} catch (Throwable) {
 				$account = null;
-			}	
+			}
 		}
-		
+
 		return $account;
-	}
+	}*/
 
-	public function safeDelete(Account $account): void {
-		// decrease by 1 the position of all accounts after it
-		$accountsGreaterPos = $this->findAllAccountsPosGtThan($account->getPosition(), $account->getUserId());
-
-		foreach ($accountsGreaterPos as $a) {
-			$a->setPosition($a->getPosition() - 1);
-			$this->update($a);
-		}
+	public function safeDelete(Account $account): void
+	{
+		AccountPositionHelper::decreasePosition($this, $this->findAllPosGtThan($account->getPosition(), $account->getUserId()));
 
 		$account->setDeletedAt(date("Y-m-d H:i:s"));
 		$account->setPosition(null);
