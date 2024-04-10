@@ -22,7 +22,6 @@ return [
 		['name' => 'account#delete', 'url' => '/accounts/{id}', 'verb' => 'DELETE'],
 		// ['name' => 'account#destroy', 'url' => '/accounts/destroy/{id}', 'verb' => 'DELETE'],
 		['name' => 'account#import', 'url' => '/accounts/import', 'verb' => 'POST'],
-		//['name' => 'account#updateCounter', 'url' => '/accounts/update-counter', 'verb' => 'POST'],
 
 		['name' => 'setting#get', 'url' => '/settings', 'verb' => 'GET'],
 		['name' => 'setting#save', 'url' => '/settings', 'verb' => 'POST'],
