@@ -82,7 +82,7 @@ class Version000013Date20240213150000 extends SimpleMigrationStep
 			$table->setPrimaryKey(['id']);
 			$table->addIndex(['receiver_id'], 'otpmanager_receiver_id_index');
 			$table->addUniqueIndex(['account_id', 'receiver_id'], 'otpmanager_shared_unique_index');
-			$table->addForeignKeyConstraint(Application::ACCOUNTS_DB, ["account_id"], ["id"], ["onDelete" => "CASCADE"]);
+			$table->addForeignKeyConstraint($schema->getTable(Application::ACCOUNTS_DB), ["account_id"], ["id"], ["onDelete" => "CASCADE"]);
 		}
 
 		return $schema;

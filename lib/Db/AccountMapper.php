@@ -118,16 +118,6 @@ class AccountMapper extends QBMapper
 		return $this->findEntities($qb);
 	}
 
-	/*public function findAllPosGteThan(int $pos, string $userId): array
-	{
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('*')
-			->from($this->getTableName())
-			->where($qb->expr()->gte("position", $qb->createNamedParameter($pos)))
-			->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
-		return $this->findEntities($qb);
-	}*/
-
 	/*public function destroy(int $accountId, string $userId): ?Account
 	{
 		$account = $this->find("id", $accountId, $userId);
