@@ -16,8 +16,8 @@ class Version000013Date20240213150000 extends SimpleMigrationStep
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable(Application::SHARED_ACCOUNTS_DB)) {
-			$table = $schema->createTable(Application::SHARED_ACCOUNTS_DB);
+		if (!$schema->hasTable("otpmanager_shared")) {
+			$table = $schema->createTable("otpmanager_shared");
 
 			$table->addColumn('id', 'integer', [
 				'autoincrement' => true,
@@ -82,7 +82,7 @@ class Version000013Date20240213150000 extends SimpleMigrationStep
 			$table->setPrimaryKey(['id']);
 			$table->addIndex(['receiver_id'], 'otpmanager_receiver_id_index');
 			$table->addUniqueIndex(['account_id', 'receiver_id'], 'otpmanager_shared_unique_index');
-			$table->addForeignKeyConstraint($schema->getTable(Application::ACCOUNTS_DB), ["account_id"], ["id"], ["onDelete" => "CASCADE"]);
+			$table->addForeignKeyConstraint($schema->getTable("otpmanager_accounts"), ["account_id"], ["id"], ["onDelete" => "CASCADE"]);
 		}
 
 		return $schema;

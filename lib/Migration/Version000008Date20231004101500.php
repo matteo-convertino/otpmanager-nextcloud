@@ -21,8 +21,8 @@ class Version000008Date20231004101500 extends SimpleMigrationStep
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable(Application::SETTINGS_DB)) {
-			$table = $schema->createTable(Application::SETTINGS_DB);
+		if (!$schema->hasTable("otpmanager_settings")) {
+			$table = $schema->createTable("otpmanager_settings");
 			$table->addColumn('id', 'integer', [
 				'autoincrement' => true,
 				'notnull' => true,

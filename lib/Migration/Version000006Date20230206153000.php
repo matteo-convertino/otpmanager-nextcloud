@@ -19,7 +19,7 @@
 		/** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 		
-		$table = $schema->getTable(Application::ACCOUNTS_DB);
+		$table = $schema->getTable("otpmanager_accounts");
 
 		$table->addColumn('created_at', 'datetime', [
 			'notnull' => false,

@@ -21,7 +21,7 @@ class Version000011Date20240127121000 extends SimpleMigrationStep
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 	
-		$table = $schema->getTable(Application::ACCOUNTS_DB);
+		$table = $schema->getTable("otpmanager_accounts");
 
 		$table->addColumn('icon', 'string', [
 			'notnull' => false,

@@ -21,7 +21,7 @@ class Version000010Date20240123120000 extends SimpleMigrationStep
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 	
-		$table = $schema->getTable(Application::ACCOUNTS_DB);
+		$table = $schema->getTable("otpmanager_accounts");
 
         $secretCol = $table->getColumn("secret");
         $nameCol = $table->getColumn("name");

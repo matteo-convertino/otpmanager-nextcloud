@@ -21,7 +21,7 @@ class Version000009Date20231007104500 extends SimpleMigrationStep
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 	
-		$table = $schema->getTable(Application::SETTINGS_DB);
+		$table = $schema->getTable("otpmanager_settings");
 
 		$table->addColumn('password', 'string', [
 			'notnull' => false,

@@ -20,8 +20,8 @@
 		/** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 
-		if (!$schema->hasTable(Application::ACCOUNTS_DB)) {
-			$table = $schema->createTable(Application::ACCOUNTS_DB);
+		if (!$schema->hasTable("otpmanager_accounts")) {
+			$table = $schema->createTable("otpmanager_accounts");
 			$table->addColumn('id', 'integer', [
 				'autoincrement' => true,
 				'notnull' => true,
