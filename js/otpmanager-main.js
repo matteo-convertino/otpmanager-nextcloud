@@ -41350,7 +41350,6 @@ function AccountsTable(_ref) {
         response = await _nextcloud_axios__WEBPACK_IMPORTED_MODULE_1__["default"].get((0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_2__.generateUrl)("/apps/otpmanager/accounts"));
         response.data.accounts = response.data.accounts.concat(response.data.shared_accounts);
         response = lodash_sortBy__WEBPACK_IMPORTED_MODULE_3___default()(response.data.accounts, sortStatus.columnAccessor);
-        console.log("aaaaaaaaaaaaaaaaaa");
         console.log(response);
         if (timer != null) {
           clearTimeout(timer);
@@ -41542,14 +41541,14 @@ function CustomDatatable(_ref) {
         spacing: 4,
         position: "right",
         noWrap: true
-      }, account.unlocked === 0 || account.unlocked === false && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, {
+      }, (account.unlocked === 0 || account.unlocked === false) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, {
         onClick: event => {
           event.stopPropagation();
           setSharedAccountToUnlock(account);
         }
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_12__["default"], {
         size: 18
-      })), account.type == "hotp" && account.unlocked !== 0 && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, {
+      })), account.type == "hotp" && (account.unlocked !== 0 || account.unlocked !== false) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_10__.ActionIcon, {
         disabled: isUpdatingCounter,
         onClick: event => {
           event.stopPropagation();
@@ -41557,7 +41556,7 @@ function CustomDatatable(_ref) {
         }
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_tabler_icons_react__WEBPACK_IMPORTED_MODULE_13__["default"], {
         size: 18
-      })), account.unlocked === 1 || account.unlocked === true && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_14__.Avatar, {
+      })), (account.unlocked === 1 || account.unlocked === true) && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mantine_core__WEBPACK_IMPORTED_MODULE_14__.Avatar, {
         src: (0,_nextcloud_router__WEBPACK_IMPORTED_MODULE_6__.generateUrl)("/avatar/" + account.user_id + "/64"),
         alt: account.user_id,
         radius: "xl",
@@ -126972,4 +126971,4 @@ function App() {
 
 /******/ })()
 ;
-//# sourceMappingURL=otpmanager-main.js.map?v=e5878d0b7cbc1c678b69
+//# sourceMappingURL=otpmanager-main.js.map?v=04107dfb0d74dd8e5683

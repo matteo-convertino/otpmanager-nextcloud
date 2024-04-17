@@ -12,22 +12,18 @@ use OCA\OtpManager\AppInfo\Application;
 use OCA\OtpManager\Utils\AccountPositionHelper;
 use Throwable;
 
-use Psr\Log\LoggerInterface;
-
 /**
  * @template-extends QBMapper<SharedAccount>
  */
 class SharedAccountMapper extends QBMapper
 {
 	private AccountMapper $accountMapper;
-	private LoggerInterface $logger;
 
-	public function __construct(IDBConnection $db, AccountMapper $accountMapper, LoggerInterface $logger)
+	public function __construct(IDBConnection $db, AccountMapper $accountMapper)
 	{
 		parent::__construct($db, Application::SHARED_ACCOUNTS_DB, SharedAccount::class);
 
 		$this->accountMapper = $accountMapper;
-		$this->logger = $logger;
 	}
 
 	public function findAllByAccountAndUserId(int $accountId, string $userId): array
@@ -136,8 +132,6 @@ class SharedAccountMapper extends QBMapper
 		$result = $qb->executeQuery();
 		$rows = $result->fetchAll();
 		$result->closeCursor();
-
-		$this->logger->info(json_encode($rows));
 
 		return $rows;
 	}

@@ -106,7 +106,8 @@ export default function CustomDatatable({
                       display:
                         userSetting.showCodes ||
                         isTouchDevice ||
-                        account.unlocked === 0 || account.unlocked === false
+                        account.unlocked === 0 ||
+                        account.unlocked === false
                           ? "none"
                           : "block",
                     }}
@@ -121,15 +122,16 @@ export default function CustomDatatable({
                       display:
                         userSetting.showCodes ||
                         isTouchDevice ||
-                        account.unlocked === 0 || account.unlocked === false
+                        account.unlocked === 0 ||
+                        account.unlocked === false
                           ? "flex"
                           : "none",
                     }}
                     onClick={(event) => {
-                      console.log(account);
                       if (
                         (account.unlocked === undefined ||
-                          account.unlocked === 1 || account.unlocked === true) &&
+                          account.unlocked === 1 ||
+                          account.unlocked === true) &&
                         ((account.type == "hotp" && account.counter >= 0) ||
                           account.type == "totp")
                       ) {
@@ -141,7 +143,8 @@ export default function CustomDatatable({
                   >
                     <Text>{account.code}</Text>
                     {(account.unlocked === undefined ||
-                      account.unlocked === 1 || account.unlocked === true) &&
+                      account.unlocked === 1 ||
+                      account.unlocked === true) &&
                       ((account.type == "hotp" && account.counter >= 0) ||
                         account.type == "totp") && (
                         <ActionIcon>
@@ -161,7 +164,7 @@ export default function CustomDatatable({
           render: (account) => (
             <>
               <Group spacing={4} position="right" noWrap>
-                {account.unlocked === 0 || account.unlocked === false && (
+                {(account.unlocked === 0 || account.unlocked === false) && (
                   <ActionIcon
                     onClick={(event) => {
                       event.stopPropagation();
@@ -172,23 +175,24 @@ export default function CustomDatatable({
                   </ActionIcon>
                 )}
 
-                {account.type == "hotp" && account.unlocked !== 0 && (
-                  <ActionIcon
-                    disabled={isUpdatingCounter}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      updateCounter(
-                        account,
-                        account.user_id,
-                        setUpdateCounterState
-                      );
-                    }}
-                  >
-                    <IconReload size={18} />
-                  </ActionIcon>
-                )}
+                {account.type == "hotp" &&
+                  (account.unlocked !== 0 || account.unlocked !== false) && (
+                    <ActionIcon
+                      disabled={isUpdatingCounter}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        updateCounter(
+                          account,
+                          account.user_id,
+                          setUpdateCounterState
+                        );
+                      }}
+                    >
+                      <IconReload size={18} />
+                    </ActionIcon>
+                  )}
 
-                {account.unlocked === 1 || account.unlocked === true && (
+                {(account.unlocked === 1 || account.unlocked === true) && (
                   <Avatar
                     src={generateUrl("/avatar/" + account.user_id + "/64")}
                     alt={account.user_id}
