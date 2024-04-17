@@ -45,7 +45,7 @@ class SyncApiController extends OCSController
 		$minor = $appVersion[1];
 		$patch = $appVersion[2];
 
-		if ($major == 1 && $minor >= 5) {
+		if ($major == 1 && $minor >= 5 && $patch >= 1) {
 			return new JSONResponse(
 				[
 					"accounts" => $this->syncAccount->sync($accounts),
