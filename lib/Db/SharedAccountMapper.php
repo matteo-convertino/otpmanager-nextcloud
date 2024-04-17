@@ -12,26 +12,30 @@ use OCA\OtpManager\AppInfo\Application;
 use OCA\OtpManager\Utils\AccountPositionHelper;
 use Throwable;
 
+use Psr\Log\LoggerInterface;
+
 /**
  * @template-extends QBMapper<SharedAccount>
  */
 class SharedAccountMapper extends QBMapper
 {
 	private AccountMapper $accountMapper;
+	private LoggerInterface $logger;
 
-	public function __construct(IDBConnection $db, AccountMapper $accountMapper)
+	public function __construct(IDBConnection $db, AccountMapper $accountMapper, LoggerInterface $logger)
 	{
 		parent::__construct($db, Application::SHARED_ACCOUNTS_DB, SharedAccount::class);
 
 		$this->accountMapper = $accountMapper;
+		$this->logger = $logger;
 	}
 
 	public function findAllByAccountAndUserId(int $accountId, string $userId): array
 	{
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('sharedAccounts.*')
-			->from($this->getTableName(), "sharedAccounts")
-			->innerJoin('sharedAccounts', Application::ACCOUNTS_DB, "accounts", "sharedAccounts.account_id = accounts.id")
+		$qb->select('shared_accounts.*')
+			->from($this->getTableName(), "shared_accounts")
+			->innerJoin('shared_accounts', Application::ACCOUNTS_DB, "accounts", "shared_accounts.account_id = accounts.id")
 			->where($qb->expr()->eq("account_id", $qb->createNamedParameter($accountId)))
 			->andWhere($qb->expr()->eq("accounts.user_id", $qb->createNamedParameter($userId)))
 			->andWhere(
@@ -111,7 +115,7 @@ class SharedAccountMapper extends QBMapper
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select(
-			"sharedAccounts.*",
+			"shared_accounts.*",
 			"accounts.period",
 			"accounts.digits",
 			"accounts.type",
@@ -119,8 +123,8 @@ class SharedAccountMapper extends QBMapper
 			"accounts.counter",
 			"accounts.user_id"
 		)
-			->from($this->getTableName(), "sharedAccounts")
-			->innerJoin('sharedAccounts', Application::ACCOUNTS_DB, "accounts", "sharedAccounts.account_id = accounts.id")
+			->from($this->getTableName(), "shared_accounts")
+			->innerJoin('shared_accounts', Application::ACCOUNTS_DB, "accounts", "shared_accounts.account_id = accounts.id")
 			->where($qb->expr()->eq('receiver_id', $qb->createNamedParameter($receiverId)))
 			->andWhere(
 				$qb->expr()->orX(
@@ -132,6 +136,8 @@ class SharedAccountMapper extends QBMapper
 		$result = $qb->executeQuery();
 		$rows = $result->fetchAll();
 		$result->closeCursor();
+
+		$this->logger->info(json_encode($rows));
 
 		return $rows;
 	}
@@ -175,10 +181,15 @@ class SharedAccountMapper extends QBMapper
 	public function findUsers(string $userId, string $accountId): array
 	{
 		$qb = $this->db->getQueryBuilder();
+
 		$qb->select('uid', 'displayname')
 			->from("users")
-			->where($qb->expr()->neq('uid', $qb->createNamedParameter($userId)))
-			->andWhere($qb->expr()->notIn('uid', $this->findUsersAlreadyShared($accountId)));
+			->where($qb->expr()->neq('uid', $qb->createNamedParameter($userId)));
+
+		$usersAlreadyShared = $this->findUsersAlreadyShared($accountId);
+
+		if (count($usersAlreadyShared) > 0)
+			$qb->andWhere($qb->expr()->notIn('uid', $qb->createNamedParameter($usersAlreadyShared)));
 
 		$result = $qb->executeQuery();
 		$rows = $result->fetchAll();
@@ -208,10 +219,10 @@ class SharedAccountMapper extends QBMapper
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('accounts.*')
-			->from($this->getTableName(), "sharedAccounts")
-			->innerJoin('sharedAccounts', Application::ACCOUNTS_DB, "accounts", "sharedAccounts.account_id = accounts.id")
-			->where($qb->expr()->eq("sharedAccounts.secret", $qb->createNamedParameter($secret)))
-			->andWhere($qb->expr()->eq("sharedAccounts.receiver_id", $qb->createNamedParameter($receiverId)))
+			->from($this->getTableName(), "shared_accounts")
+			->innerJoin('shared_accounts', Application::ACCOUNTS_DB, "accounts", "shared_accounts.account_id = accounts.id")
+			->where($qb->expr()->eq("shared_accounts.secret", $qb->createNamedParameter($secret)))
+			->andWhere($qb->expr()->eq("shared_accounts.receiver_id", $qb->createNamedParameter($receiverId)))
 			->andWhere(
 				$qb->expr()->orX(
 					$qb->expr()->isNull('expired_at'),

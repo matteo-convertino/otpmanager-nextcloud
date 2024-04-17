@@ -12,7 +12,7 @@ export function generateCodes(
   for (let i = 0; i < newAccounts.length; i++) {
     const account = newAccounts[i];
 
-    if (account.unlocked === undefined || account.unlocked === 1) {
+    if (account.unlocked === undefined || account.unlocked === 1 || account.unlocked === true) {
       if (account.decryptedSecret === undefined) {
         const key = CryptoES.enc.Hex.parse(passwordHash);
         const parsedIv = CryptoES.enc.Hex.parse(iv);
