@@ -5,6 +5,8 @@ SPDX-License-Identifier: CC0-1.0
 
 # OTP Manager
 
+[<img src="img/bmc-button.png" height="80">](https://www.paypal.me/matteoconvertino0)
+
 *Read this in other languages: [Italian](README.it.md)*
 
 *Official Nextcloud OTP Manager app repository: [otpmanager-app](https://github.com/matteo-convertino/otpmanager-app)*
