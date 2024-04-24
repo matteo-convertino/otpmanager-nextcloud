@@ -66,7 +66,6 @@ make composer
 - [ ] Develop recycle bin
 - [ ] Multiple elimination
 - [ ] [Folders to organize many OTP-entries](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/12)
-- [ ] [[Feature Request] Ability to share OTPs](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/13)
 
 ## Contributors ✨
 
