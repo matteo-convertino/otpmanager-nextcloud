@@ -27,7 +27,7 @@ export function Apps({ showApps, setShowApps }) {
             personal Nextcloud server, which allows you to store and manage
             your OTP codes securely and accessibly from anywhere."
             image={otpManager}
-            badgeText="Android"
+            badges={[{ text: "Android" }]}
             buttonText="Install from Google Play"
             link="https://play.google.com/store/apps/details?id=com.convertino.otp_manager"
           />
@@ -41,7 +41,7 @@ export function Apps({ showApps, setShowApps }) {
             personal Nextcloud server, which allows you to store and manage
             your OTP codes securely and accessibly from anywhere."
             image={otpManager}
-            badgeText="iOS"
+            badges={[{ text: "iOS" }]}
             buttonText="Install from Apple Store"
             link="https://apps.apple.com/us/app/nextcloud-otp-manager/id6471510170"
           />
@@ -54,9 +54,12 @@ export function Apps({ showApps, setShowApps }) {
             your accounts, generate TOTP and HOTP codes and much more directly
             from Firefox."
             image={firefoxImage}
-            badgeText="Firefox Extension"
+            badges={[
+              { text: "Third-party author", color: "yellow" },
+              { text: "Firefox Extension" },
+            ]}
             buttonText="Install from Firefox Add-ons"
-            buttonDisabled={true}
+            link="https://addons.mozilla.org/en-US/firefox/addon/simple-otpmanager-browser/"
           />
 
           <AppCard
@@ -67,9 +70,12 @@ export function Apps({ showApps, setShowApps }) {
             your accounts, generate TOTP and HOTP codes and much more directly
             from many Chromium based Browsers."
             image={chromeImage}
-            badgeText="Chrome Extension"
+            badges={[
+              { text: "Third-party author", color: "yellow" },
+              { text: "Chrome Extension" },
+            ]}
             buttonText="Install from Chrome Web Store"
-            buttonDisabled={true}
+            link="https://chromewebstore.google.com/detail/simple-otp-manager-browse/meopmcadkhpcpoaigkhkadagiemblecc"
           />
         </Stack>
       </ScrollArea.Autosize>

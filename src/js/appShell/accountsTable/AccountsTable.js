@@ -35,8 +35,15 @@ export function AccountsTable({
     if (accounts == null) {
       const getData = async () => {
         response = await axios.get(generateUrl("/apps/otpmanager/accounts"));
-        
-        response.data.accounts = response.data.accounts.concat(response.data.shared_accounts);
+
+        response.data.shared_accounts.forEach((shared_account) => {
+          shared_account.id = shared_account.account_id;
+          delete shared_account.account_id;
+        });
+
+        response.data.accounts = response.data.accounts.concat(
+          response.data.shared_accounts
+        );
 
         response = sortBy(response.data.accounts, sortStatus.columnAccessor);
 
@@ -49,7 +56,7 @@ export function AccountsTable({
           setTimer,
           setAccounts,
           secret.passwordHash,
-          secret.iv,
+          secret.iv
         );
 
         setFetchState(false);
@@ -70,7 +77,7 @@ export function AccountsTable({
       setAccounts={setAccounts}
       setOtp={setOtp}
       setShowAsideInfo={setShowAsideInfo}
-      setShowAsideShare={setShowAsideShare}      
+      setShowAsideShare={setShowAsideShare}
       setShowEditOtpAccount={setShowEditOtpAccount}
       sortStatus={sortStatus}
       setSortStatus={setSortStatus}

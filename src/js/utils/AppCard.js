@@ -5,12 +5,22 @@ import { Card, Button, Text, Group, Image, Badge } from "@mantine/core";
 export function AppCard({
   title,
   description,
-  badgeText,
+  badges,
   image,
   buttonText,
   link = "#",
   buttonDisabled = false,
 }) {
+  const badgesToRender = badges.map((badge, i) => (
+    <Badge
+      key={i}
+      color={"color" in badge ? badge.color : "blue"}
+      variant="light"
+    >
+      {badge.text}
+    </Badge>
+  ));
+
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section>
@@ -19,10 +29,7 @@ export function AppCard({
 
       <Group position="apart" mt="md" mb="xs">
         <Text weight={500}>{title}</Text>
-
-        <Badge color="blue" variant="light">
-          {badgeText}
-        </Badge>
+        <Group spacing="xs">{badgesToRender}</Group>
       </Group>
 
       <Text size="sm" color="dimmed" align="justify">
@@ -32,6 +39,7 @@ export function AppCard({
       <Button
         component="a"
         href={link}
+        target="_blank"
         variant="light"
         color="blue"
         fullWidth

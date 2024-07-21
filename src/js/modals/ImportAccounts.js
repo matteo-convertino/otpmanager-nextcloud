@@ -112,20 +112,20 @@ export function ImportAccounts({ setAccounts, setFetchState, closeModal }) {
 
   return (
     <>
-      {/*<Alert
+      <Alert
         variant="light"
         color="blue"
         radius="md"
         title="Other way to import"
         icon={<IconInfoCircle />}
       >
-        If you're using FreeOTP and you want to import your accounts here, take
+        If you're using <Anchor href="https://github.com/helloworld1/FreeOTPPlus" target="_blank">FreeOTP Plus</Anchor> and you want to import your accounts here, take
         a look at{" "}
-        <Anchor href="https://github.com/betabrandao/utils/blob/main/filecopys/freeotp2nextcloudotp.py" target="_blank">
+        <Anchor href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/20#issue-2066571171" target="_blank">
           this script
         </Anchor>
         .
-      </Alert>*/}
+      </Alert>
 
       <FileInput
         label="Import file"

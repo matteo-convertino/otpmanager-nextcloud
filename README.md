@@ -7,14 +7,14 @@ SPDX-License-Identifier: CC0-1.0
 
 [<img src="img/bmc-button.png" height="80">](https://www.paypal.me/matteoconvertino0)
 
-*Read this in other languages: [Italian](README.it.md)*
-
 *Official Nextcloud OTP Manager app repository: [otpmanager-app](https://github.com/matteo-convertino/otpmanager-app)*
 
 *Nextcloud App Store: [otpmanager](https://apps.nextcloud.com/apps/otpmanager)*
 
+*Simple OTP Manager Browser Extension repository (third-party): [simple-otpmanager-browser](https://github.com/beatles1/simple-otpmanager-browser)*
+
 # Screenshots
-<img src="img/screenshots/1.png">
+<img src="img/screenshots/2.png">
 
 # Description
 OTP Manager is useful for those who use two-factor authentication (2FA) and want to manage their OTP codes securely and easily. 
@@ -66,7 +66,6 @@ make composer
 - [ ] Develop recycle bin
 - [ ] Multiple elimination
 - [ ] [Folders to organize many OTP-entries](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/12)
-- [ ] [[Feature Request] Ability to share OTPs](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/13)
 
 ## Contributors ✨
 
