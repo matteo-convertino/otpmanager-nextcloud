@@ -31,8 +31,8 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
 **Apps & Extensions**
 * [Official Android App](https://play.google.com/store/apps/details?id=com.convertino.otp_manager)
 * [Official iOS App](https://apps.apple.com/us/app/nextcloud-otp-manager/id6471510170)
-* [Simple Firefox Browser Extension] (https://addons.mozilla.org/en-US/firefox/addon/simple-otpmanager-browser/)
-* [Simple Chrome Browser Extension] (https://chromewebstore.google.com/detail/simple-otp-manager-browse/meopmcadkhpcpoaigkhkadagiemblecc)
+* [Simple Firefox Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/simple-otpmanager-browser/)
+* [Simple Chrome Browser Extension](https://chromewebstore.google.com/detail/simple-otp-manager-browse/meopmcadkhpcpoaigkhkadagiemblecc)
 ]]>
   </description>
   <version>0.5.4</version>
@@ -42,7 +42,8 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
   <category>security</category>
   <bugs>https://github.com/matteo-convertino/otpmanager-nextcloud/issues</bugs>
   <repository>https://github.com/matteo-convertino/otpmanager-nextcloud</repository>
-  <screenshot>https://raw.githubusercontent.com/matteo-convertino/otpmanager-nextcloud/c683075330a6d6839cbaa5e8b847eae44d250903/img/screenshots/1.png</screenshot>
+  <screenshot>https://raw.githubusercontent.com/matteo-convertino/otpmanager-nextcloud/592b6b8236f1b9e165c1005fa5effa7dc9c89e84/img/screenshots/2.png</screenshot>
+  <screenshot>https://raw.githubusercontent.com/matteo-convertino/otpmanager-nextcloud/592b6b8236f1b9e165c1005fa5effa7dc9c89e84/img/screenshots/3.png</screenshot>
   <dependencies>
     <nextcloud min-version="26" max-version="29" />
   </dependencies>
