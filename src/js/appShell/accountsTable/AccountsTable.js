@@ -2,12 +2,27 @@ import React, { useContext, useEffect, useState } from "react";
 
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
-import sortBy from "lodash/sortBy";
+import orderBy from "lodash/orderBy";
 
 import { generateCodes } from "../../utils/generateCodes";
 import Datatable from "./Datatable";
 
 import { SecretContext } from "./../../context/SecretProvider";
+
+const sortByColumn = (accounts, columnAccessor, direction = "asc") => {
+  return orderBy(
+    accounts,
+    (account) => {
+      const value = account[columnAccessor];
+      if (typeof value === "string") {
+        return value.toLowerCase();
+      }
+
+      return value ?? "";
+    },
+    direction
+  );
+};
 
 export function AccountsTable({
   setOtp,
@@ -45,7 +60,11 @@ export function AccountsTable({
           response.data.shared_accounts
         );
 
-        response = sortBy(response.data.accounts, sortStatus.columnAccessor);
+        response = sortByColumn(
+          response.data.accounts,
+          sortStatus.columnAccessor,
+          sortStatus.direction
+        );
 
         if (timer != null) {
           clearTimeout(timer);
@@ -63,8 +82,11 @@ export function AccountsTable({
       };
       getData();
     } else {
-      response = sortBy(accounts, sortStatus.columnAccessor);
-      if (sortStatus.direction === "desc") response = response.reverse();
+      response = sortByColumn(
+        accounts,
+        sortStatus.columnAccessor,
+        sortStatus.direction
+      );
       setAccounts(response);
     }
   }, [sortStatus, isFetching]);
