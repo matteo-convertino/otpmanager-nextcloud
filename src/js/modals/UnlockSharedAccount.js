@@ -45,7 +45,7 @@ export function UnlockSharedAccount({
 
     axios
       .post(generateOcsUrl("/apps/otpmanager/share/unlock"), {
-        accountId: sharedAccountToUnlock.account_id,
+        accountId: sharedAccountToUnlock.id,
         currentPassword: secret.passwordHash,
         tempPassword: values.tempPassword,
       })
