@@ -1,6 +1,6 @@
 import { TOTP, HOTP } from "otpauth";
 import { getAlgorithm } from "./getAlgorithm";
-import CryptoES from "crypto-es";
+import {AES, Hex, Utf8} from "crypto-es";
 
 export function generateCodes(
   newAccounts,
@@ -14,11 +14,11 @@ export function generateCodes(
 
     if (account.unlocked === undefined || account.unlocked === 1 || account.unlocked === true) {
       if (account.decryptedSecret === undefined) {
-        const key = CryptoES.enc.Hex.parse(passwordHash);
-        const parsedIv = CryptoES.enc.Hex.parse(iv);
-        const dec = CryptoES.AES.decrypt(account.secret, key, { iv: parsedIv });
+        const key = Hex.parse(passwordHash);
+        const parsedIv = Hex.parse(iv);
+        const dec = AES.decrypt(account.secret, key, { iv: parsedIv });
 
-        account.decryptedSecret = dec.toString(CryptoES.enc.Utf8);
+        account.decryptedSecret = dec.toString(Utf8);
       }
 
       if (account.type == "totp") {

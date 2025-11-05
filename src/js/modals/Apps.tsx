@@ -2,9 +2,9 @@ import React from "react";
 
 import { Modal, Stack, ScrollArea } from "@mantine/core";
 
-import otpManager from "../../../img/otp_manager.png";
-import firefoxImage from "../../../img/firefox.svg";
-import chromeImage from "../../../img/chrome.svg";
+import otpManager from "@/images/otp_manager.png";
+import firefoxImage from "@/images/firefox.svg";
+import chromeImage from "@/images/chrome.svg";
 
 import { AppCard } from "../utils/AppCard";
 

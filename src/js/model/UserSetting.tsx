@@ -1,19 +1,18 @@
 export class UserSetting {
+  private readonly showCodes: boolean;
+  private readonly darkMode: boolean | null;
+  private readonly recordsPerPage: string;
+  readonly toUpdate: boolean;
+
   constructor(
-    showCodes,
-    darkMode,
-    recordsPerPage,
-    /*password = "",
-    passwordHash = "",
-    iv = "",*/
-    toUpdate = false
+    showCodes: boolean,
+    darkMode: boolean | null,
+    recordsPerPage: string,
+    toUpdate: boolean = false
   ) {
     this.showCodes = showCodes;
     this.darkMode = darkMode;
     this.recordsPerPage = recordsPerPage;
-    /*this.password = password;
-    this.passwordHash = passwordHash;
-    this.iv = iv;*/
     this.toUpdate = toUpdate;
   }
 
@@ -29,18 +28,12 @@ export class UserSetting {
     showCodes = null,
     darkMode = null,
     recordsPerPage = null,
-    /*password = null,
-    passwordHash = null,
-    iv = null,*/
     toUpdate = null,
   } = {}) {
     return new UserSetting(
       showCodes === null ? this.showCodes : showCodes,
       darkMode === null ? this.darkMode : darkMode,
       recordsPerPage === null ? this.recordsPerPage : recordsPerPage,
-      /*password == null ? this.password : password,
-      passwordHash == null ? this.passwordHash : passwordHash,
-      iv == null ? this.iv : iv,*/
       toUpdate == null ? true : toUpdate
     );
   }

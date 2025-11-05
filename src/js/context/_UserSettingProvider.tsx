@@ -2,14 +2,14 @@ import { showNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
 import { IconX } from "@tabler/icons-react";
-import React, { createContext, useEffect, useState } from "react";
+import {createContext, type ReactNode, useEffect, useState} from "react";
 import { UserSetting } from "../model/UserSetting";
 
 const initState = new UserSetting(false, null, "10");
 
 const UserSettingContext = createContext(initState);
 
-const UserSettingContextProvider = ({ children }) => {
+const UserSettingContextProvider = ({ children }: {children: ReactNode}) => {
   const [state, setState] = useState(initState);
 
   useEffect(() => {

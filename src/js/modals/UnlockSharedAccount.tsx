@@ -1,60 +1,61 @@
 import React, { useContext } from "react";
-
-import { Button, Group, Modal, Stack } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { Button, Group, Modal, Stack, PasswordInput, Flex } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
-import { generateUrl } from "@nextcloud/router";
+import { generateOcsUrl } from "@nextcloud/router";
 import { IconCheck, IconKey, IconX } from "@tabler/icons-react";
-import CryptoES from "crypto-es";
-import PasswordForm from "./../utils/PasswordForm";
 import { SecretContext } from "./../context/SecretProvider";
+import { useForm, isNotEmpty } from "@mantine/form";
 
-export function ChangePassword({
-  showChangePassword,
-  setShowChangePassword,
+export function UnlockSharedAccount({
+  sharedAccountToUnlock,
+  setSharedAccountToUnlock,
   setAccounts,
   setFetchState,
 }) {
   const [secret, setSecret] = useContext(SecretContext);
+  const [visible, { toggle }] = useDisclosure(false);
+
+  const form = useForm({
+    initialValues: {
+      tempPassword: "",
+    },
+
+    validate: {
+      tempPassword: isNotEmpty("Password cannot be empty"),
+    },
+  });
 
   function closeModal() {
-    setShowChangePassword(false);
+    setSharedAccountToUnlock(null);
   }
 
-  async function changePassword(values) {
+  async function unlock(values) {
     showNotification({
-      id: "change-password",
+      id: "unlock",
       loading: true,
-      title: "Password",
-      message: "Password is being updated",
+      title: "Shared Account",
+      message: "Unlocking shared account",
       autoClose: false,
       disallowClose: true,
     });
 
     axios
-      .put(generateUrl("/apps/otpmanager/password"), {
-        newPassword: values.password,
-        oldPassword: values.oldPassword,
+      .post(generateOcsUrl("/apps/otpmanager/share/unlock"), {
+        accountId: sharedAccountToUnlock.account_id,
+        currentPassword: secret.passwordHash,
+        tempPassword: values.tempPassword,
       })
       .then((response) => {
         updateNotification({
-          id: "change-password",
+          id: "unlock",
           color: "teal",
-          title: "Password",
-          message: "Password updated with success",
+          title: "Shared Account",
+          message: "Shared account unlocked with success",
           icon: <IconCheck size={16} />,
           autoClose: 2000,
         });
-        setSecret(
-          secret.copyWith({
-            iv: response.data["iv"],
-            password: values.password,
-            passwordHash: CryptoES.SHA256(values.password).toString(),
-          })
-        );
-        if (localStorage.getItem("otpmanager_cached_password") !== null) {
-          localStorage.setItem("otpmanager_cached_password", values.password);
-        }
         closeModal();
         setAccounts(null);
         setFetchState(true);
@@ -63,7 +64,7 @@ export function ChangePassword({
         if (error.response) {
           if (error.response.status == 400) {
             updateNotification({
-              id: "change-password",
+              id: "unlock",
               color: "red",
               title: "Request Error",
               message: error.response.data["error"],
@@ -73,7 +74,7 @@ export function ChangePassword({
           }
         } else if (error.request) {
           updateNotification({
-            id: "change-password",
+            id: "unlock",
             color: "red",
             title: "Timeout Error",
             message: "The nextcloud server took too long to respond",
@@ -82,7 +83,7 @@ export function ChangePassword({
           });
         } else {
           updateNotification({
-            id: "change-password",
+            id: "unlock",
             color: "red",
             title: "Generic Error",
             message: "Something went wrong",
@@ -95,33 +96,26 @@ export function ChangePassword({
 
   return (
     <Modal
-      opened={showChangePassword}
+      opened={sharedAccountToUnlock !== null}
       onClose={() => closeModal()}
-      title="Change Password"
+      title="Unlock Shared Account"
       centered
     >
-      <Stack spacing="xl">
-        <PasswordForm
-          exists={false}
-          onSubmit={changePassword}
-          isChanging={true}
-        />
+      <form onSubmit={form.onSubmit((values) => unlock(values))}>
+        <Stack spacing="xl">
+          <PasswordInput
+            label="Password"
+            description="Insert the password that was used to share this account"
+            visible={visible}
+            onVisibilityChange={toggle}
+            {...form.getInputProps("tempPassword")}
+          />
 
-        <Group position="right">
-          <Button
-            styles={{
-              icon: {
-                display: "inline",
-              },
-            }}
-            rightIcon={<IconKey />}
-            type="submit"
-            form="form"
-          >
-            Change Password
-          </Button>
-        </Group>
-      </Stack>
+          <Flex justify="flex-end">
+            <Button type="submit">Unlock</Button>
+          </Flex>
+        </Stack>
+      </form>
     </Modal>
   );
 }

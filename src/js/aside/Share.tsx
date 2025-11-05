@@ -22,9 +22,9 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
 import { useForm } from "@mantine/form";
-import CryptoES from "crypto-es";
 import moment from "moment";
 import { copy } from "../utils/copy";
+import {AES, Hex, WordArray} from "crypto-es";
 
 const SelectItem = forwardRef(({ image, label, value, ...others }, ref) => (
   <div ref={ref} {...others}>
@@ -76,13 +76,13 @@ export default function AsideShare({ otp }) {
       disallowClose: true,
     });
 
-    values.password = CryptoES.SHA256(values.plainTextPassword).toString();
+    values.password = SHA256(values.plainTextPassword).toString();
 
-    const key = CryptoES.enc.Hex.parse(values.password);
-    const iv = CryptoES.lib.WordArray.random(16);
+    const key = Hex.parse(values.password);
+    const iv = WordArray.random(16);
 
-    values.iv = CryptoES.enc.Hex.stringify(iv);
-    values.sharedSecret = CryptoES.AES.encrypt(otp.decryptedSecret, key, {
+    values.iv = Hex.stringify(iv);
+    values.sharedSecret = AES.encrypt(otp.decryptedSecret, key, {
       iv: iv,
     }).toString();
 

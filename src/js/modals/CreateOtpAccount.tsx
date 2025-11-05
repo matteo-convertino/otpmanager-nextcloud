@@ -6,9 +6,9 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl } from "@nextcloud/router";
 import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
-import CryptoES from "crypto-es";
 import { SecretContext } from "./../context/SecretProvider";
 import ModalContent from "./CreateEditContent";
+import {AES, Hex} from "crypto-es";
 
 export function CreateOtpAccount({
   showCreateAccount,
@@ -67,9 +67,9 @@ export function CreateOtpAccount({
       disallowClose: true,
     });
 
-    const key = CryptoES.enc.Hex.parse(secretContext.passwordHash);
-    const parsedIv = CryptoES.enc.Hex.parse(secretContext.iv);
-    values.secret = CryptoES.AES.encrypt(values.secret, key, {
+    const key = Hex.parse(secretContext.passwordHash);
+    const parsedIv = Hex.parse(secretContext.iv);
+    values.secret = AES.encrypt(values.secret, key, {
       iv: parsedIv,
     }).toString();
 

@@ -1,4 +1,8 @@
 export class Secret {
+    private readonly password: string;
+    private readonly passwordHash: string;
+    private readonly iv: string;
+
     constructor(
       password = "",
       passwordHash = "",
@@ -8,7 +12,7 @@ export class Secret {
       this.passwordHash = passwordHash;
       this.iv = iv;
     }
-  
+
     copyWith({
       password = null,
       passwordHash = null,
@@ -21,4 +25,3 @@ export class Secret {
       );
     }
   }
-  

@@ -11,7 +11,7 @@ import Aside from "./../aside/Aside";
 import AsideInfo from "./../aside/Info";
 import AsideShare from "./../aside/Share";
 
-export default function MainAppShell({ children }) {
+export default function MainAppShell() {
   const smallScreen = useMediaQuery("(max-width: 991px)");
 
   const [otp, setOtp] = useState(null);
@@ -78,7 +78,6 @@ export default function MainAppShell({ children }) {
           showImportExport={showImportExport}
           setShowImportExport={setShowImportExport}
         />
-        {children}
       </AppShell>
     </>
   );

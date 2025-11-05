@@ -15,7 +15,7 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import axios from "@nextcloud/axios";
 import { generateUrl, generateOcsUrl } from "@nextcloud/router";
 import { IconCheck, IconX } from "@tabler/icons-react";
-import CryptoES from "crypto-es";
+import { SHA256 } from 'crypto-es';
 import PasswordForm from "./PasswordForm";
 import { SecretContext } from "../context/SecretProvider";
 
@@ -57,7 +57,7 @@ export const Password = ({ exists, setAuth }) => {
           secret.copyWith({
             iv: response.data["iv"],
             password: values.password,
-            passwordHash: CryptoES.SHA256(values.password).toString(),
+            passwordHash: SHA256(values.password).toString(),
           })
         );
         if (values.savePassword) {
