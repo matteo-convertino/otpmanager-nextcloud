@@ -4,9 +4,8 @@
 
   use Closure;
   use OCP\DB\ISchemaWrapper;
-  use OCP\Migration\SimpleMigrationStep;
   use OCP\Migration\IOutput;
-  use OCA\OtpManager\AppInfo\Application;
+  use OCP\Migration\SimpleMigrationStep;
 
   class Version000005Date20221117121000 extends SimpleMigrationStep {
 
@@ -16,7 +15,8 @@
 	 * @param array $options
 	 * @return null|ISchemaWrapper
 	 */
-	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
+	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper
+    {
 		/** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
 

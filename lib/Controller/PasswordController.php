@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-// SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
-// SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace OCA\OtpManager\Controller;
 
@@ -22,12 +20,13 @@ class PasswordController extends Controller
     private ?string $userId;
 
     public function __construct(
-        string $AppName,
-        IRequest $request,
+        string        $AppName,
+        IRequest      $request,
         SettingMapper $settingMapper,
-        Encryption $encryption,
-        ?string $UserId = null
-    ) {
+        Encryption    $encryption,
+        ?string       $UserId = null
+    )
+    {
         parent::__construct($AppName, $request);
         $this->settingMapper = $settingMapper;
         $this->encryption = $encryption;

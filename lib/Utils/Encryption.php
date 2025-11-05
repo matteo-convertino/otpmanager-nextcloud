@@ -7,6 +7,7 @@ namespace OCA\OtpManager\Utils;
 use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Db\SettingMapper;
 use OCA\OtpManager\Db\SharedAccountMapper;
+use OCP\DB\Exception;
 
 class Encryption
 {
@@ -17,16 +18,17 @@ class Encryption
     private const CIPHER_ALGO = "aes-256-cbc";
 
     public function __construct(
-        AccountMapper $accountMapper,
-        SettingMapper $settingMapper,
+        AccountMapper       $accountMapper,
+        SettingMapper       $settingMapper,
         SharedAccountMapper $sharedAccountMapper,
-    ) {
+    )
+    {
         $this->accountMapper = $accountMapper;
         $this->settingMapper = $settingMapper;
         $this->sharedAccountMapper = $sharedAccountMapper;
     }
 
-    public function encrypt($data, $password, $userId, $isAlreadyHashed = false): string | false
+    public function encrypt($data, $password, $userId, $isAlreadyHashed = false): string|false
     {
         $setting = $this->settingMapper->find($userId);
 
@@ -37,14 +39,17 @@ class Encryption
         return openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin($password), 0, hex2bin($setting->getIv()));
     }
 
-    public function decrypt($data, $password, $iv, $isAlreadyHashed = false): string | false
+    public function decrypt($data, $password, $iv, $isAlreadyHashed = false): string|false
     {
         $password = $isAlreadyHashed ? $password : hash("sha256", $password);
 
         return openssl_decrypt($data, $this::CIPHER_ALGO, hex2bin($password), 0, hex2bin($iv));
     }
 
-    public function encryptAccounts($password, $iv, $userId)
+    /**
+     * @throws Exception
+     */
+    public function encryptAccounts($password, $iv, $userId): void
     {
         $accounts = $this->accountMapper->findAllWithDeleted($userId);
 
@@ -55,7 +60,10 @@ class Encryption
         }
     }
 
-    public function changeAccountsEncryption($oldPassword, $newPassword, $oldIv, $newIv, $userId)
+    /**
+     * @throws Exception
+     */
+    public function changeAccountsEncryption($oldPassword, $newPassword, $oldIv, $newIv, $userId): void
     {
         $accounts = $this->accountMapper->findAllWithDeleted($userId);
 

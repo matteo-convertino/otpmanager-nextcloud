@@ -4,24 +4,23 @@ namespace OCA\OtpManager\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
-use OCP\Migration\SimpleMigrationStep;
 use OCP\Migration\IOutput;
-use OCA\OtpManager\AppInfo\Application;
+use OCP\Migration\SimpleMigrationStep;
 
 class Version000010Date20240123120000 extends SimpleMigrationStep
 {
-	/**
-	 * @param IOutput $output
-	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
-	 * @param array $options
-	 * @return null|ISchemaWrapper
-	 */
-	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options)
-	{
-		/** @var ISchemaWrapper $schema */
-		$schema = $schemaClosure();
-	
-		$table = $schema->getTable("otpmanager_accounts");
+    /**
+     * @param IOutput $output
+     * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
+     * @param array $options
+     * @return null|ISchemaWrapper
+     */
+    public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper
+    {
+        /** @var ISchemaWrapper $schema */
+        $schema = $schemaClosure();
+
+        $table = $schema->getTable("otpmanager_accounts");
 
         $secretCol = $table->getColumn("secret");
         $nameCol = $table->getColumn("name");
@@ -35,6 +34,6 @@ class Version000010Date20240123120000 extends SimpleMigrationStep
         $digitsCol->setNotnull(false);
         $periodCol->setNotnull(false);
 
-		return $schema;
-	}
+        return $schema;
+    }
 }

@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-// SPDX-FileCopyrightText: Matteo Convertino <matteo@convertino.cloud>
-// SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace OCA\OtpManager\Controller;
 
@@ -18,11 +16,12 @@ class PasswordApiController extends OCSController
     private ?string $userId;
 
     public function __construct(
-        string $AppName,
-        IRequest $request,
+        string        $AppName,
+        IRequest      $request,
         SettingMapper $settingMapper,
-        ?string $UserId = null
-    ) {
+        ?string       $UserId = null
+    )
+    {
         parent::__construct($AppName, $request);
         $this->settingMapper = $settingMapper;
         $this->userId = $UserId;

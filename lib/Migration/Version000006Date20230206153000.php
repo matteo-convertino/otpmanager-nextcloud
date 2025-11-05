@@ -1,42 +1,43 @@
 <?php
 
-  namespace OCA\OtpManager\Migration;
+namespace OCA\OtpManager\Migration;
 
-  use Closure;
-  use OCP\DB\ISchemaWrapper;
-  use OCP\Migration\SimpleMigrationStep;
-  use OCP\Migration\IOutput;
-  use OCA\OtpManager\AppInfo\Application;
+use Closure;
+use OCP\DB\ISchemaWrapper;
+use OCP\Migration\IOutput;
+use OCP\Migration\SimpleMigrationStep;
 
-  class Version000006Date20230206153000 extends SimpleMigrationStep {
+class Version000006Date20230206153000 extends SimpleMigrationStep
+{
     /**
-	 * @param IOutput $output
-	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
-	 * @param array $options
-	 * @return null|ISchemaWrapper
-	 */
-	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
-		/** @var ISchemaWrapper $schema */
+     * @param IOutput $output
+     * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
+     * @param array $options
+     * @return null|ISchemaWrapper
+     */
+    public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper
+    {
+        /** @var ISchemaWrapper $schema */
         $schema = $schemaClosure();
-		
-		$table = $schema->getTable("otpmanager_accounts");
 
-		$table->addColumn('created_at', 'datetime', [
-			'notnull' => false,
-		]);
-		$table->addColumn('updated_at', 'datetime', [
-			'notnull' => false,
-		]);
-		$table->addColumn('deleted_at', 'datetime', [
-			'notnull' => false,
-		]);
+        $table = $schema->getTable("otpmanager_accounts");
 
-		$positionCol = $table->getColumn("position");
+        $table->addColumn('created_at', 'datetime', [
+            'notnull' => false,
+        ]);
+        $table->addColumn('updated_at', 'datetime', [
+            'notnull' => false,
+        ]);
+        $table->addColumn('deleted_at', 'datetime', [
+            'notnull' => false,
+        ]);
 
-		if ($positionCol->getNotnull()) {
-			$positionCol->setNotnull(false);
-		}
-		
-		return $schema;
-	}
+        $positionCol = $table->getColumn("position");
+
+        if ($positionCol->getNotnull()) {
+            $positionCol->setNotnull(false);
+        }
+
+        return $schema;
+    }
 }
