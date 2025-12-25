@@ -4,11 +4,54 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Db;
 
+use DateTime;
 use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
-
+/**
+ * @method string|null getSecret()
+ * @method void setSecret(string|null $secret)
+ *
+ * @method string|null getName()
+ * @method void setName(string|null $name)
+ *
+ * @method string|null getIssuer()
+ * @method void setIssuer(string|null $issuer)
+ *
+ * @method int|null getDigits()
+ * @method void setDigits(int|null $digits)
+ *
+ * @method string|null getType()
+ * @method void setType(string|null $type)
+ *
+ * @method int|null getPeriod()
+ * @method void setPeriod(int|null $period)
+ *
+ * @method int|null getAlgorithm()
+ * @method void setAlgorithm(int|null $algorithm)
+ *
+ * @method int|null getCounter()
+ * @method void setCounter(int|null $counter)
+ *
+ * @method string|null getIcon()
+ * @method void setIcon(string|null $icon)
+ *
+ * @method int|null getPosition()
+ * @method void setPosition(int|null $position)
+ *
+ * @method string|null getUserId()
+ * @method void setUserId(string|null $userId)
+ *
+ * @method int|string|null getCreatedAt()
+ * @method void setCreatedAt(string|null $createdAt)
+ *
+ * @method int|string|null getUpdatedAt()
+ * @method void setUpdatedAt(string|null $updatedAt)
+ *
+ * @method int|string|null getDeletedAt()
+ * @method void setDeletedAt(string|null $deletedAt)
+ */
 class Account extends Entity implements JsonSerializable
 {
 

@@ -1,10 +1,10 @@
 import { createRoot } from "react-dom/client";
 
-import { OtpLayout } from "./js/OtpLayout";
-import AppShell from "./js/appShell/AppShell";
+import { OtpLayout } from "@/components/OtpLayout";
+import AppShell from "@/components/appShell/AppShell";
 
-import { UserSettingContextProvider } from "./js/context/UserSettingProvider";
-import { SecretContextProvider } from "./js/context/SecretProvider";
+// import { UserSettingContextProvider } from "./js/context/UserSettingProvider";
+// import { SecretContextProvider } from "./js/context/SecretProvider";
 import createCache from "@emotion/cache";
 
 
@@ -34,13 +34,13 @@ const myCache = createCache({
 function App() {
   return (
     <>
-      <UserSettingContextProvider>
-        <SecretContextProvider>
+      {/*<UserSettingContextProvider>*/}
+      {/*  <SecretContextProvider>*/}
           <OtpLayout myCache={myCache} emotionRoot={otpManagerMantinePortal}>
             <AppShell />
           </OtpLayout>
-        </SecretContextProvider>
-      </UserSettingContextProvider>
+        {/*</SecretContextProvider>*/}
+      {/*</UserSettingContextProvider>*/}
     </>
   );
 }

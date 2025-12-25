@@ -8,6 +8,25 @@ use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 
 
+/**
+ * @method bool|null getShowCodes()
+ * @method void setShowCodes(bool|null $showCodes)
+ *
+ * @method bool|null getDarkMode()
+ * @method void setDarkMode(bool|null $darkMode)
+ *
+ * @method int|null getRecordsPerPage()
+ * @method void setRecordsPerPage(int|null $recordsPerPage)
+ *
+ * @method string|null getPassword()
+ * @method void setPassword(string|null $password)
+ *
+ * @method string|null getIv()
+ * @method void setIv(string|null $iv)
+ *
+ * @method string|null getUserId()
+ * @method void setUserId(string|null $userId)
+ */
 class Setting extends Entity implements JsonSerializable
 {
 

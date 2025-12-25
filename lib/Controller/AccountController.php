@@ -78,77 +78,78 @@ class AccountController extends Controller
 
     /**
      * @NoAdminRequired
+     * @throws Exception
      */
-    public function create($data): array|string
+    public function create(string $name, string $issuer, string $secret, string $type, string $period, string $algorithm, string $digits, ?int $counter): JSONResponse
     {
-        $errors = AccountForm::validate($data);
+        $errors = AccountForm::validate($name, $issuer, $secret, $type, $period, $algorithm, $digits);
 
         if (count($errors) > 0) {
-            return $errors;
-        } else {
-            $data["algorithm"] = $this->convertAlgorithmToInt($data["algorithm"]);
-
-            $account = $this->accountMapper->find("secret", $data["secret"], $this->userId);
-
-            if ($account != null && $account->getDeletedAt() == null) {
-                $errors["secret"] = "This secret key already exists";
-                return $errors;
-            }
-
-            $maxSharedAccountPos = $this->sharedAccountMapper->findMaxPosition($this->userId);
-            $maxAccountPos = $this->accountMapper->findMaxPosition($this->userId);
-
-            $position = max($maxSharedAccountPos, $maxAccountPos) + 1;
-
-            if ($account == null) {
-                $account = new Account();
-
-                $account->setSecret($data["secret"]);
-                $account->setName($data["name"]);
-                $account->setIssuer($data["issuer"]);
-                $account->setDigits($data["digits"]);
-                $account->setType($data["type"]);
-                $account->setPeriod($data["period"]);
-                $account->setAlgorithm($data["algorithm"]);
-                $account->setCounter($data["type"] == "totp" ? null : -1);
-                $account->setPosition($position);
-                $account->setUserId($this->userId);
-                $account->setCreatedAt(date("Y-m-d H:i:s"));
-                $account->setUpdatedAt(date("Y-m-d H:i:s"));
-
-                $this->accountMapper->insert($account);
-            } else {
-                $account->setName($data["name"]);
-                $account->setIssuer($data["issuer"]);
-                $account->setDigits($data["digits"]);
-                $account->setType($data["type"]);
-                $account->setPeriod($data["period"]);
-                $account->setAlgorithm($data["algorithm"]);
-                $account->setCounter($data["counter"]);
-                $account->setPosition($position);
-                $account->setDeletedAt(null);
-                $account->setUpdatedAt(date("Y-m-d H:i:s"));
-
-                $this->accountMapper->update($account);
-            }
-
-            return "OK";
+            return new JSONResponse($errors);
         }
+
+        $algorithm = $this->convertAlgorithmToInt($algorithm);
+
+        $account = $this->accountMapper->find("secret", $secret, $this->userId);
+
+        if ($account != null && $account->getDeletedAt() == null) {
+            $errors["secret"] = "This secret key already exists";
+            return new JSONResponse($errors);
+        }
+
+        $maxSharedAccountPos = $this->sharedAccountMapper->findMaxPosition($this->userId);
+        $maxAccountPos = $this->accountMapper->findMaxPosition($this->userId);
+
+        $position = max($maxSharedAccountPos, $maxAccountPos) + 1;
+
+        if ($account == null) {
+            $account = new Account();
+
+            $account->setSecret($secret);
+            $account->setName($name);
+            $account->setIssuer($issuer);
+            $account->setDigits($digits);
+            $account->setType($type);
+            $account->setPeriod($period);
+            $account->setAlgorithm($algorithm);
+            $account->setCounter($type == "totp" ? null : -1);
+            $account->setPosition($position);
+            $account->setUserId($this->userId);
+            $account->setCreatedAt(date("Y-m-d H:i:s"));
+            $account->setUpdatedAt(date("Y-m-d H:i:s"));
+
+            $this->accountMapper->insert($account);
+        } else {
+            $account->setName($name);
+            $account->setIssuer($issuer);
+            $account->setDigits($digits);
+            $account->setType($type);
+            $account->setPeriod($period);
+            $account->setAlgorithm($algorithm);
+            $account->setCounter($counter);
+            $account->setPosition($position);
+            $account->setDeletedAt(null);
+            $account->setUpdatedAt(date("Y-m-d H:i:s"));
+
+            $this->accountMapper->update($account);
+        }
+
+        return new JSONResponse($account);
     }
 
     /**
      * @NoAdminRequired
      */
-    public function update($data): array|string
+    public function update(string $name, string $issuer, string $secret, string $type, string $period, string $algorithm, string $digits): array|string
     {
-        $errors = AccountForm::validate($data);
+        $errors = AccountForm::validate($name, $issuer, null, $type, $period, $algorithm, $digits);
 
         if (count($errors) > 0) {
             return $errors;
         } else {
-            $data["algorithm"] = $this->convertAlgorithmToInt($data["algorithm"]);
+            $data["algorithm"] = $this->convertAlgorithmToInt($algorithm);
 
-            $account = $this->accountMapper->find("secret", $data["secret"], $this->userId);
+            $account = $this->accountMapper->find("secret", $secret, $this->userId);
 
             if ($account == null) {
                 $errors["msg"] = "This account does not exists";

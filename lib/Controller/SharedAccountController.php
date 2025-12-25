@@ -57,11 +57,11 @@ class SharedAccountController extends Controller
 
         $result = [];
 
-        foreach ($activeShares as &$activeShare) {
+        foreach ($activeShares as $activeShare) {
             $receiver = $this->userManager->get($activeShare->getReceiverId());
 
             if (!is_null($receiver)) {
-                array_push($result, $activeShare->customJson($receiver, $this->serverUrl . "avatar/" . $receiver->getUID() . "/64"));
+                $result[] = $activeShare->customJson($receiver, $this->serverUrl . "avatar/" . $receiver->getUID() . "/64");
             }
         }
 

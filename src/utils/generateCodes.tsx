@@ -1,0 +1,81 @@
+import {TOTP, HOTP} from "otpauth";
+import {AES, Hex, Utf8} from "crypto-es";
+import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
+import {convertValueIndexToEnum} from "@/utils/convertToEnum.ts";
+import type {AccountResponseDatatable} from "@/dto/utils/AccountResponseDatatable.ts";
+
+export function generateCodes(
+    {
+        accounts,
+        setAccounts,
+        setTimer,
+        passwordHash,
+        iv
+    }: {
+        accounts: AccountResponseDatatable[],
+        setAccounts: (accounts: AccountResponseDatatable[]) => void,
+        setTimer: (timer: number) => void,
+        passwordHash: string,
+        iv: string
+    }) {
+    for (let i = 0; i < accounts.length; i++) {
+        const account = accounts[i];
+
+        if (account.unlocked === undefined || account.unlocked) {
+            if (account.decryptedSecret === undefined) {
+                const key = Hex.parse(passwordHash);
+                const parsedIv = Hex.parse(iv);
+                const dec = AES.decrypt(account.secret, key, {iv: parsedIv});
+
+                account.decryptedSecret = dec.toString(Utf8);
+            }
+
+            if (account.type == "totp") {
+                let totp = new TOTP({
+                    issuer: account.issuer,
+                    label: account.name,
+                    algorithm: convertValueIndexToEnum(AccountAlgorithm, account.algorithm),
+                    digits: account.digits,
+                    period: account.period,
+                    secret: account.decryptedSecret,
+                });
+
+                account.code = totp.generate();
+            } else {
+                if (account.counter < 0) {
+                    account.code = "Click here to generate HOTP code";
+                } else {
+                    let hotp = new HOTP({
+                        issuer: account.issuer,
+                        label: account.name,
+                        algorithm: convertValueIndexToEnum(AccountAlgorithm, account.algorithm),
+                        digits: account.digits,
+                        counter: account.counter,
+                        secret: account.decryptedSecret,
+                    });
+
+                    account.code = hotp.generate();
+                }
+            }
+        } else {
+            account.code = "Click here to unlock your shared account";
+        }
+    }
+
+    setAccounts(accounts);
+
+    let timeLeft = Math.round((30 - ((Date.now() / 1000) % 30)) * 1000);
+
+    setTimer(
+        setTimeout(
+            () => generateCodes({
+                accounts: accounts,
+                setAccounts: setAccounts,
+                setTimer: setTimer,
+                passwordHash: passwordHash,
+                iv: iv,
+            }),
+            timeLeft
+        )
+    );
+}
