@@ -1,4 +1,4 @@
-export type SharedAccountResponseDetailedDTO = {
+export type SharedAccountDetailedResponseDTO = {
     id: number
     secret: string
     name: string

@@ -6,39 +6,42 @@ namespace OCA\OtpManager\Controller\Validator;
 
 class SharedAccountForm
 {
-    public static function validateCreate($data): array
+    public static function validateCreate(string $accountSecret, array $users, string $sharedSecret, string $password, string $iv, string | null $expirationDate): array
     {
         $errors = [];
 
-        if (!array_key_exists("accountSecret", $data))
-            $errors["error"] = "You must select which account to share";
+        if (strlen($accountSecret) == 0)
+            $errors["error"] = "accountSecret cannot be empty";
 
-        if (!array_key_exists("sharedSecret", $data) || strlen($data["sharedSecret"]) == 0)
-            $errors["error"] = "Secret cannot be empty";
+        if (strlen($sharedSecret) == 0)
+            $errors["error"] = "sharedSecret cannot be empty";
 
-        if (!array_key_exists("iv", $data) || strlen($data["iv"]) == 0)
+        if (strlen($iv) == 0)
             $errors["error"] = "IV cannot be empty";
 
-        if (!array_key_exists("users", $data) || !is_array($data["users"]) || count($data["users"]) == 0)
+        if (count($users) == 0)
             $errors["users"] = "You must choose at least one user";
 
-        if (array_key_exists("expirationDate", $data) && !is_null($data["expirationDate"]) && date('Y-m-d') > date('Y-m-d', strtotime($data["expirationDate"])))
+        if (!is_null($expirationDate) && date('Y-m-d') > date('Y-m-d', strtotime($expirationDate)))
             $errors["expirationDate"] = "Expiration Date must be a future date";
 
-        if (!array_key_exists("password", $data) || strlen($data["password"]) == 0)
+        if (strlen($password) == 0)
             $errors["password"] = "Password cannot be empty";
 
         return $errors;
     }
 
-    public static function validateUpdate($data): array
+    public static function validateUpdate(string $name, string $issuer, string $secret): array
     {
         $errors = [];
 
-        if (!array_key_exists("name", $data) || strlen($data["name"]) == 0 || strlen($data["name"]) > 256)
+        if (strlen($secret) == 0)
+            $errors["error"] = "Secret cannot be empty";
+
+        if (strlen($name) == 0 || strlen($name) > 256)
             $errors["name"] = "Name must be 1-256 characters long";
 
-        if (!array_key_exists("issuer", $data) || strlen($data["issuer"]) > 256)
+        if (strlen($issuer) > 256)
             $errors["issuer"] = "Issuer must be shorter than 256 characters";
 
         return $errors;

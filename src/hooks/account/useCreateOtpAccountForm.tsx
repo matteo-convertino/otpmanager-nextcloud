@@ -1,6 +1,6 @@
 import useOtpManagerApi from "@/hooks/useOtpManagerApi.ts";
 import {useForm, zodResolver} from "@mantine/form";
-import {type AccountRequestDTO, accountRequestSchema} from "@/dto/request/AccountRequestDTO.ts";
+import {accountRequestSchema, type AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
 import {AccountType} from "@/utils/accountType.ts";
 import {AccountPeriod} from "@/utils/accountPeriod.ts";
 import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
@@ -8,13 +8,15 @@ import {AccountDigits} from "@/utils/accountDigits.ts";
 import AccountService from "@/services/AccountService.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
+import useEncryption from "@/hooks/useEncryption.tsx";
 
 export default function useCreateOtpAccountForm() {
     const otpManagerApi = useOtpManagerApi();
     const {setShowCreateAccount} = useModalsStore();
-    const {setAccounts, setIsFetching} = useAccountsStore()
+    const {setAccounts, setIsFetching} = useAccountsStore();
+    const {encrypt} = useEncryption();
 
-    const form = useForm<AccountRequestDTO>({
+    const form = useForm<AccountRequestSchemaForm>({
         validate: zodResolver(accountRequestSchema),
         initialValues: {
             name: "",
@@ -27,13 +29,18 @@ export default function useCreateOtpAccountForm() {
         },
     });
 
-    function onSubmit(accountRequestDTO: AccountRequestDTO) {
+    function onSubmit(accountRequestSchemaForm: AccountRequestSchemaForm) {
         otpManagerApi({
-            api: () => AccountService.getInstance().create(accountRequestDTO),
+            api: () => AccountService.getInstance().create({
+                ...accountRequestSchemaForm,
+                secret: encrypt(accountRequestSchemaForm.secret),
+                period: parseInt(accountRequestSchemaForm.period),
+                digits: parseInt(accountRequestSchemaForm.digits)
+            }),
             titleOnSuccess: "Account created",
-            messageOnSuccess: (accountRequestDTO.issuer != ""
-                ? accountRequestDTO.issuer + " (" + accountRequestDTO.name + ")"
-                : accountRequestDTO.name) + " created with success",
+            messageOnSuccess: (accountRequestSchemaForm.issuer != ""
+                ? accountRequestSchemaForm.issuer + " (" + accountRequestSchemaForm.name + ")"
+                : accountRequestSchemaForm.name) + " created with success",
             titleOnLoading: "Creating account",
             messageOnLoading: "Account is being creating",
             onComplete: (_) => {

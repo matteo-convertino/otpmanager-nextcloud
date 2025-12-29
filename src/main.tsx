@@ -1,12 +1,7 @@
-import { createRoot } from "react-dom/client";
-
-import { OtpLayout } from "@/components/OtpLayout";
+import {createRoot} from "react-dom/client";
+import {OtpLayout} from "@/components/OtpLayout";
 import AppShell from "@/components/appShell/AppShell";
-
-// import { UserSettingContextProvider } from "./js/context/UserSettingProvider";
-// import { SecretContextProvider } from "./js/context/SecretProvider";
 import createCache from "@emotion/cache";
-
 
 // generate OTP Manager's (shadow) DOM structure
 const otpManagerContainer = document.createElement('main');
@@ -24,25 +19,29 @@ const otpManagerMantinePortal = document.createElement('div');
 otpManagerMantinePortal.id = 'otpmanager-mantine-portal';
 otpManagerMantineRoot.appendChild(otpManagerMantinePortal);
 
+const otpManagerMantineDrawer = document.createElement('div');
+otpManagerMantineDrawer.id = 'otpmanager-mantine-drawer';
+otpManagerMantineRoot.appendChild(otpManagerMantineDrawer);
+
 document.getElementById('content')!.appendChild(otpManagerContainer);
 
-const myCache = createCache({
-  key: "mantine",
-  container: otpManagerMantineRoot,
+const emotionCache = createCache({
+    key: "mantine",
+    container: otpManagerMantineRoot,
 });
 
 function App() {
-  return (
-    <>
-      {/*<UserSettingContextProvider>*/}
-      {/*  <SecretContextProvider>*/}
-          <OtpLayout myCache={myCache} emotionRoot={otpManagerMantinePortal}>
-            <AppShell />
-          </OtpLayout>
-        {/*</SecretContextProvider>*/}
-      {/*</UserSettingContextProvider>*/}
-    </>
-  );
+    return (
+        <>
+            <OtpLayout
+                emotionCache={emotionCache}
+                mantinePortalTarget={otpManagerMantinePortal}
+                mantineDrawerTarget={otpManagerMantineDrawer}
+            >
+                <AppShell/>
+            </OtpLayout>
+        </>
+    );
 }
 
-createRoot(otpManagerMantineApp).render(<App />);
+createRoot(otpManagerMantineApp).render(<App/>);

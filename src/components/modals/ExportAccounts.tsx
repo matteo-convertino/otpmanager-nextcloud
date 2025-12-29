@@ -1,6 +1,6 @@
 import {Box, Button, Group, Text} from "@mantine/core";
 import {IconLock, IconLockOpen} from "@tabler/icons-react";
-import useExportAccounts from "@/hooks/useExportAccounts.tsx";
+import useExportAccounts from "@/hooks/account/useExportAccounts.tsx";
 
 export function ExportAccounts() {
     const {onExport} = useExportAccounts();

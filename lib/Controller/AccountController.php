@@ -80,7 +80,7 @@ class AccountController extends Controller
      * @NoAdminRequired
      * @throws Exception
      */
-    public function create(string $name, string $issuer, string $secret, string $type, string $period, string $algorithm, string $digits, ?int $counter): JSONResponse
+    public function create(string $name, string $issuer, string $secret, string $type, int $period, string $algorithm, int $digits, ?int $counter): JSONResponse
     {
         $errors = AccountForm::validate($name, $issuer, $secret, $type, $period, $algorithm, $digits);
 
@@ -140,14 +140,14 @@ class AccountController extends Controller
     /**
      * @NoAdminRequired
      */
-    public function update(string $name, string $issuer, string $secret, string $type, string $period, string $algorithm, string $digits): array|string
+    public function update(string $name, string $issuer, string $secret, string $type, int $period, string $algorithm, int $digits): array|string
     {
         $errors = AccountForm::validate($name, $issuer, null, $type, $period, $algorithm, $digits);
 
         if (count($errors) > 0) {
             return $errors;
         } else {
-            $data["algorithm"] = $this->convertAlgorithmToInt($algorithm);
+            $algorithm = $this->convertAlgorithmToInt($algorithm);
 
             $account = $this->accountMapper->find("secret", $secret, $this->userId);
 
@@ -159,12 +159,12 @@ class AccountController extends Controller
                 return $errors;
             }
 
-            $account->setName($data["name"]);
-            $account->setIssuer($data["issuer"]);
-            $account->setDigits($data["digits"]);
-            $account->setType($data["type"]);
-            $account->setPeriod($data["period"]);
-            $account->setAlgorithm($data["algorithm"]);
+            $account->setName($name);
+            $account->setIssuer($issuer);
+            $account->setDigits($digits);
+            $account->setType($type);
+            $account->setPeriod($period);
+            $account->setAlgorithm($algorithm);
             if ($account->getCounter() == null) $account->setCounter(-1);
             $account->setUpdatedAt(date("Y-m-d H:i:s"));
 
@@ -213,7 +213,17 @@ class AccountController extends Controller
             $importedAccount["secret"] = $this->encryption->encrypt($importedAccount["secret"], $currentPassword, $this->userId, true);
             if ($importedAccount === false) return new JsonResponse([], 403);
 
-            $this->create($importedAccount);
+            $this->create(
+                $importedAccount["name"],
+                $importedAccount["issuer"],
+                $importedAccount["secret"],
+                $importedAccount["type"],
+                $importedAccount["period"],
+                $importedAccount["algorithm"],
+                $importedAccount["digits"],
+                array_key_exists("counter", $importedAccount) ? $importedAccount["counter"] : null,
+            );
+
         }
 
         return new JSONResponse();

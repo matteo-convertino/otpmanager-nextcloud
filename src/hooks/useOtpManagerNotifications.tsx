@@ -2,10 +2,12 @@ import {notifications} from "@mantine/notifications";
 import {IconCheck, IconInfoCircle, IconX} from "@tabler/icons-react";
 import notificationRandomId from "@/utils/notificationRandomId.ts";
 import {NotificationType} from "@/utils/notificationType.ts";
+import type {ReactNode} from "react";
 
 type NotificationParams = {
     title: string;
-    message: string;
+    message: string | ReactNode;
+    icon?: ReactNode;
 };
 
 export default function useOtpManagerNotifications() {
@@ -37,7 +39,7 @@ export default function useOtpManagerNotifications() {
 
     const showNotification = (
         type: NotificationType,
-        {title, message}: NotificationParams,
+        {title, message, icon}: NotificationParams,
         update = false
     ) => {
         const notificationProps = {
@@ -48,7 +50,7 @@ export default function useOtpManagerNotifications() {
             withCloseButton: type !== NotificationType.Loading,
             autoClose: type === NotificationType.Loading ? false : 2000,
             color: getColor(type),
-            icon: getIcon(type),
+            icon: icon === undefined ? getIcon(type) : icon,
         };
 
         update ? notifications.update(notificationProps) : notifications.show(notificationProps);

@@ -1,15 +1,13 @@
 import {useEffect, useState} from "react";
 import sortBy from "lodash/sortBy";
 
-import {generateCodes} from "@/utils/generateCodes.tsx";
 import Datatable from "./Datatable";
-
-import {useSecretStore} from "@/context/useSecretStore.ts";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useOtpManagerApi from "@/hooks/useOtpManagerApi.ts";
 import AccountService from "@/services/AccountService.ts";
 import type {AccountResponseDatatable} from "@/dto/utils/AccountResponseDatatable.ts";
 import type {DataTableSortStatus} from "mantine-datatable";
+import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
 
 export function AccountsTable() {
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -17,9 +15,9 @@ export function AccountsTable() {
         direction: "asc",
     });
     const [timer, setTimer] = useState<number | undefined>(undefined);
-    const {passwordHash, iv} = useSecretStore();
     const {accounts, setAccounts, isFetching, setIsFetching} = useAccountsStore();
     const otpManagerApi = useOtpManagerApi();
+    const {generateCodes} = useAccountsCodeGeneration();
 
     useEffect(() => {
         if (isFetching) {
@@ -46,14 +44,7 @@ export function AccountsTable() {
                         clearTimeout(timer);
                     }
 
-                    generateCodes({
-                        accounts: accountsResponseDatatable,
-                        setAccounts: setAccounts,
-                        setTimer: setTimer,
-                        passwordHash: passwordHash,
-                        iv: iv,
-                    });
-
+                    generateCodes({accounts: accountsResponseDatatable, setTimer: setTimer});
                     setIsFetching(false);
                 }
             });

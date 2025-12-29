@@ -20,4 +20,10 @@ export const accountRequestSchema = z.object({
     digits: z.nativeEnum(AccountDigits),
 })
 
-export type AccountRequestDTO = z.infer<typeof accountRequestSchema>
+export type AccountRequestSchemaForm = z.infer<typeof accountRequestSchema>
+
+export type AccountRequestDTO = Omit<AccountRequestSchemaForm, "period" | "digits"> & {
+    period: number
+    digits: number
+}
+

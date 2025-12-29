@@ -11,6 +11,7 @@ import {UnlockSharedAccount} from "../modals/UnlockSharedAccount";
 import {Apps} from "../modals/Apps";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
+import {DeleteOtpAccount} from "@/components/modals/DeleteOtpAccount.tsx";
 
 export function AppShellContent() {
     const {showNavbarSmallDevice, setShowNavbarSmallDevice} = useSidebarStore();
@@ -64,6 +65,8 @@ export function AppShellContent() {
             <CreateOtpAccount/>
 
             <EditOtpAccount/>
+
+            <DeleteOtpAccount/>
 
             <ChangePassword/>
 

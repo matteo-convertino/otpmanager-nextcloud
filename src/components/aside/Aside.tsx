@@ -28,12 +28,8 @@ export default function Aside(
                 </Text>
             }
             styles={{
-                inner: {
-                    top: "50px",
-                    right: "0px"
-                },
                 body: {
-                    height: "calc(100% - 50px)",
+                    height: "calc(100% - 71px)",
                     display: "flex",
                     flexDirection: "column",
                 },

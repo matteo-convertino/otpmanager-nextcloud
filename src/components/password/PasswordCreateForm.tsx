@@ -1,5 +1,5 @@
 import PasswordSaveForm from "@/components/password/PasswordSaveForm.tsx";
-import usePasswordCreateForm from "@/hooks/usePasswordCreateForm.tsx";
+import usePasswordCreateForm from "@/hooks/password/usePasswordCreateForm.tsx";
 
 
 export default function PasswordCreateForm() {

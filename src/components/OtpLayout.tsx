@@ -30,10 +30,11 @@ if (theme.includes("default")) {
 }
 
 
-export const OtpLayout = ({children, myCache, emotionRoot}: {
+export const OtpLayout = ({children, emotionCache, mantinePortalTarget, mantineDrawerTarget}: {
     children: ReactNode,
-    myCache: EmotionCache,
-    emotionRoot: HTMLElement
+    emotionCache: EmotionCache,
+    mantinePortalTarget: HTMLElement
+    mantineDrawerTarget: HTMLElement
 }) => {
     const {darkMode} = useSettingsStore();
     const {setPassword, auth} = useSecretStore();
@@ -56,18 +57,26 @@ export const OtpLayout = ({children, myCache, emotionRoot}: {
                         : darkMode
                             ? "dark"
                             : "light",
-                // breakpoints: {
-                //     min: 0,
-                // },
                 components: {
                     Portal: {
                         defaultProps: {
-                            target: emotionRoot,
+                            target: mantinePortalTarget,
                         },
                     },
+                    Drawer: {
+                        defaultProps: {
+                            target: mantineDrawerTarget,
+                        },
+                        styles: {
+                            inner: {
+                                top: "50px",
+                                right: "0px"
+                            },
+                        }
+                    }
                 },
             }}
-            emotionCache={myCache}
+            emotionCache={emotionCache}
         >
             <Notifications
                 position="top-right"

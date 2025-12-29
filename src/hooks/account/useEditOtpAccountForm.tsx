@@ -1,6 +1,6 @@
 import useOtpManagerApi from "@/hooks/useOtpManagerApi.ts";
 import {useForm, zodResolver} from "@mantine/form";
-import {type AccountRequestDTO, accountRequestSchema} from "@/dto/request/AccountRequestDTO.ts";
+import {accountRequestSchema, type AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
 import {AccountType} from "@/utils/accountType.ts";
 import {AccountPeriod} from "@/utils/accountPeriod.ts";
 import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
@@ -19,17 +19,19 @@ export default function useEditOtpAccountForm() {
 
     useEffect(() => {
         if (otp != undefined) {
-            form.setFieldValue("name", otp.name);
-            form.setFieldValue("issuer", otp.issuer);
-            form.setFieldValue("secret", otp.decryptedSecret!);
-            form.setFieldValue("type", convertValueToEnum(AccountType, otp.type));
-            form.setFieldValue("period", convertValueToEnum(AccountPeriod, otp.period));
-            form.setFieldValue("algorithm", convertValueIndexToEnum(AccountAlgorithm, otp.algorithm));
-            form.setFieldValue("digits", convertValueToEnum(AccountDigits, otp.digits));
+            form.setValues({
+                name: otp.name,
+                issuer: otp.issuer,
+                secret: otp.decryptedSecret!,
+                type: convertValueToEnum(AccountType, otp.type),
+                period: convertValueToEnum(AccountPeriod, otp.period.toString()),
+                algorithm: convertValueIndexToEnum(AccountAlgorithm, otp.algorithm),
+                digits: convertValueToEnum(AccountDigits, otp.digits.toString()),
+            })
         }
     }, [otp]);
 
-    const form = useForm<AccountRequestDTO>({
+    const form = useForm<AccountRequestSchemaForm>({
         initialValues: {
             name: "",
             issuer: "",
@@ -42,21 +44,27 @@ export default function useEditOtpAccountForm() {
         validate: zodResolver(accountRequestSchema),
     });
 
-    function onSubmit(accountRequestDTO: AccountRequestDTO) {
+    function onSubmit(accountRequestSchemaForm: AccountRequestSchemaForm) {
         if (otp == undefined) return;
-
-        accountRequestDTO.secret = otp.secret;
 
         otpManagerApi({
             api: () => otp.unlocked === undefined ?
-                AccountService.getInstance().update(accountRequestDTO) :
-                SharedAccountService.getInstance().update(accountRequestDTO),
+                AccountService.getInstance().update({
+                    ...accountRequestSchemaForm,
+                    secret: otp.secret,
+                    period: parseInt(accountRequestSchemaForm.period),
+                    digits: parseInt(accountRequestSchemaForm.digits)
+                }) :
+                SharedAccountService.getInstance().update({
+                    ...accountRequestSchemaForm,
+                    secret: otp.secret,
+                }),
             titleOnLoading: "Editing account",
             messageOnLoading: "Account is being editing",
             titleOnSuccess: "Account edited",
-            messageOnSuccess: (accountRequestDTO.issuer != ""
-                ? accountRequestDTO.issuer + " (" + accountRequestDTO.name + ")"
-                : accountRequestDTO.name) + " edited with success",
+            messageOnSuccess: (accountRequestSchemaForm.issuer != ""
+                ? accountRequestSchemaForm.issuer + " (" + accountRequestSchemaForm.name + ")"
+                : accountRequestSchemaForm.name) + " edited with success",
             onComplete: () => {
                 setShowEditOtpAccount(undefined);
                 setAccounts(undefined);

@@ -6,7 +6,7 @@ namespace OCA\OtpManager\Controller\Validator;
 
 class AccountForm
 {
-    public static function validate(string $name, string $issuer, string | null $secret, string $type, string $period, string $algorithm, string $digits): array
+    public static function validate(string $name, string $issuer, string | null $secret, string $type, int $period, string $algorithm, int $digits): array
     {
         $errors = [];
 
@@ -19,13 +19,13 @@ class AccountForm
         if (!in_array($type, ["totp", "hotp"]))
             $errors["type"] = "Type of code must be one of those listed";
 
-        if (!in_array($period, ["30", "45", "60"]))
+        if (!in_array($period, [30, 45, 60]))
             $errors["period"] = "Interval must be one of those listed";
 
         if (!in_array($algorithm, ["SHA1", "SHA256", "SHA512", "0", "1", "2"]))
             $errors["algorithm"] = "Algorithm must be one of those listed";
 
-        if (!in_array($digits, ["4", "6"]))
+        if (!in_array($digits, [4, 6]))
             $errors["digits"] = "Digits must be one of those listed";
 
         if (!is_null($secret) && (strlen($secret) < 16 || strlen($secret) > 512))

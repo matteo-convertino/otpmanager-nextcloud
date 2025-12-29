@@ -12,16 +12,23 @@ import {useSidebarStore} from "@/context/useSidebarStore.ts";
 
 export default function MainAppShell() {
     const smallScreen = useMediaQuery("(max-width: 991px)");
-
     const {showAsideInfo, showAsideShare, setShowAsideInfo, setShowAsideShare} = useSidebarStore();
 
     return (
         <>
-            <Aside showAside={showAsideInfo !== undefined} setShowAside={setShowAsideInfo} title="Account Details">
+            <Aside
+                showAside={showAsideInfo !== undefined}
+                setShowAside={setShowAsideInfo}
+                title="Account Details"
+            >
                 <AsideInfo/>
             </Aside>
 
-            <Aside showAside={showAsideShare !== undefined} setShowAside={setShowAsideShare} title="Account Sharing">
+            <Aside
+                showAside={showAsideShare !== undefined}
+                setShowAside={setShowAsideShare}
+                title="Account Sharing"
+            >
                 <AsideShare/>
             </Aside>
 

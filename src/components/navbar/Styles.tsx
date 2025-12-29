@@ -5,14 +5,22 @@ export const navbarStyles = createStyles((theme, _params) => {
 
   return {
     header: {
-      paddingTop: theme.spacing.xs,
-      paddingBottom: theme.spacing.md,
-      marginBottom: `calc(${theme.spacing.md} * 1.5)`,
       borderBottom: `1px solid ${
           theme.colorScheme === "dark"
               ? theme.colors.dark[4]
               : theme.colors.gray[2]
       }`,
+      paddingTop: 0,
+      paddingRight: 0,
+      paddingBottom: theme.spacing.md,
+
+      [theme.fn.largerThan("md")]: {
+        marginBottom: theme.spacing.md,
+      },
+
+      [theme.fn.smallerThan("md")]: {
+        margin: theme.spacing.md,
+      },
     },
 
     footer: {
@@ -40,6 +48,7 @@ export const navbarStyles = createStyles((theme, _params) => {
       fontWeight: 500,
 
       "&:hover": {
+        cursor: "pointer",
         backgroundColor:
             theme.colorScheme === "dark"
                 ? theme.colors.dark[6]

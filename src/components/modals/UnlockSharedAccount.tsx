@@ -1,7 +1,7 @@
 import {useDisclosure} from "@mantine/hooks";
 import {Button, Flex, Modal, PasswordInput, Stack} from "@mantine/core";
 import {useModalsStore} from "@/context/useModalsStore.ts";
-import useUnlockSharedAccountForm from "@/hooks/useUnlockSharedAccountForm.tsx";
+import useUnlockSharedAccountForm from "@/hooks/sharedAccount/useUnlockSharedAccountForm.tsx";
 
 export function UnlockSharedAccount() {
     const [visible, {toggle}] = useDisclosure(false);

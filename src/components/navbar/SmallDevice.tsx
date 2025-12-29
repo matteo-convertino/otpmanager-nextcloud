@@ -1,198 +1,36 @@
-import {useState} from "react";
-
-import {ActionIcon, Box, Checkbox, Collapse, Drawer, Flex, Group, Stack, Text} from "@mantine/core";
-import {
-    IconApps,
-    IconChevronLeft,
-    IconChevronRight,
-    IconFileInvoice,
-    IconKey,
-    IconList,
-    IconLockOff,
-    IconMoonStars,
-    IconSettings,
-    IconSun,
-} from "@tabler/icons-react";
+import {Drawer, Stack} from "@mantine/core";
 import {navbarStyles} from "./Styles";
-import {useSettingsStore} from "@/context/useSettingsStore";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
-import {useModalsStore} from "@/context/useModalsStore.ts";
+import {useNavbar} from "@/hooks/useNavbar.tsx";
 
 export function NavbarSmallDevice() {
-    const [active, setActive] = useState("All accounts");
-    const { classes, cx } = navbarStyles();
-    const [ showSettings, setShowSettings] = useState(false);
-    const ChevronIcon = !showSettings ? IconChevronRight : IconChevronLeft;
-    const { darkMode, setDarkMode, showCodes, setShowCodes } = useSettingsStore();
-    const [passwordSaved, setPasswordSaved] = useState(
-        Boolean(localStorage.getItem("otpmanager_cached_password"))
-    );
+    const {classes/*, cx*/} = navbarStyles();
     const {showNavbarSmallDevice, setShowNavbarSmallDevice} = useSidebarStore();
-    const {setShowChangePassword, setShowImportExport, setShowApps} = useModalsStore();
+    const {header, body, footer} = useNavbar();
 
     return (
         <>
             <Drawer
-                padding="xs"
+                padding="md"
                 position="left"
                 size={300}
                 opened={showNavbarSmallDevice}
                 onClose={() => setShowNavbarSmallDevice(false)}
-                title={
-                    <Text fw={700} fz="lg" ta="center">
-                        OTP Manager
-                    </Text>
-                }
+                title={header}
+                classNames={{header: classes.header}}
                 styles={{
-                    drawer: {
-                        top: "50px",
-                        //minHeight: "calc(100vh - 50px)"
-                    },
-                    header: classes.header,
                     body: {
-                        height: "calc(100% - 100px)",
-                    },
-                    closeButton: {
-                        position: "absolute",
-                        left: "calc(100% - 28px - 16px);", // - 28px (button size) - 16 px (padding right)
-                    },
-                    title: {
-                        width: "100%",
+                        height: "calc(100% - 92px)",
                     },
                 }}
             >
-                <Stack sx={{ height: "calc(100% + 20px)" }} justify="space-between">
+                <Stack h={"100%"} justify="space-between">
                     <div>
-                        <a
-                            className={cx(classes.link, {
-                                [classes.linkActive]: "All accounts" === active,
-                            })}
-                        >
-                            <IconList className={classes.linkIcon} stroke={1.5} />
-                            <span>All accounts</span>
-                        </a>
+                        {body}
                     </div>
 
                     <div className={classes.footer}>
-                        <div
-                            href="#"
-                            className={classes.link}
-                            onClick={(event) => setShowApps(true)}
-                        >
-                            <IconApps className={classes.linkIcon} stroke={1.5} />
-                            <span>Apps</span>
-                        </div>
-
-                        <Group
-                            position="apart"
-                            className={classes.link}
-                            spacing={0}
-                            onClick={() => setShowSettings((o) => !o)}
-                        >
-                            <Box sx={{ display: "flex", alignItems: "center" }}>
-                                <IconSettings className={classes.linkIcon} stroke={1.5} />
-                                <Text>Settings</Text>
-                            </Box>
-
-                            <ChevronIcon
-                                className={classes.chevron}
-                                size="16px"
-                                stroke={1.5}
-                                style={{
-                                    transform: showSettings ? "rotate(-90deg)" : "none",
-                                }}
-                            />
-                        </Group>
-
-                        <Collapse in={showSettings}>
-                            <Checkbox
-                                checked={showCodes}
-                                onChange={() =>
-                                    setShowCodes(!showCodes)
-                                }
-                                className={classes.innerLink}
-                                label="Show codes"
-                            />
-                            <Flex className={classes.innerLink} align="center">
-                                <ActionIcon
-                                    variant="outline"
-                                    color={darkMode ? "yellow" : "blue"}
-                                    onClick={() =>
-                                        setDarkMode(!darkMode)
-                                    }
-                                    sx={{
-                                        width: "20px",
-                                        height: "20px",
-                                        minWidth: "20px",
-                                        minHeight: "20px",
-                                    }}
-                                    title="Toggle color scheme"
-                                >
-                                    {darkMode ? (
-                                        <IconSun style={{ width: 16 }} />
-                                    ) : (
-                                        <IconMoonStars style={{ width: 16 }} />
-                                    )}
-                                </ActionIcon>
-                                <Text
-                                    sx={{
-                                        fontSize: "14px",
-                                        color: "#C1C2C5",
-                                        marginLeft: "12px",
-                                    }}
-                                >
-                                    {"Switch to " +
-                                        (darkMode ? "light mode" : "dark mode")}
-                                </Text>
-                            </Flex>
-
-                            <Flex className={classes.innerLink} align="center">
-                                <ActionIcon
-                                    variant="outline"
-                                    color="red"
-                                    onClick={() => {
-                                        localStorage.removeItem("otpmanager_cached_password");
-                                        setPasswordSaved(false);
-                                    }}
-                                    disabled={!passwordSaved}
-                                    sx={{
-                                        width: "20px",
-                                        height: "20px",
-                                        minWidth: "20px",
-                                        minHeight: "20px",
-                                    }}
-                                    title="Remove saved password"
-                                >
-                                    <IconLockOff style={{ width: 16 }} />
-                                </ActionIcon>
-                                <Text
-                                    sx={{
-                                        fontSize: "14px",
-                                        color: "#C1C2C5",
-                                        marginLeft: "12px",
-                                    }}
-                                >
-                                    Remove saved password
-                                </Text>
-                            </Flex>
-
-                            <div
-                                href="#"
-                                className={classes.link}
-                                onClick={(event) => setShowChangePassword(true)}
-                            >
-                                <IconKey className={classes.linkIcon} stroke={1.5} />
-                                <span>Change password</span>
-                            </div>
-                            <div
-                                href="#"
-                                className={classes.link}
-                                onClick={(event) => setShowImportExport(true)}
-                            >
-                                <IconFileInvoice className={classes.linkIcon} stroke={1.5} />
-                                <span>Import / Export</span>
-                            </div>
-                        </Collapse>
+                        {footer}
                     </div>
                 </Stack>
             </Drawer>

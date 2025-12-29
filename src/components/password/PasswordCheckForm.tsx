@@ -2,7 +2,7 @@ import {useDisclosure} from "@mantine/hooks";
 import {useCallback} from "react";
 
 import {Box, Checkbox, Flex, PasswordInput,} from "@mantine/core";
-import usePasswordCheckForm from "@/hooks/usePasswordCheckForm.tsx";
+import usePasswordCheckForm from "@/hooks/password/usePasswordCheckForm.tsx";
 
 
 export default function PasswordCheckForm() {

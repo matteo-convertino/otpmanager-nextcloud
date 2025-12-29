@@ -2,7 +2,7 @@ import {Modal} from "@mantine/core";
 import {IconPlus} from "@tabler/icons-react";
 import ModalContent from "./CreateEditContent";
 import {useModalsStore} from "@/context/useModalsStore.ts";
-import useCreateOtpAccountForm from "@/hooks/useCreateOtpAccountForm.tsx";
+import useCreateOtpAccountForm from "@/hooks/account/useCreateOtpAccountForm.tsx";
 
 export function CreateOtpAccount() {
     const {showCreateAccount, setShowCreateAccount} = useModalsStore();

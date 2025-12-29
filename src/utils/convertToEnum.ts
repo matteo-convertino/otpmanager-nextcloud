@@ -1,6 +1,6 @@
 export function convertValueToEnum<E extends Object>(
     enumObj: E,
-    value: unknown,
+    value: string,
 ): E[keyof E] {
     const values = Object.values(enumObj) as Array<E[keyof E]>
     if (!values.includes(value as E[keyof E])) {

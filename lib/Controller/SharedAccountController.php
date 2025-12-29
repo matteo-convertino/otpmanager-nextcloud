@@ -71,14 +71,14 @@ class SharedAccountController extends Controller
     /**
      * @NoAdminRequired
      */
-    public function create($data): array|string
+    public function create(string $accountSecret, array $users, string $sharedSecret, string $password, string $iv, string | null $expirationDate): array|string
     {
-        $errors = SharedAccountForm::validateCreate($data);
+        $errors = SharedAccountForm::validateCreate($accountSecret, $users, $sharedSecret, $password, $iv, $expirationDate);
 
         if (count($errors) > 0) {
             return $errors;
         } else {
-            $account = $this->accountMapper->find("secret", $data["accountSecret"], $this->userId);
+            $account = $this->accountMapper->find("secret", $accountSecret, $this->userId);
 
             if (is_null($account)) {
                 $errors["error"] = "The account to share does not exist";
@@ -88,7 +88,7 @@ class SharedAccountController extends Controller
                 return $errors;
             }
 
-            foreach ($data["users"] as $receiverId) {
+            foreach ($users as $receiverId) {
                 $accountShared = $this->sharedAccountMapper->findByReceiver($account->getId(), $receiverId);
 
                 if (is_null($accountShared)) {
@@ -103,18 +103,18 @@ class SharedAccountController extends Controller
                     $accountShared->setReceiverId($receiverId);
                     $accountShared->setName($account->getName());
                     $accountShared->setIssuer($account->getIssuer());
-                    $accountShared->setSecret($data["sharedSecret"]);
-                    $accountShared->setPassword(password_hash($data["password"], PASSWORD_DEFAULT));
-                    $accountShared->setIv($data["iv"]);
+                    $accountShared->setSecret($sharedSecret);
+                    $accountShared->setPassword(password_hash($password, PASSWORD_DEFAULT));
+                    $accountShared->setIv($iv);
                     $accountShared->setIcon($account->getIcon());
                     $accountShared->setPosition($position);
-                    $accountShared->setExpiredAt($data["expirationDate"] == null ? null : date('Y-m-d', strtotime($data["expirationDate"])));
+                    $accountShared->setExpiredAt($expirationDate == null ? null : date('Y-m-d', strtotime($expirationDate)));
                     $accountShared->setCreatedAt(date("Y-m-d H:i:s"));
                     $accountShared->setUpdatedAt(date("Y-m-d H:i:s"));
 
                     $this->sharedAccountMapper->insert($accountShared);
                 } else {
-                    $accountShared->setExpiredAt($data["expirationDate"] == null ? null : date('Y-m-d', strtotime($data["expirationDate"])));
+                    $accountShared->setExpiredAt($expirationDate == null ? null : date('Y-m-d', strtotime($expirationDate)));
                     $this->sharedAccountMapper->update($accountShared);
                 }
             }
@@ -126,22 +126,22 @@ class SharedAccountController extends Controller
     /**
      * @NoAdminRequired
      */
-    public function update($data): array|string
+    public function update(string $name, string $issuer, string $secret): array|string
     {
-        $errors = SharedAccountForm::validateUpdate($data);
+        $errors = SharedAccountForm::validateUpdate($name, $issuer, $secret);
 
         if (count($errors) > 0) {
             return $errors;
         } else {
-            $sharedAccount = $this->sharedAccountMapper->find("secret", $data["secret"], $this->userId);
+            $sharedAccount = $this->sharedAccountMapper->find("secret", $secret, $this->userId);
 
             if ($sharedAccount == null) {
                 $errors["msg"] = "This account does not exists";
                 return $errors;
             }
 
-            $sharedAccount->setName($data["name"]);
-            $sharedAccount->setIssuer($data["issuer"]);
+            $sharedAccount->setName($name);
+            $sharedAccount->setIssuer($issuer);
 
             $this->sharedAccountMapper->update($sharedAccount);
 

@@ -1,5 +1,6 @@
 import {callApi} from "@/utils/callApi";
 import useOtpManagerNotifications from "@/hooks/useOtpManagerNotifications.tsx";
+import type {ReactNode} from "react";
 
 export default function useOtpManagerApi() {
     const {
@@ -14,6 +15,7 @@ export default function useOtpManagerApi() {
             api: api,
             titleOnSuccess,
             messageOnSuccess,
+            iconOnSuccess,
             titleOnLoading,
             messageOnLoading,
             messageOnGenericError = "Generic error",
@@ -24,7 +26,8 @@ export default function useOtpManagerApi() {
         }: {
             api: () => Promise<T>
             titleOnSuccess?: string,
-            messageOnSuccess?: string,
+            messageOnSuccess?: string | ReactNode,
+            iconOnSuccess?: ReactNode,
             titleOnLoading?: string,
             messageOnLoading?: string,
             messageOnGenericError?: string,
@@ -48,7 +51,8 @@ export default function useOtpManagerApi() {
                     if (showNotifications) {
                         updateSuccess({
                             title: titleOnSuccess!,
-                            message: messageOnSuccess!
+                            message: messageOnSuccess!,
+                            icon: iconOnSuccess!,
                         });
                     }
 

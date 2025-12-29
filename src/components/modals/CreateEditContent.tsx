@@ -1,7 +1,7 @@
-import {Select, Stack, TextInput, Grid, Group, Button} from "@mantine/core";
-import {IconAbc, IconShieldLock, IconKey} from "@tabler/icons-react";
+import {Button, Grid, Group, Select, Stack, TextInput} from "@mantine/core";
+import {IconAbc, IconKey, IconShieldLock} from "@tabler/icons-react";
 import type {UseFormReturnType} from "@mantine/form";
-import type {AccountRequestDTO} from "@/dto/request/AccountRequestDTO.ts";
+import type {AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
 import type {ReactNode} from "react";
 
 export default function CreateEditContent(
@@ -12,7 +12,7 @@ export default function CreateEditContent(
         isSecretKeyDisabled,
         isSharedAccount,
     }: {
-        form: UseFormReturnType<AccountRequestDTO>,
+        form: UseFormReturnType<AccountRequestSchemaForm>,
         textSubmitButton: string,
         iconSubmitButton: ReactNode,
         isSecretKeyDisabled: boolean,

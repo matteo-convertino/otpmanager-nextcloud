@@ -2,7 +2,7 @@ import {useState} from "react";
 
 import {Alert, Anchor, Button, FileInput, Group, PasswordInput,} from "@mantine/core";
 import {IconFileImport, IconInfoCircle,} from "@tabler/icons-react";
-import useImportAccountsForm from "@/hooks/useImportAccountsForm.tsx";
+import useImportAccountsForm from "@/hooks/account/useImportAccountsForm.tsx";
 
 export function ImportAccounts() {
     const [file, setFile] = useState<File | undefined>(undefined);

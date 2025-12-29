@@ -11,8 +11,6 @@ import {
     IconTrash,
 } from "@tabler/icons-react";
 import {DataTable, type DataTableSortStatus} from "mantine-datatable";
-
-import {openDeleteModal} from "../../modals/DeleteOtpAccount";
 import {copy} from "@/utils/copy";
 import {updateCounter} from "@/utils/updateCounter";
 import {generateUrl} from "@nextcloud/router";
@@ -41,8 +39,8 @@ export default function CustomDatatable(
     const [from, setFrom] = useState(0);
     const [to, setTo] = useState(pageSize);
 
-    const {setAccounts, accounts, isFetching, setIsFetching} = useAccountsStore();
-    const {setShowSharedAccountToUnlock, setShowEditOtpAccount} = useModalsStore();
+    const {accounts, isFetching} = useAccountsStore();
+    const {setShowSharedAccountToUnlock, setShowEditOtpAccount, setShowDeleteOtpAccount} = useModalsStore();
     const {setShowAsideInfo, setShowAsideShare} = useSidebarStore();
 
 
@@ -78,7 +76,7 @@ export default function CustomDatatable(
             withBorder
             sx={{backgroundColor: "", marginTop: "0px"}}
             onRowClick={(account) => {
-                if (account.unlocked === false) {
+                if (account.unlocked === 0) {
                     setShowSharedAccountToUnlock(account);
                 } else if (account.type == "hotp" && account.counter < 0) {
                     updateCounter(account, account.user_id, setUpdateCounterState);
@@ -107,7 +105,7 @@ export default function CustomDatatable(
                                             display:
                                                 showCodes ||
                                                 isTouchDevice ||
-                                                account.unlocked === false
+                                                account.unlocked === 0
                                                     ? "none"
                                                     : "block",
                                         }}
@@ -122,14 +120,14 @@ export default function CustomDatatable(
                                             display:
                                                 showCodes ||
                                                 isTouchDevice ||
-                                                account.unlocked === false
+                                                account.unlocked === 0
                                                     ? "flex"
                                                     : "none",
                                         }}
                                         onClick={(event) => {
                                             if (
                                                 (account.unlocked === undefined ||
-                                                    account.unlocked === true) &&
+                                                    account.unlocked === 1) &&
                                                 ((account.type == "hotp" && account.counter >= 0) ||
                                                     account.type == "totp")
                                             ) {
@@ -141,7 +139,7 @@ export default function CustomDatatable(
                                     >
                                         <Text>{account.code}</Text>
                                         {(account.unlocked === undefined ||
-                                                account.unlocked === true) &&
+                                                account.unlocked === 1) &&
                                             ((account.type == "hotp" && account.counter >= 0) ||
                                                 account.type == "totp") && (
                                                 <ActionIcon>
@@ -161,7 +159,7 @@ export default function CustomDatatable(
                     render: (account) => (
                         <>
                             <Group spacing={4} position="right" noWrap>
-                                {(account.unlocked === false) && (
+                                {(account.unlocked === 0) && (
                                     <ActionIcon
                                         onClick={(event: MouseEvent) => {
                                             event.stopPropagation();
@@ -173,7 +171,7 @@ export default function CustomDatatable(
                                 )}
 
                                 {account.type == "hotp" &&
-                                    account.unlocked !== false && (
+                                    account.unlocked !== 0 && (
                                         <ActionIcon
                                             disabled={isUpdatingCounter}
                                             onClick={(event: MouseEvent) => {
@@ -189,7 +187,7 @@ export default function CustomDatatable(
                                         </ActionIcon>
                                     )}
 
-                                {account.unlocked === true && (
+                                {account.unlocked === 1 && (
                                     <Avatar
                                         src={generateUrl("/avatar/" + account.user_id + "/64")}
                                         alt={account.user_id}
@@ -224,12 +222,13 @@ export default function CustomDatatable(
                                     color="red"
                                     onClick={(event: MouseEvent) => {
                                         event.stopPropagation();
-                                        openDeleteModal({
+                                        setShowDeleteOtpAccount(account);
+                                        /*openDeleteModal({
                                             account: account,
                                             setAccounts: setAccounts,
                                             setIsFetching: setIsFetching,
                                             setPage: setPage,
-                                        });
+                                        });*/
                                     }}
                                 >
                                     <IconTrash size={18}/>
