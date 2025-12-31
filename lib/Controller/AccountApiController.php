@@ -39,6 +39,6 @@ class AccountApiController extends OCSController
 		$account->setCounter($account->getCounter() + 1);
 		$this->accountMapper->update($account);
 
-		return new JSONResponse($account->getCounter(), Http::STATUS_OK);
+		return new JSONResponse($account, Http::STATUS_OK);
 	}
 }

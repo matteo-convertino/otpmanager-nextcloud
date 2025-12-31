@@ -1,4 +1,4 @@
-import {generateOtpManagerUrl} from "@/services/routes/generate.ts";
+import {generateOtpManagerOcsUrl, generateOtpManagerUrl} from "@/services/routes/generate.ts";
 
 const BASE = '/accounts';
 
@@ -9,4 +9,5 @@ export const AccountRoutes = {
     UPDATE: generateOtpManagerUrl(BASE),
     DELETE: (id: number) => generateOtpManagerUrl(`${BASE}/${id}`),
     IMPORT: generateOtpManagerUrl(`${BASE}/import`),
+    UPDATE_COUNTER: generateOtpManagerOcsUrl(`${BASE}/update-counter`),
 };

@@ -4,6 +4,7 @@ import type {AccountResponseDTO} from "@/dto/response/AccountResponseDTO.ts";
 import type {AccountRequestDTO} from "@/dto/request/AccountRequestDTO.ts";
 import type {AllAccountResponseDTO} from "@/dto/response/AllAccountResponseDTO.ts";
 import type {ImportAccountsDTO} from "@/dto/request/ImportAccountsDTO.ts";
+import type {UpdateCounterRequestDTO} from "@/dto/request/UpdateCounterRequestDTO.ts";
 
 
 export default class AccountService {
@@ -56,6 +57,13 @@ export default class AccountService {
         return otpManagerAxiosClient.post<void>(
             AccountRoutes.IMPORT,
             importAccountsDTO
+        ).then(res => res.data);
+    }
+
+    public async updateCounter(updateCounterRequestDTO: UpdateCounterRequestDTO): Promise<AccountResponseDTO> {
+        return otpManagerAxiosClient.post<AccountResponseDTO>(
+            AccountRoutes.UPDATE_COUNTER,
+            updateCounterRequestDTO
         ).then(res => res.data);
     }
 }

@@ -8,6 +8,7 @@ import AccountService from "@/services/AccountService.ts";
 import type {AccountResponseDatatable} from "@/dto/utils/AccountResponseDatatable.ts";
 import type {DataTableSortStatus} from "mantine-datatable";
 import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
+import {PAGE_SIZES, useSettingsStore} from "@/context/useSettingsStore.ts";
 
 export function AccountsTable() {
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -18,42 +19,52 @@ export function AccountsTable() {
     const {accounts, setAccounts, isFetching, setIsFetching} = useAccountsStore();
     const otpManagerApi = useOtpManagerApi();
     const {generateCodes} = useAccountsCodeGeneration();
+    const {setPageOptions} = useSettingsStore();
 
     useEffect(() => {
-        if (isFetching) {
-            setIsFetching(true);
+        if (!isFetching) return;
 
-            otpManagerApi({
-                api: AccountService.getInstance().getAll,
-                showNotifications: false,
-                onComplete: (allAccounts) => {
-                    let accountsResponseDatatable: AccountResponseDatatable[] = [];
+        setIsFetching(true);
 
-                    accountsResponseDatatable.push(...allAccounts.accounts);
+        otpManagerApi({
+            api: AccountService.getInstance().getAll,
+            showNotifications: false,
+            onComplete: (allAccounts) => {
+                let accountsResponseDatatable: AccountResponseDatatable[] = [];
 
-                    accountsResponseDatatable.push(...allAccounts.shared_accounts.map(
-                        ({account_id, ...rest}) => ({
-                            ...rest,
-                            id: account_id,
-                        })
-                    ));
+                accountsResponseDatatable.push(...allAccounts.accounts);
 
-                    accountsResponseDatatable = sortBy(accountsResponseDatatable, sortStatus.columnAccessor);
+                accountsResponseDatatable.push(...allAccounts.shared_accounts.map(
+                    ({account_id, ...rest}) => ({
+                        ...rest,
+                        id: account_id,
+                    })
+                ));
 
-                    if (timer !== undefined) {
-                        clearTimeout(timer);
-                    }
+                accountsResponseDatatable = sortBy(accountsResponseDatatable, sortStatus.columnAccessor);
 
-                    generateCodes({accounts: accountsResponseDatatable, setTimer: setTimer});
-                    setIsFetching(false);
+                if (timer !== undefined) {
+                    clearTimeout(timer);
                 }
-            });
-        } else if (accounts !== undefined) {
-            let response = sortBy(accounts, sortStatus.columnAccessor);
-            if (sortStatus.direction === "desc") response = response.reverse();
-            setAccounts(response);
-        }
-    }, [sortStatus, isFetching]);
+
+                generateCodes({accounts: accountsResponseDatatable, setTimer: setTimer});
+
+                setPageOptions([
+                    ...PAGE_SIZES.filter((n) => n < accountsResponseDatatable.length),
+                    accountsResponseDatatable.length]
+                );
+                setIsFetching(false);
+            }
+        });
+    }, [isFetching]);
+
+    useEffect(() => {
+        if (accounts === undefined) return;
+
+        let response = sortBy(accounts, sortStatus.columnAccessor);
+        if (sortStatus.direction === "desc") response = response.reverse();
+        setAccounts(response);
+    }, [sortStatus]);
 
     return (
         <Datatable

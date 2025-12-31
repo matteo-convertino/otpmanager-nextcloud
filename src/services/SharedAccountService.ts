@@ -7,6 +7,7 @@ import type {SharedAccountUnlockDTO} from "@/dto/request/SharedAccountUnlockDTO.
 import type {SharedAccountCreateRequestDTO} from "@/dto/request/SharedAccountCreateRequestDTO.ts";
 import type {SharedAccountEditRequestDTO} from "@/dto/request/SharedAccountEditRequestDTO.ts";
 import type {NextcloudUserDTO} from "@/dto/response/NextcloudUserDTO.ts";
+import type {UpdateCounterRequestDTO} from "@/dto/request/UpdateCounterRequestDTO.ts";
 
 
 export default class SharedAccountService {
@@ -62,18 +63,10 @@ export default class SharedAccountService {
         ).then(res => res.data);
     }
 
-    ////////////////////////////////
-
-    // public async getAll(): Promise<AccountResponseDTO[]> {
-    //     return otpManagerAxiosClient.get<AccountResponseDTO[]>(
-    //         AccountRoutes.GET_ALL
-    //     ).then(res => res.data);
-    // }
-    //
-    // public async import(data: unknown): Promise<void> {
-    //     return otpManagerAxiosClient.post<void>(
-    //         AccountRoutes.IMPORT,
-    //         data
-    //     ).then(res => res.data);
-    // }
+    public async updateCounter(updateCounterRequestDTO: UpdateCounterRequestDTO): Promise<SharedAccountResponseDTO> {
+        return otpManagerAxiosClient.post<SharedAccountResponseDTO>(
+            SharedAccountRoutes.UPDATE_COUNTER,
+            updateCounterRequestDTO
+        ).then(res => res.data);
+    }
 }

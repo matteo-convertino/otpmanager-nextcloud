@@ -12,13 +12,12 @@ import {
 } from "@tabler/icons-react";
 import {DataTable, type DataTableSortStatus} from "mantine-datatable";
 import {copy} from "@/utils/copy";
-import {updateCounter} from "@/utils/updateCounter";
 import {generateUrl} from "@nextcloud/router";
-import {PAGE_SIZES, useSettingsStore} from "@/context/useSettingsStore";
+import {useSettingsStore} from "@/context/useSettingsStore";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
-
+import useUpdateCounter from "@/hooks/useUpdateCounter.tsx";
 
 const isTouchDevice =
     "ontouchstart" in window ||
@@ -32,54 +31,43 @@ export default function CustomDatatable(
         sortStatus: DataTableSortStatus,
         setSortStatus: (sortStatus: DataTableSortStatus) => void
     }) {
-    const {showCodes, recordsPerPage, setRecordsPerPage} = useSettingsStore();
-    const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [isUpdatingCounter, setUpdateCounterState] = useState(false);
+    const {showCodes, recordsPerPage, setRecordsPerPage, pageOptions} = useSettingsStore();
     const [page, setPage] = useState(1);
     const [from, setFrom] = useState(0);
-    const [to, setTo] = useState(pageSize);
+    const [to, setTo] = useState(recordsPerPage);
 
     const {accounts, isFetching} = useAccountsStore();
     const {setShowSharedAccountToUnlock, setShowEditOtpAccount, setShowDeleteOtpAccount} = useModalsStore();
     const {setShowAsideInfo, setShowAsideShare} = useSidebarStore();
 
+    const {isUpdating: isUpdatingCounter, onUpdate: onUpdateCounter} = useUpdateCounter();
 
     useEffect(() => {
-        if (accounts === undefined) return;
-
-        setPageSize(accounts.length);
-        // recordsPerPage == "All"
-        //   ? setPageSize(accounts.length)
-        //   : setPageSize(recordsPerPage);
-    }, [recordsPerPage, accounts]);
+        if (accounts === undefined) setPage(1);
+    }, [accounts]);
 
     useEffect(() => {
-        if (accounts === undefined) {
-            setFrom(0);
-            setTo(pageSize);
-        } else {
-            let from = (page - 1) * pageSize;
+        let from = (page - 1) * recordsPerPage;
 
-            setFrom(from);
-            setTo(from + pageSize);
-        }
-    }, [page, pageSize]);
+        setFrom(from);
+        setTo(from + recordsPerPage);
+    }, [page, recordsPerPage]);
 
     return (
         <DataTable
             fetching={isFetching}
             textSelectionDisabled
             verticalSpacing="xs"
-            records={accounts === undefined ? undefined : accounts.slice(from, to)}
+            records={accounts?.slice(from, to)}
             striped
             highlightOnHover
             withBorder
-            sx={{backgroundColor: "", marginTop: "0px"}}
+            // sx={{backgroundColor: "", marginTop: "0px"}}
             onRowClick={(account) => {
                 if (account.unlocked === 0) {
                     setShowSharedAccountToUnlock(account);
                 } else if (account.type == "hotp" && account.counter < 0) {
-                    updateCounter(account, account.user_id, setUpdateCounterState);
+                    onUpdateCounter(account);
                 } else {
                     setShowAsideInfo(account);
                 }
@@ -92,6 +80,9 @@ export default function CustomDatatable(
                     accessor: "code",
                     width: 300,
                     render: (account) => {
+                        let canCopyCode = (account.unlocked === undefined || account.unlocked === 1) &&
+                            ((account.type == "hotp" && account.counter >= 0) || account.type == "totp");
+
                         return (
                             <>
                                 <Box
@@ -111,7 +102,7 @@ export default function CustomDatatable(
                                         }}
                                         id="hiddenCode"
                                     >
-                                        ******
+                                        {"*".repeat(account.digits)}
                                     </Text>
                                     <Group
                                         spacing={0}
@@ -125,12 +116,7 @@ export default function CustomDatatable(
                                                     : "none",
                                         }}
                                         onClick={(event) => {
-                                            if (
-                                                (account.unlocked === undefined ||
-                                                    account.unlocked === 1) &&
-                                                ((account.type == "hotp" && account.counter >= 0) ||
-                                                    account.type == "totp")
-                                            ) {
+                                            if (canCopyCode) {
                                                 event.preventDefault();
                                                 event.stopPropagation();
                                                 copy(account.code);
@@ -138,14 +124,11 @@ export default function CustomDatatable(
                                         }}
                                     >
                                         <Text>{account.code}</Text>
-                                        {(account.unlocked === undefined ||
-                                                account.unlocked === 1) &&
-                                            ((account.type == "hotp" && account.counter >= 0) ||
-                                                account.type == "totp") && (
-                                                <ActionIcon>
-                                                    <IconCopy size={18}/>
-                                                </ActionIcon>
-                                            )}
+                                        {canCopyCode && (
+                                            <ActionIcon>
+                                                <IconCopy size={18}/>
+                                            </ActionIcon>
+                                        )}
                                     </Group>
                                 </Box>
                             </>
@@ -159,7 +142,7 @@ export default function CustomDatatable(
                     render: (account) => (
                         <>
                             <Group spacing={4} position="right" noWrap>
-                                {(account.unlocked === 0) && (
+                                {account.unlocked === 0 && (
                                     <ActionIcon
                                         onClick={(event: MouseEvent) => {
                                             event.stopPropagation();
@@ -176,11 +159,7 @@ export default function CustomDatatable(
                                             disabled={isUpdatingCounter}
                                             onClick={(event: MouseEvent) => {
                                                 event.stopPropagation();
-                                                updateCounter(
-                                                    account,
-                                                    account.user_id,
-                                                    setUpdateCounterState
-                                                );
+                                                onUpdateCounter(account);
                                             }}
                                         >
                                             <IconReload size={18}/>
@@ -223,12 +202,6 @@ export default function CustomDatatable(
                                     onClick={(event: MouseEvent) => {
                                         event.stopPropagation();
                                         setShowDeleteOtpAccount(account);
-                                        /*openDeleteModal({
-                                            account: account,
-                                            setAccounts: setAccounts,
-                                            setIsFetching: setIsFetching,
-                                            setPage: setPage,
-                                        });*/
                                     }}
                                 >
                                     <IconTrash size={18}/>
@@ -241,15 +214,13 @@ export default function CustomDatatable(
             sortStatus={sortStatus}
             onSortStatusChange={setSortStatus}
             totalRecords={accounts == null ? 0 : accounts.length}
-            recordsPerPage={pageSize}
+            recordsPerPage={recordsPerPage}
             page={page}
             onPageChange={(p) => setPage(p)}
-            recordsPerPageOptions={PAGE_SIZES}
+            recordsPerPageOptions={pageOptions}
             onRecordsPerPageChange={(p) => {
                 setRecordsPerPage(p)
                 setPage(1);
-                setPageSize(p);
-                // p == "All" ? setPageSize(accounts.length) : setPageSize(p);
             }}
             emptyState={
                 <Stack align="center" spacing="xs">
