@@ -4,114 +4,95 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Controller;
 
-use OCA\OtpManager\Db\Setting;
-use OCA\OtpManager\Db\SettingMapper;
-use OCA\OtpManager\Utils\Encryption;
-use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\JSONResponse;
+use OCA\OtpManager\Attribute\ValidateRequestBodyDTO;
+use OCA\OtpManager\Dto\Request\PasswordCheckRequestDto;
+use OCA\OtpManager\Dto\Request\PasswordCreateRequestDto;
+use OCA\OtpManager\Dto\Request\PasswordUpdateRequestDto;
+use OCA\OtpManager\Dto\Response\PasswordResponseDto;
+use OCA\OtpManager\Service\PasswordService;
+use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
+use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 
 
-class PasswordController extends Controller
+class PasswordController extends OCSController
 {
-
-    private SettingMapper $settingMapper;
-    private Encryption $encryption;
-    private ?string $userId;
+    private PasswordService $passwordService;
 
     public function __construct(
-        string        $AppName,
-        IRequest      $request,
-        SettingMapper $settingMapper,
-        Encryption    $encryption,
-        ?string       $UserId = null
+        string          $AppName,
+        IRequest        $request,
+        PasswordService $passwordService,
     )
     {
         parent::__construct($AppName, $request);
-        $this->settingMapper = $settingMapper;
-        $this->encryption = $encryption;
-        $this->userId = $UserId;
+        $this->passwordService = $passwordService;
     }
 
     /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
+     * @param string $password
+     * @return DataResponse<PasswordResponseDto>
+     * @throws OCSBadRequestException
      */
-    public function get(): bool
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'POST', url: '/password/check')]
+    #[ValidateRequestBodyDTO(PasswordCheckRequestDto::class)]
+    public function check(string $password): DataResponse
     {
-        $setting = $this->settingMapper->find($this->userId);
-
-        if (is_null($setting)) {
-            $setting = new Setting();
-            $setting->setShowCodes(false);
-            $setting->setDarkMode(true);
-            $setting->setRecordsPerPage("10");
-            $setting->setUserId($this->userId);
-            $this->settingMapper->insert($setting);
-            return false;
-        }
-
-        return !is_null($setting->getPassword());
-    }
-
-    private function validatePassword($password): bool
-    {
-
-        if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$&+,:;=?@#|'<>.^*()%!-]).{6,}$/", $password)) {
-            return false;
-        }
-
-        return true;
+        return $this->passwordService->check(
+            new PasswordCreateRequestDto(password: $password)
+        );
     }
 
     /**
-     * @NoAdminRequired
+     * @return DataResponse<PasswordResponseDto>
+     * @throws OCSException
      */
-    public function create(string $password): JSONResponse
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/password/status')]
+    public function status(): DataResponse
     {
-
-        if (!$this->validatePassword($password)) return new JSONResponse(["error" => "Not all requirements are satisfied"], 400);
-
-        $setting = $this->settingMapper->find($this->userId);
-
-        if (!is_null($setting->getPassword())) return new JSONResponse(["error" => "Password already set"], 400);
-
-        $password = hash("sha256", $password);
-
-        $iv = bin2hex(random_bytes(16));
-
-        $this->encryption->encryptAccounts($password, $iv, $this->userId);
-
-        $setting->setPassword(password_hash($password, PASSWORD_DEFAULT));
-        $setting->setIv($iv);
-        $this->settingMapper->update($setting);
-
-        return new JSONResponse(["iv" => $setting->getIv()]);
+        return $this->passwordService->status();
     }
 
     /**
-     * @NoAdminRequired
+     * @param string $password
+     * @return DataResponse<PasswordResponseDto>
+     * @throws OCSBadRequestException | OCSException
      */
-    public function update(string $oldPassword, string $newPassword): JSONResponse
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/password')]
+    #[ValidateRequestBodyDTO(PasswordCreateRequestDto::class)]
+    public function create(string $password): DataResponse
     {
+        return $this->passwordService->create(
+            new PasswordCreateRequestDto(password: $password)
+        );
+    }
 
-        if (!$this->validatePassword($newPassword)) return new JSONResponse(["error" => "Not all requirements are satisfied"], 400);
-
-        $setting = $this->settingMapper->find($this->userId);
-
-        if (is_null($setting->getPassword())) return new JSONResponse(["error" => "No password set yet"], 400);
-        else if (!password_verify(hash("sha256", $oldPassword), $setting->getPassword())) return new JSONResponse(["error" => "The old password is incorrect"], 400);
-
-        $newPassword = hash("sha256", $newPassword);
-
-        $newIv = bin2hex(random_bytes(16));
-
-        $this->encryption->changeAccountsEncryption(hash("sha256", $oldPassword), $newPassword, $setting->getIv(), $newIv, $this->userId);
-
-        $setting->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
-        $setting->setIv($newIv);
-        $this->settingMapper->update($setting);
-
-        return new JSONResponse(["iv" => $setting->getIv()]);
+    /**
+     * @param string $oldPassword
+     * @param string $newPassword
+     * @return DataResponse<PasswordResponseDto>
+     * @throws OCSBadRequestException | OCSException
+     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'PUT', url: '/password')]
+    #[ValidateRequestBodyDTO(PasswordUpdateRequestDto::class)]
+    public function update(string $oldPassword, string $newPassword): DataResponse
+    {
+        return $this->passwordService->update(
+            new PasswordUpdateRequestDto(
+                oldPassword: $oldPassword,
+                newPassword: $newPassword
+            )
+        );
     }
 }

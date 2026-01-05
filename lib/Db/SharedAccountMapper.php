@@ -6,8 +6,11 @@ namespace OCA\OtpManager\Db;
 
 use OCA\OtpManager\AppInfo\Application;
 use OCA\OtpManager\Utils\AccountPositionHelper;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\DB\Exception;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use Throwable;
 
@@ -26,7 +29,67 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param IQueryBuilder $query
+     * @return SharedAccount[]
+     * @throws OCSException
+     */
+    protected function findEntities(IQueryBuilder $query): array
+    {
+        try {
+            return parent::findEntities($query);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while finding shared accounts" , 500);
+        }
+    }
+
+    /**
+     * @param SharedAccount $entity
+     * @return SharedAccount
+     * @throws OCSException
+     */
+    public function insert(Entity $entity): Entity
+    {
+        try {
+            return parent::insert($entity);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while inserting shared account with id:" . $entity->getId(), 500);
+        }
+    }
+
+    /**
+     * @param SharedAccount $entity
+     * @return SharedAccount
+     * @throws OCSException
+     */
+    public function update(Entity $entity): Entity
+    {
+        try {
+            return parent::update($entity);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while updating shared account with id:" . $entity->getId(), 500);
+        }
+    }
+
+    /**
+     * @param SharedAccount $entity
+     * @return SharedAccount
+     * @throws OCSException
+     */
+    public function delete(Entity $entity): Entity
+    {
+        try {
+            return parent::delete($entity);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while deleting shared account with id:" . $entity->getId(), 500);
+        }
+    }
+
+
+    /**
+     * @param int $accountId
+     * @param string $userId
+     * @return SharedAccount[]
+     * @throws OCSException
      */
     public function findAllByAccountAndUserId(int $accountId, string $userId): array
     {
@@ -43,9 +106,16 @@ class SharedAccountMapper extends QBMapper
                 )
             );
 
+
         return $this->findEntities($qb);
     }
 
+    /**
+     * @param string $column
+     * @param string|int $value
+     * @param string $receiverId
+     * @return SharedAccount|null
+     */
     public function find(string $column, string|int $value, string $receiverId): ?SharedAccount
     {
         $qb = $this->db->getQueryBuilder();
@@ -69,6 +139,11 @@ class SharedAccountMapper extends QBMapper
         return $sharedAccount;
     }
 
+    /**
+     * @param int $accountId
+     * @param string $receiverId
+     * @return SharedAccount|null
+     */
     public function findByReceiver(int $accountId, string $receiverId): ?SharedAccount
     {
         $qb = $this->db->getQueryBuilder();
@@ -93,7 +168,9 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param string $receiverId
+     * @return SharedAccount[]
+     * @throws OCSException
      */
     public function findAllByReceiver(string $receiverId): array
     {
@@ -112,7 +189,9 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param string $receiverId
+     * @return array
+     * @throws OCSException
      */
     public function findAllByReceiverJoin(string $receiverId): array
     {
@@ -137,7 +216,12 @@ class SharedAccountMapper extends QBMapper
                 )
             );
 
-        $result = $qb->executeQuery();
+        try {
+            $result = $qb->executeQuery();
+        } catch (\Exception) {
+            throw new OCSException("There was an error while fetching all detailed shared accounts by receiver", 500);
+        }
+
         $rows = $result->fetchAll();
         $result->closeCursor();
 
@@ -145,7 +229,9 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param string $accountId
+     * @return SharedAccount[]
+     * @throws OCSException
      */
     public function findAllByAccount(string $accountId): array
     {
@@ -164,7 +250,9 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param string $accountId
+     * @return string[]
+     * @throws OCSException
      */
     public function findUsersAlreadyShared(string $accountId): array
     {
@@ -179,7 +267,12 @@ class SharedAccountMapper extends QBMapper
                 )
             );
 
-        $result = $qb->executeQuery();
+        try {
+            $result = $qb->executeQuery();
+        } catch (\Exception) {
+            throw new OCSException("There was an error while fetching all nextcloud users the account is shared with", 500);
+        }
+
         $row = $result->fetchAll();
         $result->closeCursor();
 
@@ -187,7 +280,10 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param string $userId
+     * @param string $accountId
+     * @return array
+     * @throws OCSException
      */
     public function findUsers(string $userId, string $accountId): array
     {
@@ -202,7 +298,12 @@ class SharedAccountMapper extends QBMapper
         if (count($usersAlreadyShared) > 0)
             $qb->andWhere($qb->expr()->notIn('uid', $qb->createNamedParameter($usersAlreadyShared)));
 
-        $result = $qb->executeQuery();
+        try {
+            $result = $qb->executeQuery();
+        } catch (\Exception) {
+            throw new OCSException("There was an error while fetching all nextcloud users", 500);
+        }
+
         $rows = $result->fetchAll();
         $result->closeCursor();
 
@@ -210,7 +311,10 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param int $pos
+     * @param string $receiverId
+     * @return SharedAccount[]
+     * @throws OCSException
      */
     public function findAllPosGtThan(int $pos, string $receiverId): array
     {
@@ -225,9 +329,15 @@ class SharedAccountMapper extends QBMapper
                     $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
+
         return $this->findEntities($qb);
     }
 
+    /**
+     * @param string $receiverId
+     * @param string $secret
+     * @return Account|null
+     */
     public function findAccountBySecret(string $receiverId, string $secret): ?Account
     {
         $qb = $this->db->getQueryBuilder();
@@ -254,7 +364,9 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @param Account $account
+     * @return void
+     * @throws OCSException
      */
     public function destroy(Account $account): void
     {
@@ -269,16 +381,24 @@ class SharedAccountMapper extends QBMapper
 
         // loop users it was shared with
         foreach ($sharedAccounts as $sharedAccount) {
-            AccountPositionHelper::decreasePosition($this, $this->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId()));
-            AccountPositionHelper::decreasePosition($this->accountMapper, $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId()));
+            AccountPositionHelper::decreasePosition(
+                mapper: $this,
+                accounts: $this->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId())
+            );
+            AccountPositionHelper::decreasePosition(
+                mapper: $this->accountMapper,
+                accounts: $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $sharedAccount->getReceiverId())
+            );
 
             $this->delete($sharedAccount);
         }
     }
 
-
     /**
-     * @throws Exception
+     * @param int $accountId
+     * @param string $receiverId
+     * @return bool
+     * @throws OCSException
      */
     public function unshare(int $accountId, string $receiverId): bool
     {
@@ -287,8 +407,14 @@ class SharedAccountMapper extends QBMapper
         if ($sharedAccount == null) {
             return false;
         } else {
-            AccountPositionHelper::decreasePosition($this, $this->findAllPosGtThan($sharedAccount->getPosition(), $receiverId));
-            AccountPositionHelper::decreasePosition($this->accountMapper, $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $receiverId));
+            AccountPositionHelper::decreasePosition(
+                mapper: $this,
+                accounts: $this->findAllPosGtThan($sharedAccount->getPosition(), $receiverId)
+            );
+            AccountPositionHelper::decreasePosition(
+                mapper: $this->accountMapper,
+                accounts: $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $receiverId)
+            );
 
             $this->delete($sharedAccount);
 
@@ -296,6 +422,10 @@ class SharedAccountMapper extends QBMapper
         }
     }
 
+    /**
+     * @param string $receiverId
+     * @return int
+     */
     public function findMaxPosition(string $receiverId): int
     {
         $qb = $this->db->getQueryBuilder();

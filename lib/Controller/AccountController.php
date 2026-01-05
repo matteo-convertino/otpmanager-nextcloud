@@ -8,25 +8,29 @@ use OCA\OtpManager\Controller\Validator\AccountForm;
 use OCA\OtpManager\Db\Account;
 use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Db\SharedAccountMapper;
-use OCA\OtpManager\Utils\Encryption;
-use OCP\AppFramework\Controller;
+use OCA\OtpManager\Service\EncryptionService;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\OCSController;
 use OCP\DB\Exception;
 use OCP\IRequest;
 
-class AccountController extends Controller
+class AccountController extends OCSController
 {
-    private AccountMapper $accountMapper;
+	private AccountMapper $accountMapper;
+	private ?string $userId;
     private SharedAccountMapper $sharedAccountMapper;
-    private Encryption $encryption;
-    private ?string $userId;
+    private EncryptionService $encryption;
 
     public function __construct(
         string              $AppName,
         IRequest            $request,
         AccountMapper       $accountMapper,
         SharedAccountMapper $sharedAccountMapper,
-        Encryption          $encryption,
+        EncryptionService   $encryption,
         ?string             $UserId = null
     )
     {
@@ -37,19 +41,17 @@ class AccountController extends Controller
         $this->userId = $UserId;
     }
 
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/accounts/{id}')]
     public function get($id): ?Account
     {
         return $this->accountMapper->find("id", $id, $this->userId);
     }
 
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/accounts')]
     public function getAll(): array
     {
         $accounts = $this->accountMapper->findAllByUser($this->userId);
@@ -77,9 +79,10 @@ class AccountController extends Controller
     }
 
     /**
-     * @NoAdminRequired
      * @throws Exception
      */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/accounts')]
     public function create(string $name, string $issuer, string $secret, string $type, int $period, string $algorithm, int $digits, ?int $counter): JSONResponse
     {
         $errors = AccountForm::validate($name, $issuer, $secret, $type, $period, $algorithm, $digits);
@@ -137,9 +140,8 @@ class AccountController extends Controller
         return new JSONResponse($account);
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'PUT', url: '/accounts')]
     public function update(string $name, string $issuer, string $secret, string $type, int $period, string $algorithm, int $digits): array|string
     {
         $errors = AccountForm::validate($name, $issuer, null, $type, $period, $algorithm, $digits);
@@ -174,9 +176,8 @@ class AccountController extends Controller
         }
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'DELETE', url: '/accounts/{id}')]
     public function delete(int $id): JSONResponse
     {
         $account = $this->accountMapper->find("id", $id, $this->userId);
@@ -195,9 +196,8 @@ class AccountController extends Controller
         return new JSONResponse();
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/accounts/import')]
     public function import(array $data, string|null $passwordUsedOnExport, string $currentPassword): JSONResponse
     {
         if (!array_key_exists("accounts", $data)) return new JSONResponse(["error" => "Invalid JSON file"], 400);
@@ -228,4 +228,19 @@ class AccountController extends Controller
 
         return new JSONResponse();
     }
+
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/accounts/update-counter')]
+    public function updateCounter(string $secret): JSONResponse
+	{
+		$account = $this->accountMapper->find("secret", $secret, $this->userId);
+
+		if ($account == null) return new JSONResponse(["error" => "This account does not exists"], Http::STATUS_NOT_FOUND);
+		if ($account->getType() == "totp")  return new JSONResponse(["error" => "You cannot update counter of a TOTP account"], Http::STATUS_NOT_FOUND);
+
+		$account->setCounter($account->getCounter() + 1);
+		$this->accountMapper->update($account);
+
+		return new JSONResponse($account, Http::STATUS_OK);
+	}
 }

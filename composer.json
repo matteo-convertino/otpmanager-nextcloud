@@ -31,9 +31,10 @@
         "rector": "rector && composer cs:fix"
     },
     "require": {
-        "bamarni/composer-bin-plugin": "^1.8",
         "php": "^8.1",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "bamarni/composer-bin-plugin": "^1.8",
+        "symfony/validator": "^6.4"
     },
     "require-dev": {
         "nextcloud/ocp": "dev-stable30",

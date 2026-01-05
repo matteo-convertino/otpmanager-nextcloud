@@ -6,6 +6,7 @@ namespace OCA\OtpManager\Db;
 
 use OCA\OtpManager\AppInfo\Application;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\DB\Exception;
 use OCP\IDBConnection;
 use Throwable;
@@ -20,6 +21,10 @@ class SettingMapper extends QBMapper
         parent::__construct($db, Application::SETTINGS_DB, Setting::class);
     }
 
+    /**
+     * @param string $userId
+     * @return Setting|null
+     */
     public function find(string $userId): ?Setting
     {
         $qb = $this->db->getQueryBuilder();
@@ -37,13 +42,18 @@ class SettingMapper extends QBMapper
     }
 
     /**
-     * @throws Exception
+     * @return array
+     * @throws OCSException
      */
     public function findAll(): array
     {
         $qb = $this->db->getQueryBuilder();
         $qb->select('*')->from($this->getTableName());
 
-        return $this->findEntities($qb);
+        try {
+            return $this->findEntities($qb);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while fetching all settings", 500);
+        }
     }
 }

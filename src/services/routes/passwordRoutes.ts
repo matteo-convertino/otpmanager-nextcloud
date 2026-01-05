@@ -1,10 +1,10 @@
-import {generateOtpManagerOcsUrl, generateOtpManagerUrl} from "@/services/routes/generate.ts";
+import {generateOtpManagerUrl} from "@/services/routes/generate.ts";
 
 const BASE = '/password';
 
 export const PasswordRoutes = {
     CREATE: generateOtpManagerUrl(BASE),
-    GET: generateOtpManagerUrl(BASE),
+    GET: generateOtpManagerUrl(`${BASE}/status`),
     UPDATE: generateOtpManagerUrl(BASE),
-    CHECK: generateOtpManagerOcsUrl(`${BASE}/check`),
+    CHECK: generateOtpManagerUrl(`${BASE}/check`),
 };

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Db;
 
-use DateTime;
 use JsonSerializable;
-
 use OCP\AppFramework\Db\Entity;
 
 /**
@@ -55,49 +53,49 @@ use OCP\AppFramework\Db\Entity;
 class Account extends Entity implements JsonSerializable
 {
 
-	protected $secret;
-	protected $name;
-	protected $issuer;
-	protected $digits;
-	protected $type;
-	protected $period;
-	protected $algorithm;
-	protected $counter;
-	protected $icon;
-	protected $position;
-	protected $userId;
-	protected $createdAt;
-	protected $updatedAt;
-	protected $deletedAt;
+    protected $secret;
+    protected $name;
+    protected $issuer;
+    protected $digits;
+    protected $type;
+    protected $period;
+    protected $algorithm;
+    protected $counter;
+    protected $icon;
+    protected $position;
+    protected $userId;
+    protected $createdAt;
+    protected $updatedAt;
+    protected $deletedAt;
 
-	public function __construct()
-	{
-		$this->addType('id', 'integer');
-		$this->addType('digits', 'integer');
-		$this->addType('period', 'integer');
-		$this->addType('algorithm', 'integer');
-		$this->addType('counter', 'integer');
-		$this->addType('position', 'integer');
-	}
+    public function __construct()
+    {
+        $this->addType('id', 'integer');
+        $this->addType('digits', 'integer');
+        $this->addType('period', 'integer');
+        $this->addType('algorithm', 'integer');
+        $this->addType('counter', 'integer');
+        $this->addType('position', 'integer');
+    }
 
-	public function jsonSerialize(): array
-	{
-		return [
-			'id' => $this->id,
-			'secret' => $this->secret,
-			'name' => $this->name,
-			'issuer' => $this->issuer,
-			'digits' => $this->digits,
-			'type' => $this->type,
-			'period' => $this->period,
-			'algorithm' => $this->algorithm,
-			'counter' => $this->counter,
-			'icon' => $this->icon,
-			'position' => $this->position,
-			'user_id' => $this->userId,
-			'created_at' => $this->createdAt,
-			'updated_at' => $this->updatedAt,
-			'deleted_at' => $this->deletedAt
-		];
-	}
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'secret' => $this->secret,
+            'name' => $this->name,
+            'issuer' => $this->issuer,
+            'digits' => $this->digits,
+            'type' => $this->type,
+            'period' => $this->period,
+            'algorithm' => $this->algorithm,
+            'counter' => $this->counter,
+            'icon' => $this->icon,
+            'position' => $this->position,
+            'user_id' => $this->userId,
+            'created_at' => $this->createdAt,
+            'updated_at' => $this->updatedAt,
+            'deleted_at' => $this->deletedAt
+        ];
+    }
 }

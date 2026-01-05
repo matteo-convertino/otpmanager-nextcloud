@@ -15,8 +15,8 @@ use OCP\AppFramework\Db\Entity;
  * @method bool|null getDarkMode()
  * @method void setDarkMode(bool|null $darkMode)
  *
- * @method int|null getRecordsPerPage()
- * @method void setRecordsPerPage(int|null $recordsPerPage)
+ * @method string|null getRecordsPerPage()
+ * @method void setRecordsPerPage(string|null $recordsPerPage)
  *
  * @method string|null getPassword()
  * @method void setPassword(string|null $password)

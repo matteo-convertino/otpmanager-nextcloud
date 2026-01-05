@@ -8,6 +8,46 @@ use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 use OCP\IUser;
 
+/**
+ * @method int|null getAccountId()
+ * @method void setAccountId(int|null $accountId)
+ *
+ * @method string|null getReceiverId()
+ * @method void setReceiverId(string|null $receiverId)
+ *
+ * @method string|null getName()
+ * @method void setName(string|null $name)
+ *
+ * @method string|null getIssuer()
+ * @method void setIssuer(string|null $issuer)
+ *
+ * @method string|null getSecret()
+ * @method void setSecret(string|null $secret)
+ *
+ * @method string|null getIcon()
+ * @method void setIcon(string|null $icon)
+ *
+ * @method int|null getPosition()
+ * @method void setPosition(int|null $position)
+ *
+ * @method bool|null getUnlocked()
+ * @method void setUnlocked(bool|null $unlocked)
+ *
+ * @method string|null getPassword()
+ * @method void setPassword(string|null $password)
+ *
+ * @method string|null getIv()
+ * @method void setIv(string|null $iv)
+ *
+ * @method int|string|null getExpiredAt()
+ * @method void setExpiredAt(string|null $expiredAt)
+ *
+ * @method int|string|null getCreatedAt()
+ * @method void setCreatedAt(string|null $createdAt)
+ *
+ * @method int|string|null getUpdatedAt()
+ * @method void setUpdatedAt(string|null $updatedAt)
+ */
 class SharedAccount extends Entity implements JsonSerializable
 {
 

@@ -9,11 +9,13 @@ use OCA\OtpManager\Db\SharedAccountMapper;
 use OCA\OtpManager\Utils\SyncAccount;
 use OCA\OtpManager\Utils\SyncSharedAccount;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 
-class SyncApiController extends OCSController
+class SyncController extends OCSController
 {
     private SyncAccount $syncAccount;
     private SyncSharedAccount $syncSharedAccount;
@@ -31,9 +33,8 @@ class SyncApiController extends OCSController
         $this->syncSharedAccount = new SyncSharedAccount($sharedAccountMapper, $UserId);
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/accounts/sync')]
     public function update(?array $accounts, ?array $sharedAccounts, ?string $appVersion): JSONResponse
     {
         if (is_null($accounts) || is_null($sharedAccounts) || is_null($appVersion)) return new JSONResponse(["error" => "Please update mobile app to the latest version"], Http::STATUS_BAD_REQUEST);

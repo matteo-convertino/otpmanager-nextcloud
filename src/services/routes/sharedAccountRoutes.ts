@@ -1,4 +1,4 @@
-import {generateOtpManagerOcsUrl, generateOtpManagerUrl} from "@/services/routes/generate.ts";
+import {generateOtpManagerUrl} from "@/services/routes/generate.ts";
 
 const BASE = '/share';
 
@@ -9,8 +9,8 @@ export const SharedAccountRoutes = {
     GET_BY_ID: (id: number) => generateOtpManagerUrl(`${BASE}/${id}`),
     UPDATE: generateOtpManagerUrl(BASE),
     DELETE: (accountId: number, receiverId?: number) => generateOtpManagerUrl(`${BASE}/${accountId}?receiver=${receiverId === undefined ? '' : receiverId}`),
-    UNLOCK: generateOtpManagerOcsUrl(`${BASE}/unlock`),
-    UPDATE_COUNTER: generateOtpManagerOcsUrl(`${BASE}/update-counter`),
+    UNLOCK: generateOtpManagerUrl(`${BASE}/unlock`),
+    UPDATE_COUNTER: generateOtpManagerUrl(`${BASE}/update-counter`),
 
     GET_USERS_BY_ACCOUNT_ID: (accountId: number) => generateOtpManagerUrl(`/get-users/${accountId}`),
 };

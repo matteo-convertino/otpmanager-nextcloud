@@ -6,10 +6,16 @@ namespace OCA\OtpManager\Controller;
 
 use OCA\OtpManager\Db\SettingMapper;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 
 
-class SettingController extends Controller
+class SettingController extends OCSController
 {
 
     private SettingMapper $settingMapper;
@@ -28,18 +34,16 @@ class SettingController extends Controller
         $this->userId = $UserId;
     }
 
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
-    public function get()
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/settings')]
+    public function get(): DataResponse
     {
         return $this->settingMapper->find($this->userId);
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/settings')]
     public function save(?bool $showCodes, ?bool $darkMode, ?string $recordsPerPage)
     {
         $setting = $this->settingMapper->find($this->userId);

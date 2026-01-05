@@ -22,7 +22,7 @@ export default function usePasswordCheckForm() {
     const onSubmit = (values: z.infer<typeof passwordFormCheckSchema>) => {
 
         otpManagerApi({
-            api: () => PasswordService.getInstance().check(values),
+            api: () => PasswordService.getInstance().check({ password: values.password }),
             titleOnLoading: "Password",
             messageOnLoading: "Password is being checked",
             titleOnSuccess: "Password",

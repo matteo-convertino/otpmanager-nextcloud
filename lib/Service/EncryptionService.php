@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace OCA\OtpManager\Utils;
+namespace OCA\OtpManager\Service;
 
 use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Db\SettingMapper;
 use OCA\OtpManager\Db\SharedAccountMapper;
-use OCP\DB\Exception;
+use OCP\AppFramework\OCS\OCSException;
 
-class Encryption
+class EncryptionService
 {
     private AccountMapper $accountMapper;
     private SettingMapper $settingMapper;
@@ -28,7 +28,14 @@ class Encryption
         $this->sharedAccountMapper = $sharedAccountMapper;
     }
 
-    public function encrypt($data, $password, $userId, $isAlreadyHashed = false): string|false
+    /**
+     * @param string $data
+     * @param string $password
+     * @param string $userId
+     * @param bool $isAlreadyHashed
+     * @return string|false
+     */
+    public function encrypt(string $data, string $password, string $userId, bool $isAlreadyHashed = false): string|false
     {
         $setting = $this->settingMapper->find($userId);
 
@@ -39,7 +46,14 @@ class Encryption
         return openssl_encrypt($data, $this::CIPHER_ALGO, hex2bin($password), 0, hex2bin($setting->getIv()));
     }
 
-    public function decrypt($data, $password, $iv, $isAlreadyHashed = false): string|false
+    /**
+     * @param string $data
+     * @param string $password
+     * @param string $iv
+     * @param bool $isAlreadyHashed
+     * @return string|false
+     */
+    public function decrypt(string $data, string $password, string $iv, bool $isAlreadyHashed = false): string|false
     {
         $password = $isAlreadyHashed ? $password : hash("sha256", $password);
 
@@ -47,9 +61,13 @@ class Encryption
     }
 
     /**
-     * @throws Exception
+     * @param string $password
+     * @param string $iv
+     * @param string $userId
+     * @return void
+     * @throws OCSException
      */
-    public function encryptAccounts($password, $iv, $userId): void
+    public function encryptAccounts(string $password, string $iv, string $userId): void
     {
         $accounts = $this->accountMapper->findAllWithDeleted($userId);
 
@@ -60,10 +78,17 @@ class Encryption
         }
     }
 
+
     /**
-     * @throws Exception
+     * @param string $oldPassword
+     * @param string $newPassword
+     * @param string $oldIv
+     * @param string $newIv
+     * @param string $userId
+     * @return void
+     * @throws OCSException
      */
-    public function changeAccountsEncryption($oldPassword, $newPassword, $oldIv, $newIv, $userId): void
+    public function changeAccountsEncryption(string $oldPassword, string $newPassword, string $oldIv, string $newIv, string $userId): void
     {
         $accounts = $this->accountMapper->findAllWithDeleted($userId);
 

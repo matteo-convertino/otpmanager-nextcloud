@@ -6,8 +6,10 @@ namespace OCA\OtpManager\Db;
 
 use OCA\OtpManager\AppInfo\Application;
 use OCA\OtpManager\Utils\AccountPositionHelper;
+use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
-use OCP\DB\Exception;
+use OCP\AppFramework\OCS\OCSException;
+use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use Throwable;
 
@@ -21,6 +23,54 @@ class AccountMapper extends QBMapper
         parent::__construct($db, Application::ACCOUNTS_DB, Account::class);
     }
 
+    /**
+     * @param IQueryBuilder $query
+     * @return Account[]
+     * @throws OCSException
+     */
+    protected function findEntities(IQueryBuilder $query): array
+    {
+        try {
+            return parent::findEntities($query);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while finding accounts" , 500);
+        }
+    }
+
+    /**
+     * @param Account $entity
+     * @return Account
+     * @throws OCSException
+     */
+    public function insert(Entity $entity): Entity
+    {
+        try {
+            return parent::insert($entity);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while inserting account with id:" . $entity->getId(), 500);
+        }
+    }
+
+    /**
+     * @param Account $entity
+     * @return Account
+     * @throws OCSException
+     */
+    public function update(Entity $entity): Entity
+    {
+        try {
+            return parent::update($entity);
+        } catch (\Exception) {
+            throw new OCSException("There was an error while updating account with id:" . $entity->getId(), 500);
+        }
+    }
+
+    /**
+     * @param string $column
+     * @param string|int $value
+     * @param string $userId
+     * @return Account|null
+     */
     public function find(string $column, string|int $value, string $userId): ?Account
     {
         $qb = $this->db->getQueryBuilder();
@@ -41,7 +91,7 @@ class AccountMapper extends QBMapper
     /**
      * @param string $userId
      * @return array
-     * @throws Exception
+     * @throws OCSException
      */
     public function findAllByUser(string $userId): array
     {
@@ -82,7 +132,7 @@ class AccountMapper extends QBMapper
     /**
      * @param string $userId
      * @return array
-     * @throws Exception
+     * @throws OCSException
      */
     public function findAllWithDeleted(string $userId): array
     {
@@ -91,6 +141,7 @@ class AccountMapper extends QBMapper
             ->from($this->getTableName())
             ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
             ->orderBy("position", "desc");
+
         return $this->findEntities($qb);
     }
 
@@ -98,7 +149,7 @@ class AccountMapper extends QBMapper
      * @param int $pos
      * @param string $userId
      * @return array
-     * @throws Exception
+     * @throws OCSException
      */
     public function findAllPosGtThan(int $pos, string $userId): array
     {
@@ -107,6 +158,7 @@ class AccountMapper extends QBMapper
             ->from($this->getTableName())
             ->where($qb->expr()->gt("position", $qb->createNamedParameter($pos)))
             ->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+
         return $this->findEntities($qb);
     }
 
@@ -126,14 +178,20 @@ class AccountMapper extends QBMapper
     }*/
 
     /**
-     * @throws Exception
+     * @param Account $account
+     * @return void
+     * @throws OCSException
      */
     public function safeDelete(Account $account): void
     {
-        AccountPositionHelper::decreasePosition($this, $this->findAllPosGtThan($account->getPosition(), $account->getUserId()));
+        AccountPositionHelper::decreasePosition(
+            mapper: $this,
+            accounts: $this->findAllPosGtThan($account->getPosition(), $account->getUserId())
+        );
 
         $account->setDeletedAt(date("Y-m-d H:i:s"));
         $account->setPosition(null);
+
         $this->update($account);
     }
 }

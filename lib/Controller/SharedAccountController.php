@@ -8,18 +8,24 @@ use OCA\OtpManager\Controller\Validator\SharedAccountForm;
 use OCA\OtpManager\Db\AccountMapper;
 use OCA\OtpManager\Db\SharedAccount;
 use OCA\OtpManager\Db\SharedAccountMapper;
-use OCP\AppFramework\Controller;
+use OCA\OtpManager\Service\EncryptionService;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\IUserManager;
 
-class SharedAccountController extends Controller
+class SharedAccountController extends OCSController
 {
     private IUserManager $userManager;
     private SharedAccountMapper $sharedAccountMapper;
     private AccountMapper $accountMapper;
-    private $serverUrl;
+    private string $serverUrl;
     private ?string $userId;
+    private EncryptionService $encryption;
 
     public function __construct(
         string              $AppName,
@@ -27,6 +33,7 @@ class SharedAccountController extends Controller
         IUserManager        $userManager,
         SharedAccountMapper $sharedAccountMapper,
         AccountMapper       $accountMapper,
+        EncryptionService   $encryption,
         ?string             $UserId = null,
     )
     {
@@ -35,22 +42,21 @@ class SharedAccountController extends Controller
         $this->userId = $UserId;
         $this->sharedAccountMapper = $sharedAccountMapper;
         $this->accountMapper = $accountMapper;
+        $this->encryption = $encryption;
         $this->serverUrl = $request->getServerProtocol() . "://" . $request->getServerHost() . "/";
     }
 
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/share')]
     public function getByUser(): array
     {
         return $this->sharedAccountMapper->findAllByReceiverJoin($this->userId);
     }
 
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/share/{id}')]
     public function getByAccount($id): array
     {
         $activeShares = $this->sharedAccountMapper->findAllByAccount($id);
@@ -68,9 +74,8 @@ class SharedAccountController extends Controller
         return $result;
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/share')]
     public function create(string $accountSecret, array $users, string $sharedSecret, string $password, string $iv, string | null $expirationDate): array|string
     {
         $errors = SharedAccountForm::validateCreate($accountSecret, $users, $sharedSecret, $password, $iv, $expirationDate);
@@ -123,9 +128,8 @@ class SharedAccountController extends Controller
         }
     }
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'PUT', url: '/share')]
     public function update(string $name, string $issuer, string $secret): array|string
     {
         $errors = SharedAccountForm::validateUpdate($name, $issuer, $secret);
@@ -150,9 +154,8 @@ class SharedAccountController extends Controller
     }
 
 
-    /**
-     * @NoAdminRequired
-     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'DELETE', url: '/share/{accountId}')]
     public function delete(int $accountId): JSONResponse
     {
         $receiverId = $this->request->getParam("receiver");
@@ -164,10 +167,9 @@ class SharedAccountController extends Controller
         return new JSONResponse(["error" => "There was an error while deleting your shared account"], 500);
     }
 
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/get-users/{accountId}')]
     public function getUsers($accountId): array
     {
         $result = $this->sharedAccountMapper->findUsers($this->userId, $accountId);
@@ -185,5 +187,52 @@ class SharedAccountController extends Controller
         }
 
         return $users;
+    }
+
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/share/unlock')]
+    public function unlock(int $accountId, string $currentPassword, string $tempPassword): JSONResponse
+    {
+        $accountShared = $this->sharedAccountMapper->findByReceiver($accountId, $this->userId);
+
+        if ($accountShared == null)
+            return new JSONResponse(["error" => "This shared account does not exists"], Http::STATUS_NOT_FOUND);
+
+        if ($accountShared->getUnlocked())
+            return new JSONResponse(null, Http::STATUS_OK);
+
+        if (!password_verify(hash("sha256", $tempPassword), $accountShared->getPassword()))
+            return new JSONResponse(["error" => "The password is incorrect"], Http::STATUS_BAD_REQUEST);
+
+        $decryptedSecret = $this->encryption->decrypt($accountShared->getSecret(), $tempPassword, $accountShared->getIv());
+
+        if ($decryptedSecret === false)
+            return new JSONResponse(["error" => "There was an error while trying to decrypt the secret key"], Http::STATUS_BAD_REQUEST);
+
+        $encryptedSecret = $this->encryption->encrypt($decryptedSecret, $currentPassword, $this->userId, true);
+
+        if ($encryptedSecret === false)
+            return new JSONResponse(["error" => "There was an error while trying to encrypt the secret key"], Http::STATUS_BAD_REQUEST);
+
+        $accountShared->setSecret($encryptedSecret);
+        $accountShared->setUnlocked(true);
+        $this->sharedAccountMapper->update($accountShared);
+
+        return new JSONResponse(null, Http::STATUS_OK);
+    }
+
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/share/update-counter')]
+    public function updateCounter(string $secret): JSONResponse
+    {
+        $account = $this->sharedAccountMapper->findAccountBySecret($this->userId, $secret);
+
+        if ($account == null) return new JSONResponse(["error" => "This account does not exists"], Http::STATUS_NOT_FOUND);
+        if ($account->getType() == "totp") return new JSONResponse(["error" => "You cannot update counter of a TOTP account"], Http::STATUS_BAD_REQUEST);
+
+        $account->setCounter($account->getCounter() + 1);
+        $this->accountMapper->update($account);
+
+        return new JSONResponse($account, Http::STATUS_OK);
     }
 }

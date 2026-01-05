@@ -15,10 +15,12 @@
 		<directory name="lib" />
 		<ignoreFiles>
 			<directory name="vendor" />
+            <directory name="vendor-bin" />
 		</ignoreFiles>
 	</projectFiles>
 	<extraFiles>
 		<directory name="vendor" />
+        <directory name="vendor-bin/psalm/vendor" />
 		<ignoreFiles>
 			<directory name="vendor/phpunit/php-code-coverage" />
 			<directory name="vendor/psalm" />
