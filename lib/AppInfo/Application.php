@@ -17,6 +17,7 @@ class Application extends App implements IBootstrap
     public const ACCOUNTS_DB = 'otpmanager_accounts';
     public const SETTINGS_DB = 'otpmanager_settings';
     public const SHARED_ACCOUNTS_DB = 'otpmanager_shared';
+    public const MIN_MOBILE_VERSION = '2.0.0';
 
     public function __construct()
     {

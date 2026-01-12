@@ -11,7 +11,7 @@ declare(strict_types=1);
  */
 return [
     'routes' => [
-        ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+//        ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
 
 //        ['name' => 'account#getAll', 'url' => '/accounts', 'verb' => 'GET'],
 //        ['name' => 'account#create', 'url' => '/accounts', 'verb' => 'POST'],

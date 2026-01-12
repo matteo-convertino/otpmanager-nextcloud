@@ -4,31 +4,28 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Controller;
 
-use OCP\App\IAppManager;
-use OCP\AppFramework\Controller;
-use OCP\IRequest;
+use OCP\AppFramework\OCSController;
 
 
-class InfoController extends Controller
+class InfoController extends OCSController
 {
-    private IAppManager $appManager;
+//    public function __construct(
+//        string      $appName,
+//        IRequest    $request,
+//        private readonly IAppManager $appManager,
+//    )
+//    {
+//        parent::__construct($appName, $request);
+//    }
 
-    public function __construct(
-        string      $AppName,
-        IRequest    $request,
-        IAppManager $appManager,
-    )
-    {
-        parent::__construct($AppName, $request);
-        $this->appManager = $appManager;
-    }
-
-    /**
-     * @NoAdminRequired
-     * @NoCSRFRequired
-     */
-    public function get(): string
-    {
-        return $this->appManager->getAppVersion($this->appName, useCache: false);
-    }
+//    /**
+//     * @return DataResponse
+//     */
+//    #[NoAdminRequired]
+//    #[NoCSRFRequired]
+//    #[ApiRoute(verb: 'GET', url: '/info')]
+//    public function get(): DataResponse
+//    {
+//        return new DataResponse($this->appManager->getAppVersion($this->appName, useCache: false));
+//    }
 }

@@ -4,56 +4,59 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Controller;
 
-use OCA\OtpManager\Db\SettingMapper;
-use OCP\AppFramework\Controller;
+use OCA\OtpManager\Attribute\ValidateRequestBodyDTO;
+use OCA\OtpManager\Dto\Request\SettingSaveRequestDto;
+use OCA\OtpManager\Dto\Response\SettingResponseDto;
+use OCA\OtpManager\Service\SettingService;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataResponse;
-use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 
 
 class SettingController extends OCSController
 {
-
-    private SettingMapper $settingMapper;
-
-    private ?string $userId;
-
     public function __construct(
-        string        $AppName,
-        IRequest      $request,
-        SettingMapper $settingMapper,
-        ?string       $UserId = null
+        string                          $appName,
+        IRequest                        $request,
+        private readonly SettingService $settingService
     )
     {
-        parent::__construct($AppName, $request);
-        $this->settingMapper = $settingMapper;
-        $this->userId = $UserId;
+        parent::__construct($appName, $request);
     }
 
+    /**
+     * @return DataResponse<SettingResponseDto>
+     */
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/settings')]
     public function get(): DataResponse
     {
-        return $this->settingMapper->find($this->userId);
+        return $this->settingService->get();
     }
 
+    /**
+     * @param bool|null $showCodes
+     * @param bool|null $darkMode
+     * @param string|null $recordsPerPage
+     * @return DataResponse<SettingResponseDto>
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/settings')]
-    public function save(?bool $showCodes, ?bool $darkMode, ?string $recordsPerPage)
+    #[ValidateRequestBodyDTO(SettingSaveRequestDto::class)]
+    public function save(?bool $showCodes, ?bool $darkMode, ?string $recordsPerPage): DataResponse
     {
-        $setting = $this->settingMapper->find($this->userId);
-
-        $perPageAvailable = ["10", "20", "30", "All"];
-
-        if (!is_null($showCodes)) $setting->setShowCodes($showCodes);
-        if (!is_null($darkMode)) $setting->setDarkMode($darkMode);
-        if (!is_null($recordsPerPage) && in_array($recordsPerPage, $perPageAvailable)) $setting->setRecordsPerPage($recordsPerPage);
-
-        return $this->settingMapper->update($setting);
+        return $this->settingService->save(
+            new SettingSaveRequestDto(
+                showCodes: $showCodes,
+                darkMode: $darkMode,
+                recordsPerPage: $recordsPerPage
+            )
+        );
     }
 }

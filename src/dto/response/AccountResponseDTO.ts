@@ -10,8 +10,8 @@ export type AccountResponseDTO = {
     counter: number
     icon: string
     position: number
-    user_id: string
-    created_at: Date
-    updated_at: Date
-    deleted_at: Date
+    userId: string
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
 }

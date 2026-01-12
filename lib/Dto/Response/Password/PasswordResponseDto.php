@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\OtpManager\Dto\Response;
+namespace OCA\OtpManager\Dto\Response\Password;
 
 use JsonSerializable;
 

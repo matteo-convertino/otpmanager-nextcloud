@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OCA\OtpManager\Controller;
 
 use OCA\OtpManager\Attribute\ValidateRequestBodyDTO;
-use OCA\OtpManager\Dto\Request\PasswordCheckRequestDto;
-use OCA\OtpManager\Dto\Request\PasswordCreateRequestDto;
-use OCA\OtpManager\Dto\Request\PasswordUpdateRequestDto;
-use OCA\OtpManager\Dto\Response\PasswordResponseDto;
+use OCA\OtpManager\Dto\Request\Password\PasswordCheckRequestDto;
+use OCA\OtpManager\Dto\Request\Password\PasswordCreateRequestDto;
+use OCA\OtpManager\Dto\Request\Password\PasswordUpdateRequestDto;
+use OCA\OtpManager\Dto\Response\Password\PasswordResponseDto;
 use OCA\OtpManager\Service\PasswordService;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -22,16 +22,14 @@ use OCP\IRequest;
 
 class PasswordController extends OCSController
 {
-    private PasswordService $passwordService;
 
     public function __construct(
-        string          $AppName,
-        IRequest        $request,
-        PasswordService $passwordService,
+        string                           $appName,
+        IRequest                         $request,
+        private readonly PasswordService $passwordService,
     )
     {
-        parent::__construct($AppName, $request);
-        $this->passwordService = $passwordService;
+        parent::__construct($appName, $request);
     }
 
     /**
@@ -65,7 +63,8 @@ class PasswordController extends OCSController
     /**
      * @param string $password
      * @return DataResponse<PasswordResponseDto>
-     * @throws OCSBadRequestException | OCSException
+     * @throws OCSBadRequestException
+     * @throws OCSException
      */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/password')]
@@ -81,7 +80,8 @@ class PasswordController extends OCSController
      * @param string $oldPassword
      * @param string $newPassword
      * @return DataResponse<PasswordResponseDto>
-     * @throws OCSBadRequestException | OCSException
+     * @throws OCSBadRequestException
+     * @throws OCSException
      */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'PUT', url: '/password')]

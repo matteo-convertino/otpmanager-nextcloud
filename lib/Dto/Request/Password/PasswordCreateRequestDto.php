@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\OtpManager\Dto\Request;
+namespace OCA\OtpManager\Dto\Request\Password;
 
 use JsonSerializable;
 use Symfony\Component\Validator\Constraints as Assert;

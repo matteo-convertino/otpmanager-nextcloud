@@ -9,7 +9,7 @@ export default function useExportAccounts() {
         if (accounts === undefined) return;
 
         let accountsToExport = accounts.map((account) => {
-            const {decryptedSecret, id, created_at, updated_at, deleted_at, user_id, position, code, ...rest} = account;
+            const {decryptedSecret, id, createdAt, updatedAt, deletedAt, userId, position, code, ...rest} = account;
 
             return {
                 ...rest,

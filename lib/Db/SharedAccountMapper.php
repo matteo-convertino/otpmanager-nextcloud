@@ -8,6 +8,7 @@ use OCA\OtpManager\AppInfo\Application;
 use OCA\OtpManager\Utils\AccountPositionHelper;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
+use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -38,7 +39,7 @@ class SharedAccountMapper extends QBMapper
         try {
             return parent::findEntities($query);
         } catch (\Exception) {
-            throw new OCSException("There was an error while finding shared accounts" , 500);
+            throw new OCSException("There was an error while finding shared accounts", 500);
         }
     }
 
@@ -229,11 +230,11 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @param string $accountId
+     * @param int $accountId
      * @return SharedAccount[]
      * @throws OCSException
      */
-    public function findAllByAccount(string $accountId): array
+    public function findAllByAccount(int $accountId): array
     {
         $qb = $this->db->getQueryBuilder();
         $qb->select('*')
@@ -250,11 +251,11 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @param string $accountId
+     * @param int $accountId
      * @return string[]
      * @throws OCSException
      */
-    public function findUsersAlreadyShared(string $accountId): array
+    public function findUsersAlreadyShared(int $accountId): array
     {
         $qb = $this->db->getQueryBuilder();
         $qb->select("receiver_id")
@@ -281,11 +282,11 @@ class SharedAccountMapper extends QBMapper
 
     /**
      * @param string $userId
-     * @param string $accountId
+     * @param int $accountId
      * @return array
      * @throws OCSException
      */
-    public function findUsers(string $userId, string $accountId): array
+    public function findUsers(string $userId, int $accountId): array
     {
         $qb = $this->db->getQueryBuilder();
 
@@ -400,26 +401,24 @@ class SharedAccountMapper extends QBMapper
      * @return bool
      * @throws OCSException
      */
-    public function unshare(int $accountId, string $receiverId): bool
+    public function unshare(int $accountId, string $receiverId): void
     {
         $sharedAccount = $this->find("account_id", $accountId, $receiverId);
 
-        if ($sharedAccount == null) {
-            return false;
-        } else {
-            AccountPositionHelper::decreasePosition(
-                mapper: $this,
-                accounts: $this->findAllPosGtThan($sharedAccount->getPosition(), $receiverId)
-            );
-            AccountPositionHelper::decreasePosition(
-                mapper: $this->accountMapper,
-                accounts: $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $receiverId)
-            );
+        if ($sharedAccount == null)
+            throw new OCSBadRequestException("Shared account with id $accountId not found");
 
-            $this->delete($sharedAccount);
+        AccountPositionHelper::decreasePosition(
+            mapper: $this,
+            accounts: $this->findAllPosGtThan($sharedAccount->getPosition(), $receiverId)
+        );
+        AccountPositionHelper::decreasePosition(
+            mapper: $this->accountMapper,
+            accounts: $this->accountMapper->findAllPosGtThan($sharedAccount->getPosition(), $receiverId)
+        );
 
-            return true;
-        }
+        $this->delete($sharedAccount);
+
     }
 
     /**

@@ -6,29 +6,23 @@ namespace OCA\OtpManager\Service;
 
 use OCA\OtpManager\Db\Setting;
 use OCA\OtpManager\Db\SettingMapper;
-use OCA\OtpManager\Dto\Request\PasswordCreateRequestDto;
-use OCA\OtpManager\Dto\Request\PasswordUpdateRequestDto;
-use OCA\OtpManager\Dto\Response\PasswordResponseDto;
-use OCA\OtpManager\Dto\Response\PasswordStatusResponseDto;
+use OCA\OtpManager\Dto\Request\Password\PasswordCreateRequestDto;
+use OCA\OtpManager\Dto\Request\Password\PasswordUpdateRequestDto;
+use OCA\OtpManager\Dto\Response\Password\PasswordResponseDto;
+use OCA\OtpManager\Dto\Response\Password\PasswordStatusResponseDto;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 
 class PasswordService
 {
-    private SettingMapper $settingMapper;
-    private EncryptionService $encryption;
-    private ?string $userId;
 
     public function __construct(
-        SettingMapper     $settingMapper,
-        EncryptionService $encryption,
-        ?string           $UserId = null
+        private readonly SettingMapper     $settingMapper,
+        private readonly EncryptionService $encryption,
+        private readonly ?string $userId = null
     )
     {
-        $this->settingMapper = $settingMapper;
-        $this->encryption = $encryption;
-        $this->userId = $UserId;
     }
 
     /**

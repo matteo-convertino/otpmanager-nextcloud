@@ -4,235 +4,186 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\Controller;
 
-use OCA\OtpManager\Controller\Validator\SharedAccountForm;
-use OCA\OtpManager\Db\AccountMapper;
-use OCA\OtpManager\Db\SharedAccount;
-use OCA\OtpManager\Db\SharedAccountMapper;
-use OCA\OtpManager\Service\EncryptionService;
-use OCP\AppFramework\Http;
+use OCA\OtpManager\Attribute\ValidateRequestBodyDTO;
+use OCA\OtpManager\Dto\Request\Account\AccountUpdateCounterRequestDto;
+use OCA\OtpManager\Dto\Request\SharedAccount\SharedAccountCreateRequestDto;
+use OCA\OtpManager\Dto\Request\SharedAccount\SharedAccountDeleteRequestDto;
+use OCA\OtpManager\Dto\Request\SharedAccount\SharedAccountGetRequestDto;
+use OCA\OtpManager\Dto\Request\SharedAccount\SharedAccountUnlockRequestDto;
+use OCA\OtpManager\Dto\Request\SharedAccount\SharedAccountUpdateRequestDto;
+use OCA\OtpManager\Dto\Response\AccountResponseDto;
+use OCA\OtpManager\Dto\Response\ReceiverResponseDto;
+use OCA\OtpManager\Dto\Response\SharedAccountResponseDto;
+use OCA\OtpManager\Service\SharedAccountService;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
-use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\OCS\OCSBadRequestException;
+use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
-use OCP\IUserManager;
 
 class SharedAccountController extends OCSController
 {
-    private IUserManager $userManager;
-    private SharedAccountMapper $sharedAccountMapper;
-    private AccountMapper $accountMapper;
-    private string $serverUrl;
-    private ?string $userId;
-    private EncryptionService $encryption;
 
     public function __construct(
-        string              $AppName,
-        IRequest            $request,
-        IUserManager        $userManager,
-        SharedAccountMapper $sharedAccountMapper,
-        AccountMapper       $accountMapper,
-        EncryptionService   $encryption,
-        ?string             $UserId = null,
+        string                                $appName,
+        IRequest                              $request,
+        private readonly SharedAccountService $sharedAccountService,
     )
     {
-        parent::__construct($AppName, $request);
-        $this->userManager = $userManager;
-        $this->userId = $UserId;
-        $this->sharedAccountMapper = $sharedAccountMapper;
-        $this->accountMapper = $accountMapper;
-        $this->encryption = $encryption;
-        $this->serverUrl = $request->getServerProtocol() . "://" . $request->getServerHost() . "/";
+        parent::__construct($appName, $request);
     }
 
+    /**
+     * @return DataResponse<SharedAccountResponseDto[]>
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/share')]
-    public function getByUser(): array
+    public function getByUser(): DataResponse
     {
-        return $this->sharedAccountMapper->findAllByReceiverJoin($this->userId);
+        return $this->sharedAccountService->getByUser();
     }
 
+    /**
+     * @param int $accountId
+     * @return DataResponse<SharedAccountResponseDto[]>
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/share/{id}')]
-    public function getByAccount($id): array
+    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
+    public function getByAccount(int $accountId): DataResponse
     {
-        $activeShares = $this->sharedAccountMapper->findAllByAccount($id);
-
-        $result = [];
-
-        foreach ($activeShares as $activeShare) {
-            $receiver = $this->userManager->get($activeShare->getReceiverId());
-
-            if (!is_null($receiver)) {
-                $result[] = $activeShare->customJson($receiver, $this->serverUrl . "avatar/" . $receiver->getUID() . "/64");
-            }
-        }
-
-        return $result;
+        return $this->sharedAccountService->getByAccount(new SharedAccountGetRequestDto($accountId));
     }
 
+    /**
+     * @param string $accountSecret
+     * @param string[] $users
+     * @param string $sharedSecret
+     * @param string $password
+     * @param string $iv
+     * @param string|null $expirationDate
+     * @return DataResponse<null>
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/share')]
-    public function create(string $accountSecret, array $users, string $sharedSecret, string $password, string $iv, string | null $expirationDate): array|string
+    #[ValidateRequestBodyDTO(SharedAccountCreateRequestDto::class)]
+    public function create(
+        array   $users,
+        string  $accountSecret,
+        string  $sharedSecret,
+        string  $password,
+        string  $iv,
+        ?string $expirationDate
+    ): DataResponse
     {
-        $errors = SharedAccountForm::validateCreate($accountSecret, $users, $sharedSecret, $password, $iv, $expirationDate);
-
-        if (count($errors) > 0) {
-            return $errors;
-        } else {
-            $account = $this->accountMapper->find("secret", $accountSecret, $this->userId);
-
-            if (is_null($account)) {
-                $errors["error"] = "The account to share does not exist";
-                return $errors;
-            } else if ($account->getUserId() != $this->userId) {
-                $errors["error"] = "You cannot share an account that is not yours";
-                return $errors;
-            }
-
-            foreach ($users as $receiverId) {
-                $accountShared = $this->sharedAccountMapper->findByReceiver($account->getId(), $receiverId);
-
-                if (is_null($accountShared)) {
-                    $accountShared = new SharedAccount();
-
-                    $maxSharedAccountPos = $this->sharedAccountMapper->findMaxPosition($receiverId);
-                    $maxAccountPos = $this->accountMapper->findMaxPosition($receiverId);
-
-                    $position = max($maxSharedAccountPos, $maxAccountPos) + 1;
-
-                    $accountShared->setAccountId($account->getId());
-                    $accountShared->setReceiverId($receiverId);
-                    $accountShared->setName($account->getName());
-                    $accountShared->setIssuer($account->getIssuer());
-                    $accountShared->setSecret($sharedSecret);
-                    $accountShared->setPassword(password_hash($password, PASSWORD_DEFAULT));
-                    $accountShared->setIv($iv);
-                    $accountShared->setIcon($account->getIcon());
-                    $accountShared->setPosition($position);
-                    $accountShared->setExpiredAt($expirationDate == null ? null : date('Y-m-d', strtotime($expirationDate)));
-                    $accountShared->setCreatedAt(date("Y-m-d H:i:s"));
-                    $accountShared->setUpdatedAt(date("Y-m-d H:i:s"));
-
-                    $this->sharedAccountMapper->insert($accountShared);
-                } else {
-                    $accountShared->setExpiredAt($expirationDate == null ? null : date('Y-m-d', strtotime($expirationDate)));
-                    $this->sharedAccountMapper->update($accountShared);
-                }
-            }
-
-            return "OK";
-        }
+        return $this->sharedAccountService->create(
+            new SharedAccountCreateRequestDto(
+                users: $users,
+                accountSecret: $accountSecret,
+                sharedSecret: $sharedSecret,
+                password: $password,
+                iv: $iv,
+                expirationDate: $expirationDate
+            )
+        );
     }
 
+    /**
+     * @param string $name
+     * @param string $issuer
+     * @param string $secret
+     * @return DataResponse
+     * @throws OCSBadRequestException
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'PUT', url: '/share')]
-    public function update(string $name, string $issuer, string $secret): array|string
+    #[ValidateRequestBodyDTO(SharedAccountUpdateRequestDto::class)]
+    public function update(string $name, string $issuer, string $secret): DataResponse
     {
-        $errors = SharedAccountForm::validateUpdate($name, $issuer, $secret);
-
-        if (count($errors) > 0) {
-            return $errors;
-        } else {
-            $sharedAccount = $this->sharedAccountMapper->find("secret", $secret, $this->userId);
-
-            if ($sharedAccount == null) {
-                $errors["msg"] = "This account does not exists";
-                return $errors;
-            }
-
-            $sharedAccount->setName($name);
-            $sharedAccount->setIssuer($issuer);
-
-            $this->sharedAccountMapper->update($sharedAccount);
-
-            return "OK";
-        }
+        return $this->sharedAccountService->update(
+            new SharedAccountUpdateRequestDto(
+                name: $name,
+                issuer: $issuer,
+                secret: $secret
+            )
+        );
     }
 
-
+    /**
+     * @param int $accountId
+     * @param int|null $receiverId
+     * @return DataResponse
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'DELETE', url: '/share/{accountId}')]
-    public function delete(int $accountId): JSONResponse
+    #[ValidateRequestBodyDTO(SharedAccountDeleteRequestDto::class)]
+    public function delete(int $accountId, ?int $receiverId): DataResponse
     {
-        $receiverId = $this->request->getParam("receiver");
-
-        if ($this->sharedAccountMapper->unshare($accountId, $receiverId == null ? $this->userId : $receiverId)) {
-            return new JSONResponse();
-        }
-
-        return new JSONResponse(["error" => "There was an error while deleting your shared account"], 500);
+        return $this->sharedAccountService->delete(
+            new SharedAccountDeleteRequestDto(
+                accountId: $accountId,
+                receiverId: $receiverId
+            )
+        );
     }
 
+    /**
+     * @param int $accountId
+     * @return DataResponse<ReceiverResponseDto[]>
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/get-users/{accountId}')]
-    public function getUsers($accountId): array
+    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
+    public function getUsers(int $accountId): DataResponse
     {
-        $result = $this->sharedAccountMapper->findUsers($this->userId, $accountId);
-
-        $users = [];
-
-        for ($i = 0; $i < count($result); $i++) {
-            $user = $result[$i];
-
-            $users[] = [
-                "image" => $this->serverUrl . "avatar/" . $user["uid"] . "/64",
-                "value" => $user["uid"],
-                "label" => is_null($user["displayname"]) ? $user["uid"] : $user["displayname"],
-            ];
-        }
-
-        return $users;
+        return $this->sharedAccountService->getUsers(new SharedAccountGetRequestDto($accountId));
     }
 
+    /**
+     * @param int $accountId
+     * @param string $currentPassword
+     * @param string $tempPassword
+     * @return DataResponse<null>
+     * @throws OCSBadRequestException
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/share/unlock')]
-    public function unlock(int $accountId, string $currentPassword, string $tempPassword): JSONResponse
+    #[ValidateRequestBodyDTO(SharedAccountUnlockRequestDto::class)]
+    public function unlock(int $accountId, string $currentPassword, string $tempPassword): DataResponse
     {
-        $accountShared = $this->sharedAccountMapper->findByReceiver($accountId, $this->userId);
-
-        if ($accountShared == null)
-            return new JSONResponse(["error" => "This shared account does not exists"], Http::STATUS_NOT_FOUND);
-
-        if ($accountShared->getUnlocked())
-            return new JSONResponse(null, Http::STATUS_OK);
-
-        if (!password_verify(hash("sha256", $tempPassword), $accountShared->getPassword()))
-            return new JSONResponse(["error" => "The password is incorrect"], Http::STATUS_BAD_REQUEST);
-
-        $decryptedSecret = $this->encryption->decrypt($accountShared->getSecret(), $tempPassword, $accountShared->getIv());
-
-        if ($decryptedSecret === false)
-            return new JSONResponse(["error" => "There was an error while trying to decrypt the secret key"], Http::STATUS_BAD_REQUEST);
-
-        $encryptedSecret = $this->encryption->encrypt($decryptedSecret, $currentPassword, $this->userId, true);
-
-        if ($encryptedSecret === false)
-            return new JSONResponse(["error" => "There was an error while trying to encrypt the secret key"], Http::STATUS_BAD_REQUEST);
-
-        $accountShared->setSecret($encryptedSecret);
-        $accountShared->setUnlocked(true);
-        $this->sharedAccountMapper->update($accountShared);
-
-        return new JSONResponse(null, Http::STATUS_OK);
+        return $this->sharedAccountService->unlock(
+            new SharedAccountUnlockRequestDto(
+                accountId: $accountId,
+                currentPassword: $currentPassword,
+                tempPassword: $tempPassword
+            )
+        );
     }
 
+    /**
+     * @param string $secret
+     * @return DataResponse<AccountResponseDto>
+     * @throws OCSBadRequestException
+     * @throws OCSException
+     */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/share/update-counter')]
-    public function updateCounter(string $secret): JSONResponse
+    #[ValidateRequestBodyDTO(AccountUpdateCounterRequestDto::class)]
+    public function updateCounter(string $secret): DataResponse
     {
-        $account = $this->sharedAccountMapper->findAccountBySecret($this->userId, $secret);
-
-        if ($account == null) return new JSONResponse(["error" => "This account does not exists"], Http::STATUS_NOT_FOUND);
-        if ($account->getType() == "totp") return new JSONResponse(["error" => "You cannot update counter of a TOTP account"], Http::STATUS_BAD_REQUEST);
-
-        $account->setCounter($account->getCounter() + 1);
-        $this->accountMapper->update($account);
-
-        return new JSONResponse($account, Http::STATUS_OK);
+        return $this->sharedAccountService->updateCounter(new AccountUpdateCounterRequestDto($secret));
     }
 }

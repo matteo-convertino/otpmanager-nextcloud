@@ -9,19 +9,17 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Middleware;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\IRequest;
-use Psr\Log\LoggerInterface;
 use ReflectionException;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use function count;
-use function PHPUnit\Framework\containsEqual;
 
 final class RequestBodyValidator extends Middleware
 {
 
     private ValidatorInterface $validator;
 
-    public function __construct(private readonly IRequest $request, private readonly LoggerInterface $logger)
+    public function __construct(private readonly IRequest $request)
     {
         $this->validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()

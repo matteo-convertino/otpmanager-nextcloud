@@ -79,7 +79,7 @@ export default function AsideInfo() {
                     <Grid.Col span={3}>Created At</Grid.Col>
                     <Grid.Col span={3}>
                         <Text ta="right" fs="italic" c="dimmed">
-                            {otp.created_at.toString()}
+                            {otp.createdAt.toString()}
                         </Text>
                     </Grid.Col>
                 </Grid>
@@ -88,17 +88,17 @@ export default function AsideInfo() {
                     <Grid.Col span={3}>Updated At</Grid.Col>
                     <Grid.Col span={3}>
                         <Text ta="right" fs="italic" c="dimmed">
-                            {otp.updated_at.toString()}
+                            {otp.updatedAt.toString()}
                         </Text>
                     </Grid.Col>
                 </Grid>
 
-                {otp.deleted_at != null && (
+                {otp.deletedAt != null && (
                     <Grid grow justify="space-between">
                         <Grid.Col span={3}>Deleted At</Grid.Col>
                         <Grid.Col span={3}>
                             <Text ta="right" fs="italic" c="dimmed">
-                                {otp.deleted_at.toString()}
+                                {otp.deletedAt.toString()}
                             </Text>
                         </Grid.Col>
                     </Grid>
