@@ -7,23 +7,25 @@ import {
 } from "@/dto/request/SharedAccountCreateRequestDTO.ts";
 import {IconCopy} from "@tabler/icons-react";
 import {AES, Hex, SHA256, WordArray} from "crypto-es";
-import {copy} from "@/utils/copy.tsx";
 import {ActionIcon, Text} from "@mantine/core";
 import {useEffect, useState} from "react";
-import type {NextcloudUserDTO} from "@/dto/response/NextcloudUserDTO.ts";
-import type {SharedAccountDetailedResponseDTO} from "@/dto/response/SharedAccountDetailedResponseDTO.ts";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import moment from "moment";
+import type {ReceiverResponseDTO} from "@/dto/response/ReceiverResponseDTO.ts";
+import type {SharedAccountResponseDTO} from "@/dto/response/SharedAccountResponseDTO.ts";
+import useCopy from "@/hooks/useCopy.tsx";
 
 export default function useSharedAccountForm() {
     const otpManagerApi = useOtpManagerApi();
     const {showAsideShare: otp} = useSidebarStore();
 
-    const [activeShares, setActiveShares] = useState<SharedAccountDetailedResponseDTO[]>([]);
-    const [nextcloudUsers, setNextcloudUsers] = useState<NextcloudUserDTO[]>([]);
+    const [activeShares, setActiveShares] = useState<SharedAccountResponseDTO[]>([]);
+    const [nextcloudUsers, setNextcloudUsers] = useState<ReceiverResponseDTO[]>([]);
 
     const [isFetchingNextcloudUsers, setIsFetchingNextcloudUsers] = useState(true);
     const [isFetchingActiveShares, setIsFetchingActiveShares] = useState(true);
+
+    const {copy} = useCopy();
 
     const form = useForm<SharedAccountCreateRequestSchemaForm>({
         initialValues: {
@@ -72,7 +74,7 @@ export default function useSharedAccountForm() {
             api: () => SharedAccountService.getInstance().create({
                 users: values.users,
                 password: password,
-                expirationDate: values.expirationDate === null ? undefined : moment(values.expirationDate).format("MM/DD/YYYY"),
+                expirationDate: values.expirationDate === null ? undefined : moment(values.expirationDate).format("YYYY-MM-DD"),
                 accountSecret: otp.secret,
                 iv: Hex.stringify(iv),
                 sharedSecret: sharedSecret,
@@ -113,7 +115,7 @@ export default function useSharedAccountForm() {
         });
     }
 
-    function onDelete(accountId: number, receiver: any) {
+    function onDelete(accountId: number, receiver: ReceiverResponseDTO) {
         if (otp === undefined) return;
 
         otpManagerApi({

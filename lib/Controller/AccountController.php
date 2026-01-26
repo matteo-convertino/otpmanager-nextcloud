@@ -11,8 +11,8 @@ use OCA\OtpManager\Dto\Request\Account\AccountGetRequestDto;
 use OCA\OtpManager\Dto\Request\Account\AccountImportRequestDto;
 use OCA\OtpManager\Dto\Request\Account\AccountUpdateCounterRequestDto;
 use OCA\OtpManager\Dto\Request\Account\AccountUpdateRequestDto;
+use OCA\OtpManager\Dto\Response\AccountDatatableResponseDto;
 use OCA\OtpManager\Dto\Response\AccountResponseDto;
-use OCA\OtpManager\Dto\Response\SharedAccountResponseDto;
 use OCA\OtpManager\Service\AccountService;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -22,14 +22,16 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class AccountController extends OCSController
 {
 
     public function __construct(
-        string                          $appName,
-        IRequest                        $request,
-        private readonly AccountService $accountService,
+        string                           $appName,
+        IRequest                         $request,
+        private readonly AccountService  $accountService,
+        private readonly LoggerInterface $logger
     )
     {
         parent::__construct($appName, $request);
@@ -42,14 +44,13 @@ class AccountController extends OCSController
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/accounts/{id}')]
-    #[ValidateRequestBodyDTO(AccountGetRequestDto::class)]
     public function get(int $id): DataResponse
     {
         return $this->accountService->get(new AccountGetRequestDto($id));
     }
 
     /**
-     * @return DataResponse<SharedAccountResponseDto[]>
+     * @return DataResponse<AccountDatatableResponseDto[]>
      * @throws OCSException
      */
     #[NoAdminRequired]
@@ -147,7 +148,6 @@ class AccountController extends OCSController
      */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'DELETE', url: '/accounts/{id}')]
-    #[ValidateRequestBodyDTO(AccountDeleteRequestDto::class)]
     public function delete(int $id): DataResponse
     {
         return $this->accountService->delete(new AccountDeleteRequestDto($id));
@@ -174,7 +174,10 @@ class AccountController extends OCSController
     {
         return $this->accountService->import(
             new AccountImportRequestDto(
-                accounts: $accounts,
+                accounts: array_map(
+                    static fn(array $a) => AccountCreateRequestDto::fromArray($a),
+                    $accounts
+                ),
                 iv: $iv,
                 passwordUsedOnExport: $passwordUsedOnExport,
                 currentPassword: $currentPassword
@@ -183,7 +186,7 @@ class AccountController extends OCSController
     }
 
     /**
-     * @param string $secret
+     * @param int $id
      * @return DataResponse<AccountResponseDto>
      * @throws OCSBadRequestException
      * @throws OCSException
@@ -191,10 +194,10 @@ class AccountController extends OCSController
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/accounts/update-counter')]
     #[ValidateRequestBodyDTO(AccountUpdateCounterRequestDto::class)]
-    public function updateCounter(string $secret): DataResponse
+    public function updateCounter(int $id): DataResponse
     {
         return $this->accountService->updateCounter(
-            new AccountUpdateCounterRequestDto($secret)
+            new AccountUpdateCounterRequestDto($id)
         );
     }
 }

@@ -16,9 +16,9 @@ export default function useSettingsForm() {
             api: SettingsService.getInstance().get,
             showNotifications: false,
             onComplete: (settingsResponseDTO) => {
-                setShowCodes(settingsResponseDTO.show_codes);
-                setDarkMode(settingsResponseDTO.dark_mode);
-                setRecordsPerPage(parseInt(settingsResponseDTO.records_per_page));
+                setShowCodes(settingsResponseDTO.showCodes);
+                setDarkMode(settingsResponseDTO.darkMode);
+                setRecordsPerPage(parseInt(settingsResponseDTO.recordsPerPage));
                 setIsFetching(false);
             }
         });
@@ -33,9 +33,9 @@ export default function useSettingsForm() {
             api: () => SettingsService.getInstance().save(settingsRequestDTO),
             showNotifications: false,
             onComplete: (settingsResponseDTO) => {
-                setShowCodes(settingsResponseDTO.show_codes);
-                setDarkMode(settingsResponseDTO.dark_mode);
-                setRecordsPerPage(parseInt(settingsResponseDTO.records_per_page));
+                setShowCodes(settingsResponseDTO.showCodes);
+                setDarkMode(settingsResponseDTO.darkMode);
+                setRecordsPerPage(parseInt(settingsResponseDTO.recordsPerPage));
             }
         });
     }

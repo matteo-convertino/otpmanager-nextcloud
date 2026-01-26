@@ -4,12 +4,13 @@ import {useForm, zodResolver} from "@mantine/form";
 import {SHA256} from "crypto-es";
 import {useEffect} from "react";
 import {useSecretStore} from "@/context/useSecretStore.ts";
-import {passwordFormCheckSchema} from "@/dto/utils/passwordFormCheckSchema.ts";
 import {z} from "zod";
+import {passwordFormCheckSchema} from "@/dto/request/PasswordRequestDTO.ts";
+import {LOCAL_STORAGE_CACHED_PASSWORD_KEY} from "@/utils/localStorageKey.ts";
 
 export default function usePasswordCheckForm() {
     const otpManagerApi = useOtpManagerApi();
-    const {setIv, setPassword, setPasswordHash, setAuth} = useSecretStore();
+    const {password, setIv, setPassword, setPasswordHash, setAuth} = useSecretStore();
 
     const form = useForm({
         initialValues: {
@@ -20,14 +21,14 @@ export default function usePasswordCheckForm() {
     });
 
     const onSubmit = (values: z.infer<typeof passwordFormCheckSchema>) => {
-
         otpManagerApi({
-            api: () => PasswordService.getInstance().check({ password: values.password }),
+            api: () => PasswordService.getInstance().check({password: values.password}),
             titleOnLoading: "Password",
             messageOnLoading: "Password is being checked",
             titleOnSuccess: "Password",
             messageOnSuccess: "Correct password",
             onComplete: (passwordResponseDTO) => {
+                if(values.savePassword) localStorage.setItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY, values.password)
                 setIv(passwordResponseDTO.iv);
                 setPassword(true);
                 setPasswordHash(SHA256(values.password).toString());
@@ -37,12 +38,13 @@ export default function usePasswordCheckForm() {
     }
 
     useEffect(() => {
-        // if (password && localStorage.getItem("otpmanager_cached_password")) {
-        //     form.setValues({
-        //         password: localStorage.getItem("otpmanager_cached_password"),
-        //     });
-        // }
-        console.log("TODO: auto login");
+        const cachedPassword = localStorage.getItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY);
+        if (password && cachedPassword !== null) {
+            onSubmit({
+                password: cachedPassword,
+                savePassword: true,
+            })
+        }
     }, []);
 
     return {form, onSubmit};

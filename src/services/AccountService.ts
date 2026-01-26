@@ -1,10 +1,10 @@
-import otpManagerAxiosClient from "@/utils/otpManagerAxiosClient";
+import otpManagerAxiosClient from "@/services/utils/otpManagerAxiosClient.ts";
 import {AccountRoutes} from "@/services/routes/accountRoutes.ts";
 import type {AccountResponseDTO} from "@/dto/response/AccountResponseDTO.ts";
 import type {AccountRequestDTO} from "@/dto/request/AccountRequestDTO.ts";
-import type {AllAccountResponseDTO} from "@/dto/response/AllAccountResponseDTO.ts";
 import type {ImportAccountsDTO} from "@/dto/request/ImportAccountsDTO.ts";
 import type {UpdateCounterRequestDTO} from "@/dto/request/UpdateCounterRequestDTO.ts";
+import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
 
 
 export default class AccountService {
@@ -28,8 +28,8 @@ export default class AccountService {
         ).then(res => res.data);
     }
 
-    public async getAll(): Promise<AllAccountResponseDTO> {
-        return otpManagerAxiosClient.get<AllAccountResponseDTO>(
+    public async getAll(): Promise<AccountResponseDatatable[]> {
+        return otpManagerAxiosClient.get<AccountResponseDatatable[]>(
             AccountRoutes.GET_ALL
         ).then(res => res.data);
     }

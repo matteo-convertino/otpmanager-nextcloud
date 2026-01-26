@@ -1,9 +1,9 @@
-import otpManagerAxiosClient from "@/utils/otpManagerAxiosClient";
-import {AccountRoutes} from "@/services/routes/accountRoutes.ts";
+import otpManagerAxiosClient from "@/services/utils/otpManagerAxiosClient.ts";
 import {PasswordRoutes} from "@/services/routes/passwordRoutes.ts";
 import type {PasswordRequestDTO} from "@/dto/request/PasswordRequestDTO.ts";
 import type {PasswordResponseDTO} from "@/dto/response/PasswordResponseDTO.ts";
-import type {passwordUpdateFormType} from "@/dto/utils/passwordFormUpdateType.ts";
+import type {PasswordResponseStatusDTO} from "@/dto/response/PasswordResponseStatusDTO.ts";
+import type {PasswordUpdateRequestDTO} from "@/dto/request/PasswordUpdateRequestDTO.ts";
 
 export default class PasswordService {
     private static instance: PasswordService;
@@ -26,9 +26,9 @@ export default class PasswordService {
         ).then(res => res.data);
     }
 
-    public async get(): Promise<boolean> {
-        return otpManagerAxiosClient.get<boolean>(
-            PasswordRoutes.GET
+    public async status(): Promise<PasswordResponseStatusDTO> {
+        return otpManagerAxiosClient.get<PasswordResponseStatusDTO>(
+            PasswordRoutes.STATUS
         ).then(res => res.data);
     }
 
@@ -39,9 +39,9 @@ export default class PasswordService {
         ).then(res => res.data);
     }
 
-    public async update(passwordUpdateRequestDTO: passwordUpdateFormType): Promise<PasswordResponseDTO> {
+    public async update(passwordUpdateRequestDTO: PasswordUpdateRequestDTO): Promise<PasswordResponseDTO> {
         return otpManagerAxiosClient.put<PasswordResponseDTO>(
-            AccountRoutes.UPDATE,
+            PasswordRoutes.UPDATE,
             passwordUpdateRequestDTO
         ).then(res => res.data);
     }

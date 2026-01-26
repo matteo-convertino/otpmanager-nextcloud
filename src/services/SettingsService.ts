@@ -1,4 +1,4 @@
-import otpManagerAxiosClient from "@/utils/otpManagerAxiosClient";
+import otpManagerAxiosClient from "@/services/utils/otpManagerAxiosClient.ts";
 import type {SettingsResponseDTO} from "@/dto/response/SettingsResponseDTO.ts";
 import {SettingsRoutes} from "@/services/routes/settingsRoutes.ts";
 import type {SettingsRequestDTO} from "@/dto/request/SettingsRequestDTO.ts";

@@ -1,13 +1,12 @@
-import otpManagerAxiosClient from "@/utils/otpManagerAxiosClient";
+import otpManagerAxiosClient from "@/services/utils/otpManagerAxiosClient.ts";
 import type {AccountResponseDTO} from "@/dto/response/AccountResponseDTO.ts";
 import {SharedAccountRoutes} from "@/services/routes/sharedAccountRoutes.ts";
-import type {SharedAccountDetailedResponseDTO} from "@/dto/response/SharedAccountDetailedResponseDTO.ts";
 import type {SharedAccountResponseDTO} from "@/dto/response/SharedAccountResponseDTO.ts";
 import type {SharedAccountUnlockDTO} from "@/dto/request/SharedAccountUnlockDTO.ts";
 import type {SharedAccountCreateRequestDTO} from "@/dto/request/SharedAccountCreateRequestDTO.ts";
 import type {SharedAccountEditRequestDTO} from "@/dto/request/SharedAccountEditRequestDTO.ts";
-import type {NextcloudUserDTO} from "@/dto/response/NextcloudUserDTO.ts";
 import type {UpdateCounterRequestDTO} from "@/dto/request/UpdateCounterRequestDTO.ts";
+import type {ReceiverResponseDTO} from "@/dto/response/ReceiverResponseDTO.ts";
 
 
 export default class SharedAccountService {
@@ -24,14 +23,14 @@ export default class SharedAccountService {
         return SharedAccountService.instance;
     }
 
-    public async getAllByAccountId(accountId: number): Promise<SharedAccountDetailedResponseDTO[]> {
-        return otpManagerAxiosClient.get<SharedAccountDetailedResponseDTO[]>(
+    public async getAllByAccountId(accountId: number): Promise<SharedAccountResponseDTO[]> {
+        return otpManagerAxiosClient.get<SharedAccountResponseDTO[]>(
             SharedAccountRoutes.GET_ALL_BY_ACCOUNT_ID(accountId)
         ).then(res => res.data);
     }
 
-    public async getUsersByAccountId(accountId: number): Promise<NextcloudUserDTO[]> {
-        return otpManagerAxiosClient.get<NextcloudUserDTO[]>(
+    public async getUsersByAccountId(accountId: number): Promise<ReceiverResponseDTO[]> {
+        return otpManagerAxiosClient.get<ReceiverResponseDTO[]>(
             SharedAccountRoutes.GET_USERS_BY_ACCOUNT_ID(accountId)
         ).then(res => res.data);
     }
@@ -50,7 +49,7 @@ export default class SharedAccountService {
         ).then(res => res.data);
     }
 
-    public async delete(accountId: number, receiverId?: number): Promise<SharedAccountResponseDTO> {
+    public async delete(accountId: number, receiverId: string | null): Promise<SharedAccountResponseDTO> {
         return otpManagerAxiosClient.delete<SharedAccountResponseDTO>(
             SharedAccountRoutes.DELETE(accountId, receiverId),
         ).then(res => res.data);

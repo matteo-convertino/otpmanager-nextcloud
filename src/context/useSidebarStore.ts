@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import type {AccountResponseDatatable} from "@/dto/utils/AccountResponseDatatable.ts";
+import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
 
 interface SidebarStore {
     showAsideInfo?: AccountResponseDatatable;

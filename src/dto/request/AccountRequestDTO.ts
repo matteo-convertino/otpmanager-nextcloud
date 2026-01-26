@@ -1,8 +1,8 @@
 import {z} from 'zod'
-import {AccountType} from "@/utils/accountType.ts";
-import {AccountPeriod} from "@/utils/accountPeriod.ts";
-import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
-import {AccountDigits} from "@/utils/accountDigits.ts";
+import {OtpType} from "@/utils/enum/otpType.ts";
+import {OtpPeriod} from "@/utils/enum/otpPeriod.ts";
+import {OtpAlgorithm} from "@/utils/enum/otpAlgorithm.ts";
+import {OtpDigits} from "@/utils/enum/otpDigits.ts";
 
 export const accountRequestSchema = z.object({
     name: z.string()
@@ -14,10 +14,10 @@ export const accountRequestSchema = z.object({
         .min(16, "Secret key cannot be shorter than 16 characters")
         .max(512, "Secret key cannot be longer than 16 characters")
         .regex(/^[A-Z2-7]+=*$/i, "Secret key is not Base32-encodable"),
-    type: z.nativeEnum(AccountType),
-    period: z.nativeEnum(AccountPeriod),
-    algorithm: z.nativeEnum(AccountAlgorithm),
-    digits: z.nativeEnum(AccountDigits),
+    type: z.nativeEnum(OtpType),
+    period: z.nativeEnum(OtpPeriod),
+    algorithm: z.nativeEnum(OtpAlgorithm),
+    digits: z.nativeEnum(OtpDigits),
 })
 
 export type AccountRequestSchemaForm = z.infer<typeof accountRequestSchema>

@@ -103,7 +103,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -127,7 +127,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -155,7 +155,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -182,7 +182,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -213,7 +213,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -243,7 +243,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -264,7 +264,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -327,7 +327,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -335,23 +335,23 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
+     * @param int $accountId
      * @param string $receiverId
-     * @param string $secret
      * @return Account|null
      */
-    public function findAccountBySecret(string $receiverId, string $secret): ?Account
+    public function findAccountById( int $accountId, string $receiverId): ?Account
     {
         $qb = $this->db->getQueryBuilder();
 
         $qb->select('accounts.*')
             ->from($this->getTableName(), "shared_accounts")
             ->innerJoin('shared_accounts', Application::ACCOUNTS_DB, "accounts", "shared_accounts.account_id = accounts.id")
-            ->where($qb->expr()->eq("shared_accounts.secret", $qb->createNamedParameter($secret)))
+            ->where($qb->expr()->eq("shared_accounts.account_id", $qb->createNamedParameter($accountId)))
             ->andWhere($qb->expr()->eq("shared_accounts.receiver_id", $qb->createNamedParameter($receiverId)))
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 
@@ -398,7 +398,8 @@ class SharedAccountMapper extends QBMapper
     /**
      * @param int $accountId
      * @param string $receiverId
-     * @return bool
+     * @return void
+     * @throws OCSBadRequestException
      * @throws OCSException
      */
     public function unshare(int $accountId, string $receiverId): void
@@ -434,7 +435,7 @@ class SharedAccountMapper extends QBMapper
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('expired_at'),
-                    $qb->expr()->gte('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
+                    $qb->expr()->gt('expired_at', $qb->createNamedParameter(date('Y-m-d'))),
                 )
             );
 

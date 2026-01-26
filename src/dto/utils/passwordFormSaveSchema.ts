@@ -15,7 +15,7 @@ export const passwordFormSaveSchema = (
             confirmPassword: z.string(),
         })
         .superRefine((values, ctx) => {
-            // oldPassword obbligatoria solo se si sta cambiando
+            // oldPassword is only required when changing password
             if (isChanging && !values.oldPassword) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
@@ -32,7 +32,8 @@ export const passwordFormSaveSchema = (
                 });
             }
 
-            if (values.confirmPassword !== values.password) {
+            // confirmPassword is only required when creating password
+            if (!isChanging && values.confirmPassword !== values.password) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "Passwords did not match",

@@ -11,13 +11,16 @@ import {
     IconTrash,
 } from "@tabler/icons-react";
 import {DataTable, type DataTableSortStatus} from "mantine-datatable";
-import {copy} from "@/utils/copy";
 import {generateUrl} from "@nextcloud/router";
 import {useSettingsStore} from "@/context/useSettingsStore";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import useUpdateCounter from "@/hooks/useUpdateCounter.tsx";
+import {OtpType} from "@/utils/enum/otpType.ts";
+import useCopy from "@/hooks/useCopy.tsx";
+import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
+import useSettingsForm from "@/hooks/useSettingsForm.tsx";
 
 const isTouchDevice =
     "ontouchstart" in window ||
@@ -31,27 +34,46 @@ export default function CustomDatatable(
         sortStatus: DataTableSortStatus,
         setSortStatus: (sortStatus: DataTableSortStatus) => void
     }) {
-    const {showCodes, recordsPerPage, setRecordsPerPage, pageOptions} = useSettingsStore();
-    const [page, setPage] = useState(1);
-    const [from, setFrom] = useState(0);
-    const [to, setTo] = useState(recordsPerPage);
+
+    function getCodeLabel(account: AccountResponseDatatable): string {
+        if (account.code === undefined) return '';
+
+        if (account.code !== null) return account.code;
+
+        if (account.unlocked === false) return 'Click here to unlock your shared account';
+        if (account.type === OtpType.HOTP) return 'Click here to generate HOTP code';
+
+        return '';
+    }
+
+    const getRecordsPerPage = (p: number) => p === -1 && accounts !== undefined ? accounts.length : p;
 
     const {accounts, isFetching} = useAccountsStore();
+    const {showCodes, recordsPerPage, setRecordsPerPage, pageOptions} = useSettingsStore();
     const {setShowSharedAccountToUnlock, setShowEditOtpAccount, setShowDeleteOtpAccount} = useModalsStore();
     const {setShowAsideInfo, setShowAsideShare} = useSidebarStore();
 
+    const {copy} = useCopy();
+    const [page, setPage] = useState(1);
+    const [from, setFrom] = useState(0);
+    const [to, setTo] = useState(getRecordsPerPage(recordsPerPage));
+
     const {isUpdating: isUpdatingCounter, onUpdate: onUpdateCounter} = useUpdateCounter();
+    const {onUpdate: onUpdateSettings} = useSettingsForm();
 
     useEffect(() => {
-        if (accounts === undefined) setPage(1);
-    }, [accounts]);
+        if (accounts === undefined) {
+            setPage(1);
+            return;
+        }
 
-    useEffect(() => {
-        let from = (page - 1) * recordsPerPage;
+        let p = getRecordsPerPage(recordsPerPage);
+        let from = (page - 1) * p;
 
         setFrom(from);
-        setTo(from + recordsPerPage);
-    }, [page, recordsPerPage]);
+        setTo(from + p);
+    }, [accounts, page, recordsPerPage]);
+
 
     return (
         <DataTable
@@ -64,9 +86,9 @@ export default function CustomDatatable(
             withBorder
             // sx={{backgroundColor: "", marginTop: "0px"}}
             onRowClick={(account) => {
-                if (account.unlocked === 0) {
+                if (account.unlocked === false) {
                     setShowSharedAccountToUnlock(account);
-                } else if (account.type == "hotp" && account.counter < 0) {
+                } else if (account.type === OtpType.HOTP && account.counter !== null && account.counter < 0) {
                     onUpdateCounter(account);
                 } else {
                     setShowAsideInfo(account);
@@ -80,8 +102,7 @@ export default function CustomDatatable(
                     accessor: "code",
                     width: 300,
                     render: (account) => {
-                        let canCopyCode = (account.unlocked === undefined || account.unlocked === 1) &&
-                            ((account.type == "hotp" && account.counter >= 0) || account.type == "totp");
+                        let canCopyCode = account.code !== undefined && account.code !== null;
 
                         return (
                             <>
@@ -96,7 +117,7 @@ export default function CustomDatatable(
                                             display:
                                                 showCodes ||
                                                 isTouchDevice ||
-                                                account.unlocked === 0
+                                                account.unlocked === false
                                                     ? "none"
                                                     : "block",
                                         }}
@@ -111,19 +132,19 @@ export default function CustomDatatable(
                                             display:
                                                 showCodes ||
                                                 isTouchDevice ||
-                                                account.unlocked === 0
+                                                account.unlocked === false
                                                     ? "flex"
                                                     : "none",
                                         }}
                                         onClick={(event) => {
-                                            if (canCopyCode) {
+                                            if (account.code !== undefined && account.code !== null) {
                                                 event.preventDefault();
                                                 event.stopPropagation();
                                                 copy(account.code);
                                             }
                                         }}
                                     >
-                                        <Text>{account.code}</Text>
+                                        <Text>{getCodeLabel(account)}</Text>
                                         {canCopyCode && (
                                             <ActionIcon>
                                                 <IconCopy size={18}/>
@@ -142,7 +163,7 @@ export default function CustomDatatable(
                     render: (account) => (
                         <>
                             <Group spacing={4} position="right" noWrap>
-                                {account.unlocked === 0 && (
+                                {account.unlocked === false && (
                                     <ActionIcon
                                         onClick={(event: MouseEvent) => {
                                             event.stopPropagation();
@@ -153,8 +174,8 @@ export default function CustomDatatable(
                                     </ActionIcon>
                                 )}
 
-                                {account.type == "hotp" &&
-                                    account.unlocked !== 0 && (
+                                {account.type === OtpType.HOTP &&
+                                    account.unlocked !== false && (
                                         <ActionIcon
                                             disabled={isUpdatingCounter}
                                             onClick={(event: MouseEvent) => {
@@ -166,16 +187,16 @@ export default function CustomDatatable(
                                         </ActionIcon>
                                     )}
 
-                                {account.unlocked === 1 && (
+                                {account.unlocked === true && (
                                     <Avatar
-                                        src={generateUrl("/avatar/" + account.user_id + "/64")}
-                                        alt={account.user_id}
+                                        src={generateUrl("/avatar/" + account.userId + "/64")}
+                                        alt={account.userId}
                                         radius="xl"
                                         size="sm"
                                     />
                                 )}
 
-                                {account.unlocked === undefined && (
+                                {!account.isShared && (
                                     <ActionIcon
                                         //color="gray"
                                         onClick={(event: MouseEvent) => {
@@ -213,14 +234,17 @@ export default function CustomDatatable(
             ]}
             sortStatus={sortStatus}
             onSortStatusChange={setSortStatus}
-            totalRecords={accounts == null ? 0 : accounts.length}
-            recordsPerPage={recordsPerPage}
+            totalRecords={accounts?.length}
+            recordsPerPage={getRecordsPerPage(recordsPerPage)}
             page={page}
             onPageChange={(p) => setPage(p)}
             recordsPerPageOptions={pageOptions}
             onRecordsPerPageChange={(p) => {
-                setRecordsPerPage(p)
+                p = p === accounts?.length ? -1 : p;
+
+                setRecordsPerPage(p);
                 setPage(1);
+                onUpdateSettings({recordsPerPage: p.toString()});
             }}
             emptyState={
                 <Stack align="center" spacing="xs">

@@ -5,23 +5,19 @@ declare(strict_types=1);
 namespace OCA\OtpManager\Dto\Request\Account;
 
 use JsonSerializable;
+use OCA\OtpManager\AppInfo\Application;
+use OCA\OtpManager\Attribute\ValidateArrayOfDto;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-#[Assert\Expression(
-    expression: 'this.iv === null or this.passwordUsedOnExport !== null',
-    message: 'Password is required to decrypt accounts'
-)]
 class AccountImportRequestDto implements JsonSerializable
 {
     public function __construct(
         /**
          * @param AccountCreateRequestDto[] $accounts
          */
+        #[ValidateArrayOfDto(AccountCreateRequestDto::class)]
         #[Assert\Count(min: 1, minMessage: 'At least one account is required.')]
-        #[Assert\All([
-            new Assert\Type(type: AccountCreateRequestDto::class, message: 'Each item must be a valid account'),
-            new Assert\Valid,
-        ])]
         public readonly array   $accounts,
 
         public readonly ?string $iv,
@@ -29,6 +25,16 @@ class AccountImportRequestDto implements JsonSerializable
         public readonly string  $currentPassword
     )
     {
+    }
+
+    #[Assert\Callback]
+    public function passwordViolation(ExecutionContextInterface $context): void
+    {
+        if ($this->iv !== null && ($this->passwordUsedOnExport === null || $this->passwordUsedOnExport === "")) {
+            $context->buildViolation('Password is required to decrypt accounts')
+                ->atPath('passwordUsedOnExport')
+                ->addViolation();
+        }
     }
 
     public function jsonSerialize(): array

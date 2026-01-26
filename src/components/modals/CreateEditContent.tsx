@@ -3,6 +3,10 @@ import {IconAbc, IconKey, IconShieldLock} from "@tabler/icons-react";
 import type {UseFormReturnType} from "@mantine/form";
 import type {AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
 import type {ReactNode} from "react";
+import {OtpType} from "@/utils/enum/otpType.ts";
+import {OtpPeriod} from "@/utils/enum/otpPeriod.ts";
+import {OtpAlgorithm} from "@/utils/enum/otpAlgorithm.ts";
+import {OtpDigits} from "@/utils/enum/otpDigits.ts";
 
 export default function CreateEditContent(
     {
@@ -45,25 +49,28 @@ export default function CreateEditContent(
                         <Grid.Col span={8}>
                             <Select
                                 label="Type of code"
-                                defaultValue="totp"
+                                defaultValue={OtpType.TOTP}
                                 data={[
-                                    {value: "totp", label: "Based on time (TOTP)"},
-                                    {value: "hotp", label: "Based on counter (HOTP)"},
+                                    {value: OtpType.TOTP, label: "Based on time (TOTP)"},
+                                    {value: OtpType.HOTP, label: "Based on counter (HOTP)"},
                                 ]}
                                 {...form.getInputProps("type")}
                             />
                         </Grid.Col>
-                        {form.values.type == "totp" && (
+                        {form.values.type === OtpType.TOTP && (
                             <Grid.Col span={4}>
                                 <Select
                                     label="Interval"
-                                    defaultValue="30"
+                                    defaultValue={OtpPeriod.P30.toString()}
                                     data={[
-                                        {value: "30", label: "30s"},
-                                        {value: "45", label: "45s"},
-                                        {value: "60", label: "60s"},
+                                        {value: OtpPeriod.P30.toString(), label: "30s"},
+                                        {value: OtpPeriod.P45.toString(), label: "45s"},
+                                        {value: OtpPeriod.P60.toString(), label: "60s"},
                                     ]}
-                                    {...form.getInputProps("period")}
+                                    value={form.values.period.toString()}
+                                    onChange={period => {
+                                        if(period !== null) form.setFieldValue("period", parseInt(period));
+                                    }}
                                 />
                             </Grid.Col>
                         )}
@@ -72,11 +79,11 @@ export default function CreateEditContent(
                         <Grid.Col span={3}>
                             <Select
                                 label="Algorithm"
-                                defaultValue="SHA1"
+                                defaultValue={OtpAlgorithm.SHA1}
                                 data={[
-                                    {value: "SHA1", label: "SHA1"},
-                                    {value: "SHA256", label: "SHA256"},
-                                    {value: "SHA512", label: "SHA512"},
+                                    {value: OtpAlgorithm.SHA1, label: "SHA1"},
+                                    {value: OtpAlgorithm.SHA256, label: "SHA256"},
+                                    {value: OtpAlgorithm.SHA512, label: "SHA512"},
                                 ]}
                                 {...form.getInputProps("algorithm")}
                             />
@@ -84,12 +91,15 @@ export default function CreateEditContent(
                         <Grid.Col span={3}>
                             <Select
                                 label="Digits"
-                                defaultValue="6"
+                                defaultValue={OtpDigits.D6.toString()}
                                 data={[
-                                    {value: "6", label: "6"},
-                                    {value: "4", label: "4"},
+                                    {value: OtpDigits.D6.toString(), label: "6"},
+                                    {value: OtpDigits.D4.toString(), label: "4"},
                                 ]}
-                                {...form.getInputProps("digits")}
+                                value={form.values.digits.toString()}
+                                onChange={digits => {
+                                    if(digits !== null) form.setFieldValue("digits", parseInt(digits));
+                                }}
                             />
                         </Grid.Col>
                     </Grid>

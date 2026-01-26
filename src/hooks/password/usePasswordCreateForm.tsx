@@ -5,7 +5,7 @@ import {SHA256} from "crypto-es";
 import {useSecretStore} from "@/context/useSecretStore.ts";
 import {passwordFormSaveSchema} from "@/dto/utils/passwordFormSaveSchema.ts";
 import {getStrength} from "@/components/password/PasswordRequirement.tsx";
-import type {passwordCreateFormType} from "@/dto/utils/passwordFormCreateType.ts";
+import type {passwordCreateFormType} from "@/dto/request/PasswordRequestDTO.ts";
 
 
 export default function usePasswordCreateForm() {

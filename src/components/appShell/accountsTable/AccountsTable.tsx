@@ -5,7 +5,6 @@ import Datatable from "./Datatable";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useOtpManagerApi from "@/hooks/useOtpManagerApi.ts";
 import AccountService from "@/services/AccountService.ts";
-import type {AccountResponseDatatable} from "@/dto/utils/AccountResponseDatatable.ts";
 import type {DataTableSortStatus} from "mantine-datatable";
 import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
 import {PAGE_SIZES, useSettingsStore} from "@/context/useSettingsStore.ts";
@@ -29,17 +28,12 @@ export function AccountsTable() {
         otpManagerApi({
             api: AccountService.getInstance().getAll,
             showNotifications: false,
-            onComplete: (allAccounts) => {
-                let accountsResponseDatatable: AccountResponseDatatable[] = [];
-
-                accountsResponseDatatable.push(...allAccounts.accounts);
-
-                accountsResponseDatatable.push(...allAccounts.shared_accounts.map(
-                    ({account_id, ...rest}) => ({
-                        ...rest,
-                        id: account_id,
-                    })
-                ));
+            onComplete: (accountsResponseDatatable) => {
+                // let accountsResponseDatatable: AccountResponseDatatable[] = [];
+                //
+                // accountsResponseDatatable.push(...allAccounts.accounts);
+                //
+                // accountsResponseDatatable.push(...allAccounts.shared_accounts);
 
                 accountsResponseDatatable = sortBy(accountsResponseDatatable, sortStatus.columnAccessor);
 

@@ -17,6 +17,7 @@ import {navbarStyles} from "../components/navbar/Styles.tsx";
 import {useSettingsStore} from "@/context/useSettingsStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import useSettingsForm from "@/hooks/useSettingsForm.tsx";
+import {LOCAL_STORAGE_CACHED_PASSWORD_KEY} from "@/utils/localStorageKey.ts";
 
 export function useNavbar() {
     const [active/*, setActive*/] = useState("All accounts");
@@ -25,7 +26,7 @@ export function useNavbar() {
     const ChevronIcon = !showSettings ? IconChevronRight : IconChevronLeft;
     const {darkMode, showCodes} = useSettingsStore();
     const [passwordSaved, setPasswordSaved] = useState(
-        Boolean(localStorage.getItem("otpmanager_cached_password"))
+        Boolean(localStorage.getItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY))
     );
     const {setShowChangePassword, setShowImportExport, setShowApps} = useModalsStore();
     const {isFetching: isFetchingSettings, onUpdate: onUpdateSettings} = useSettingsForm();
@@ -122,7 +123,7 @@ export function useNavbar() {
                         variant="outline"
                         color="red"
                         onClick={() => {
-                            localStorage.removeItem("otpmanager_cached_password");
+                            localStorage.removeItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY);
                             setPasswordSaved(false);
                         }}
                         disabled={!passwordSaved}

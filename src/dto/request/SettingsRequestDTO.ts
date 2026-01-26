@@ -1,7 +1,7 @@
 export type SettingsRequestDTO = {
-    showCodes?: boolean,
-    darkMode?: boolean,
-    recordsPerPage?: string,
+    showCodes?: boolean
+    darkMode?: boolean
+    recordsPerPage?: string
 }
 
 

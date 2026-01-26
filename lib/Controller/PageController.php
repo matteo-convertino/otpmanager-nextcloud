@@ -6,6 +6,7 @@ namespace OCA\OtpManager\Controller;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
+use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -22,7 +23,7 @@ class PageController extends Controller
 
     #[NoAdminRequired]
     #[NoCSRFRequired]
-    #[ApiRoute(verb: 'GET', url: '/')]
+    #[FrontpageRoute(verb: 'GET', url: '/')]
     public function index(): TemplateResponse
     {
         Util::addScript($this->appName, 'otpmanager-main');

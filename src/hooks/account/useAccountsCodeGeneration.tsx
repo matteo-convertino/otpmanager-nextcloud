@@ -1,9 +1,8 @@
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useEncryption from "@/hooks/useEncryption.tsx";
-import {convertValueIndexToEnum} from "@/utils/convertToEnum.ts";
-import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
 import {HOTP, TOTP} from "otpauth";
-import type {AccountResponseDatatable} from "@/dto/utils/AccountResponseDatatable.ts";
+import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
+import {OtpType} from "@/utils/enum/otpType.ts";
 
 export default function useAccountsCodeGeneration() {
     const {setAccounts} = useAccountsStore();
@@ -16,29 +15,30 @@ export default function useAccountsCodeGeneration() {
         for (let i = 0; i < accounts.length; i++) {
             const account = accounts[i];
 
-            if (account.unlocked === undefined || account.unlocked == 1) {
+            if (account.unlocked === null || account.unlocked) {
                 if (account.decryptedSecret === undefined) {
                     account.decryptedSecret = decrypt(account.secret);
                 }
 
-                if (account.type == "totp") {
+                if (account.type === OtpType.TOTP) {
                     let totp = new TOTP({
                         issuer: account.issuer,
                         label: account.name,
-                        algorithm: convertValueIndexToEnum(AccountAlgorithm, account.algorithm),
+                        algorithm: account.algorithm,
                         digits: account.digits,
                         period: account.period,
                         secret: account.decryptedSecret,
                     });
 
                     account.code = totp.generate();
-                } else if (account.counter < 0) {
-                    account.code = "Click here to generate HOTP code";
+                } else if (account.counter === null || account.counter < 0) {
+                    // account.code = "Click here to generate HOTP code";
+                    account.code = null;
                 } else {
                     let hotp = new HOTP({
                         issuer: account.issuer,
                         label: account.name,
-                        algorithm: convertValueIndexToEnum(AccountAlgorithm, account.algorithm),
+                        algorithm: account.algorithm,
                         digits: account.digits,
                         counter: account.counter,
                         secret: account.decryptedSecret,
@@ -47,7 +47,8 @@ export default function useAccountsCodeGeneration() {
                     account.code = hotp.generate();
                 }
             } else {
-                account.code = "Click here to unlock your shared account";
+                // account.code = "Click here to unlock your shared account";
+                account.code = null;
             }
         }
 

@@ -4,7 +4,7 @@ const BASE = '/password';
 
 export const PasswordRoutes = {
     CREATE: generateOtpManagerUrl(BASE),
-    GET: generateOtpManagerUrl(`${BASE}/status`),
+    STATUS: generateOtpManagerUrl(`${BASE}/status`),
     UPDATE: generateOtpManagerUrl(BASE),
     CHECK: generateOtpManagerUrl(`${BASE}/check`),
 };

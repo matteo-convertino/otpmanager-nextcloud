@@ -9,6 +9,7 @@ use OCA\OtpManager\Dto\Request\Password\PasswordCheckRequestDto;
 use OCA\OtpManager\Dto\Request\Password\PasswordCreateRequestDto;
 use OCA\OtpManager\Dto\Request\Password\PasswordUpdateRequestDto;
 use OCA\OtpManager\Dto\Response\Password\PasswordResponseDto;
+use OCA\OtpManager\Dto\Response\Password\PasswordStatusResponseDto;
 use OCA\OtpManager\Service\PasswordService;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -49,7 +50,7 @@ class PasswordController extends OCSController
     }
 
     /**
-     * @return DataResponse<PasswordResponseDto>
+     * @return DataResponse<PasswordStatusResponseDto>
      * @throws OCSException
      */
     #[NoAdminRequired]

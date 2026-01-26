@@ -18,7 +18,7 @@ import {IconShareOff} from "@tabler/icons-react";
 import {DatePickerInput} from "@mantine/dates";
 import moment from "moment";
 import useSharedAccountForm from "@/hooks/sharedAccount/useSharedAccountForm.tsx";
-import type {NextcloudUserDTO} from "@/dto/response/NextcloudUserDTO.ts";
+import type {ReceiverResponseDTO} from "@/dto/response/ReceiverResponseDTO.ts";
 
 export default function AsideShare() {
     const {isFetchingActiveShares, activeShares, nextcloudUsers, form, onSubmit, onDelete} = useSharedAccountForm();
@@ -59,15 +59,11 @@ export default function AsideShare() {
                         transitionDuration={150}
                         transition="pop"
                         transitionTimingFunction="ease"
-                        minDate={new Date()}
-                        valueFormat={"MM/DD/YYYY"}
+                        minDate={moment().add(1, "day").toDate()}
+                        valueFormat={"YYYY-MM-DD"}
                         clearable
                         {...form.getInputProps("expirationDate")}
-                        onChange={(date) => {
-                            // console.log(moment(date).format("MM/DD/YYYY"));
-                            // form.setValues({expirationDate: date == null ? null : moment(date).format("MM/DD/YYYY")});
-                            form.setValues({expirationDate: date});
-                        }}
+                        onChange={(date) => form.setValues({expirationDate: date})}
                     />
 
                     <Group position="right">
@@ -108,10 +104,10 @@ export default function AsideShare() {
                                                         <Text fz="sm">{receiver.value}</Text>
                                                         <Text fz="sm">|</Text>
                                                         <Text fz="sm" fs="italic">
-                                                            {activeShare.expired_at == null
+                                                            {activeShare.expiredAt === null
                                                                 ? "Never expires"
                                                                 : `Expires on ${moment(
-                                                                    activeShare.expired_at
+                                                                    activeShare.expiredAt
                                                                 ).format("D/MM/YYYY")}`}
                                                         </Text>
                                                     </Group>
@@ -120,7 +116,7 @@ export default function AsideShare() {
                                         </Group>
                                         <ActionIcon
                                             color="red"
-                                            onClick={() => onDelete(activeShare.account_id, receiver)}
+                                            onClick={() => onDelete(activeShare.id, receiver)}
                                         >
                                             <IconShareOff size={18}/>
                                         </ActionIcon>
@@ -139,8 +135,8 @@ export default function AsideShare() {
 
 const SelectItem = forwardRef(
     ({
-         image, label, value, ...others
-     }: NextcloudUserDTO, ref: Ref<HTMLDivElement> | undefined) =>
+         id, label, value, image, ...others
+     }: ReceiverResponseDTO, ref: Ref<HTMLDivElement> | undefined) =>
         <div ref={ref} {...others}>
             <Group noWrap>
                 <Avatar src={image} radius="xl"/>

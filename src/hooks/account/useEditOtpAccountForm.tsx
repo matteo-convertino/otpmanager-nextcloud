@@ -1,14 +1,13 @@
 import useOtpManagerApi from "@/hooks/useOtpManagerApi.ts";
 import {useForm, zodResolver} from "@mantine/form";
 import {accountRequestSchema, type AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
-import {AccountType} from "@/utils/accountType.ts";
-import {AccountPeriod} from "@/utils/accountPeriod.ts";
-import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
-import {AccountDigits} from "@/utils/accountDigits.ts";
+import {OtpType} from "@/utils/enum/otpType.ts";
+import {OtpPeriod} from "@/utils/enum/otpPeriod.ts";
+import {OtpAlgorithm} from "@/utils/enum/otpAlgorithm.ts";
+import {OtpDigits} from "@/utils/enum/otpDigits.ts";
 import AccountService from "@/services/AccountService.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
-import {convertValueIndexToEnum, convertValueToEnum} from "@/utils/convertToEnum.ts";
 import {useEffect} from "react";
 import SharedAccountService from "@/services/SharedAccountService.ts";
 
@@ -23,10 +22,10 @@ export default function useEditOtpAccountForm() {
                 name: otp.name,
                 issuer: otp.issuer,
                 secret: otp.decryptedSecret!,
-                type: convertValueToEnum(AccountType, otp.type),
-                period: convertValueToEnum(AccountPeriod, otp.period.toString()),
-                algorithm: convertValueIndexToEnum(AccountAlgorithm, otp.algorithm),
-                digits: convertValueToEnum(AccountDigits, otp.digits.toString()),
+                type: otp.type,
+                period: otp.period,
+                algorithm: otp.algorithm,
+                digits: otp.digits,
             })
         }
     }, [otp]);
@@ -36,10 +35,10 @@ export default function useEditOtpAccountForm() {
             name: "",
             issuer: "",
             secret: "",
-            type: AccountType.TOTP,
-            period: AccountPeriod.P30,
-            algorithm: AccountAlgorithm.SHA1,
-            digits: AccountDigits.D6,
+            type: OtpType.TOTP,
+            period: OtpPeriod.P30,
+            algorithm: OtpAlgorithm.SHA1,
+            digits: OtpDigits.D6,
         },
         validate: zodResolver(accountRequestSchema),
     });
@@ -47,24 +46,24 @@ export default function useEditOtpAccountForm() {
     function onSubmit(accountRequestSchemaForm: AccountRequestSchemaForm) {
         if (otp == undefined) return;
 
-        otpManagerApi({
-            api: () => otp.unlocked === undefined ?
-                AccountService.getInstance().update({
-                    ...accountRequestSchemaForm,
-                    secret: otp.secret,
-                    period: parseInt(accountRequestSchemaForm.period),
-                    digits: parseInt(accountRequestSchemaForm.digits)
-                }) :
-                SharedAccountService.getInstance().update({
-                    ...accountRequestSchemaForm,
-                    secret: otp.secret,
-                }),
+        const data = {
+            ...accountRequestSchemaForm,
+            secret: otp.secret,
+        };
+
+        otpManagerApi<any>({
+            api: () => otp.isShared
+                ? SharedAccountService.getInstance().update(data)
+                : AccountService.getInstance().update(data),
             titleOnLoading: "Editing account",
-            messageOnLoading: "Account is being editing",
-            titleOnSuccess: "Account edited",
-            messageOnSuccess: (accountRequestSchemaForm.issuer != ""
-                ? accountRequestSchemaForm.issuer + " (" + accountRequestSchemaForm.name + ")"
-                : accountRequestSchemaForm.name) + " edited with success",
+            messageOnLoading:
+                "Account is being editing",
+            titleOnSuccess:
+                "Account edited",
+            messageOnSuccess:
+                (accountRequestSchemaForm.issuer != ""
+                    ? accountRequestSchemaForm.issuer + " (" + accountRequestSchemaForm.name + ")"
+                    : accountRequestSchemaForm.name) + " edited with success",
             onComplete: () => {
                 setShowEditOtpAccount(undefined);
                 setAccounts(undefined);

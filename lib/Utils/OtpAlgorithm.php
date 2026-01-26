@@ -12,7 +12,7 @@ enum OtpAlgorithm: string
 
     public static function values(): array
     {
-        return array_map(fn ($case) => $case->value, self::cases());
+        return array_map(fn($case) => $case->value, self::cases());
     }
 
     /**
@@ -29,5 +29,30 @@ enum OtpAlgorithm: string
         }
 
         return array_search($case, self::cases(), true);
+    }
+
+    /**
+     * @param int $index
+     * @return string
+     * @throws OCSBadRequestException
+     */
+    public static function convertFromInt(int $index): string
+    {
+        $cases = self::cases();
+
+        if (!isset($cases[$index])) {
+            throw new OCSBadRequestException("Algorithm index is not valid: $index");
+        }
+
+        return $cases[$index]->value;
+    }
+
+    /**
+     * @param int $index
+     * @return OtpAlgorithm|null
+     */
+    public static function tryFromInt(int $index): ?self
+    {
+        return self::cases()[$index] ?? null;
     }
 }

@@ -166,7 +166,10 @@ class SharedAccountService
         $sharedAccount->setIssuer($sharedAccountUpdateRequestDto->issuer);
 
         return new DataResponse(
-            SharedAccountResponseDto::sharedAccountToDto($this->sharedAccountMapper->update($sharedAccount))
+            SharedAccountResponseDto::sharedAccountEntityToDto(
+                sharedAccount: $this->sharedAccountMapper->update($sharedAccount),
+                receiver: new ReceiverResponseDto(id: $this->userId),
+            )
         );
     }
 
@@ -270,9 +273,9 @@ class SharedAccountService
      */
     public function updateCounter(AccountUpdateCounterRequestDto $accountUpdateCounterRequestDto): DataResponse
     {
-        $account = $this->sharedAccountMapper->findAccountBySecret(
-            receiverId: $this->userId,
-            secret: $accountUpdateCounterRequestDto->secret
+        $account = $this->sharedAccountMapper->findAccountById(
+            accountId: $accountUpdateCounterRequestDto->id,
+            receiverId: $this->userId
         );
 
         if ($account == null)

@@ -4,8 +4,8 @@ import {useState} from "react";
 import {Box, Flex, PasswordInput, Popover, Progress,} from "@mantine/core";
 import {type UseFormReturnType} from "@mantine/form";
 import {getStrength, PasswordRequirement, requirements} from "@/components/password/PasswordRequirement.tsx";
-import type {passwordCreateFormType} from "@/dto/utils/passwordFormCreateType.ts";
-import type {passwordUpdateFormType} from "@/dto/utils/passwordFormUpdateType.ts";
+import type {passwordCreateFormType} from "@/dto/request/PasswordRequestDTO.ts";
+import type {passwordUpdateFormType} from "@/dto/request/PasswordUpdateRequestDTO.ts";
 
 
 export default function PasswordSaveForm({form, onSubmit, isUpdate}: {
@@ -32,9 +32,10 @@ export default function PasswordSaveForm({form, onSubmit, isUpdate}: {
                 <Flex justify="center" direction="column">
                     <Popover
                         opened={popoverOpened}
-                        position="bottom"
-                        width="calc(100% - 68px)"
+                        position="bottom-start"
+                        width="target"
                         shadow="md"
+                        withinPortal
                     >
                         {isUpdate && (
                             <PasswordInput
@@ -45,12 +46,12 @@ export default function PasswordSaveForm({form, onSubmit, isUpdate}: {
                                 {...form.getInputProps("oldPassword")}
                             />
                         )}
-                        <Popover.Target>
-                            <Box
-                                w="100%"
-                                onFocusCapture={() => setPopoverOpened(true)}
-                                onBlurCapture={() => setPopoverOpened(false)}
-                            >
+                        <Box
+                            onFocusCapture={() => setPopoverOpened(true)}
+                            onBlurCapture={() => setPopoverOpened(false)}
+                        >
+                            <Popover.Target>
+
                                 <PasswordInput
                                     required
                                     label="Password"
@@ -61,13 +62,13 @@ export default function PasswordSaveForm({form, onSubmit, isUpdate}: {
                                     onVisibilityChange={toggle}
                                     {...(form as any).getInputProps("password")}
                                 />
-                            </Box>
-                        </Popover.Target>
-                        <Popover.Dropdown>
-                            <Progress color={color} value={strength} size={5} mb="xs"/>
+                            </Popover.Target>
+                            <Popover.Dropdown>
+                                <Progress color={color} value={strength} size={5} mb="xs"/>
 
-                            {checks}
-                        </Popover.Dropdown>
+                                {checks}
+                            </Popover.Dropdown>
+                        </Box>
                     </Popover>
                     {!isUpdate && (
                         <>

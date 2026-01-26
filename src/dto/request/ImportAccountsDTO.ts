@@ -1,6 +1,8 @@
+import {type AccountRequestDTO} from "@/dto/request/AccountRequestDTO.ts";
 
 export type ImportAccountsDTO = {
-    data: JSON;
-    passwordUsedOnExport: string
-    currentPassword: string
+    accounts: AccountRequestDTO[];
+    currentPassword?: string;
+    iv?: string
+    passwordUsedOnExport?: string
 }

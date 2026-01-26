@@ -18,15 +18,13 @@ class SyncUpdateRequestDto implements JsonSerializable
     public function __construct(
 
         #[Assert\All([
-            new Assert\Type(type: AccountSyncRequestDto::class, message: 'Each item must be a valid account'),
-            new Assert\Valid,
+            new Assert\Type(type: AccountSyncRequestDto::class, message: 'Item must be a valid account'),
         ])]
         public readonly array  $accounts,
 
 
         #[Assert\All([
-            new Assert\Type(type: SharedAccountSyncRequestDto::class, message: 'Each item must be a valid shared account'),
-            new Assert\Valid,
+            new Assert\Type(type: SharedAccountSyncRequestDto::class, message: 'Item must be a valid shared account'),
         ])]
         public readonly array  $sharedAccounts,
 

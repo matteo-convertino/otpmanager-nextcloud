@@ -47,7 +47,7 @@ class SharedAccountCreateRequestDto implements JsonSerializable
         public readonly string  $iv,
 
         #[Assert\Date]
-        #[Assert\GreaterThan('today', message: 'expirationDate must be a future date')]
+        #[Assert\LessThanOrEqual('today', message: 'expirationDate must be a future date')]
         public readonly ?string $expirationDate,
     )
     {

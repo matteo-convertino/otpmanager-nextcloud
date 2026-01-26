@@ -23,6 +23,7 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 class SharedAccountController extends OCSController
 {
@@ -31,6 +32,7 @@ class SharedAccountController extends OCSController
         string                                $appName,
         IRequest                              $request,
         private readonly SharedAccountService $sharedAccountService,
+        private readonly LoggerInterface $logger,
     )
     {
         parent::__construct($appName, $request);
@@ -55,8 +57,8 @@ class SharedAccountController extends OCSController
      */
     #[NoAdminRequired]
     #[NoCSRFRequired]
-    #[ApiRoute(verb: 'GET', url: '/share/{id}')]
-    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
+    #[ApiRoute(verb: 'GET', url: '/share/{accountId}')]
+//    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
     public function getByAccount(int $accountId): DataResponse
     {
         return $this->sharedAccountService->getByAccount(new SharedAccountGetRequestDto($accountId));
@@ -120,14 +122,13 @@ class SharedAccountController extends OCSController
 
     /**
      * @param int $accountId
-     * @param int|null $receiverId
+     * @param string|null $receiverId
      * @return DataResponse
      * @throws OCSException
      */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'DELETE', url: '/share/{accountId}')]
-    #[ValidateRequestBodyDTO(SharedAccountDeleteRequestDto::class)]
-    public function delete(int $accountId, ?int $receiverId): DataResponse
+    public function delete(int $accountId, ?string $receiverId): DataResponse
     {
         return $this->sharedAccountService->delete(
             new SharedAccountDeleteRequestDto(
@@ -145,7 +146,6 @@ class SharedAccountController extends OCSController
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/get-users/{accountId}')]
-    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
     public function getUsers(int $accountId): DataResponse
     {
         return $this->sharedAccountService->getUsers(new SharedAccountGetRequestDto($accountId));
@@ -174,7 +174,7 @@ class SharedAccountController extends OCSController
     }
 
     /**
-     * @param string $secret
+     * @param int $id
      * @return DataResponse<AccountResponseDto>
      * @throws OCSBadRequestException
      * @throws OCSException
@@ -182,8 +182,8 @@ class SharedAccountController extends OCSController
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/share/update-counter')]
     #[ValidateRequestBodyDTO(AccountUpdateCounterRequestDto::class)]
-    public function updateCounter(string $secret): DataResponse
+    public function updateCounter(int $id): DataResponse
     {
-        return $this->sharedAccountService->updateCounter(new AccountUpdateCounterRequestDto($secret));
+        return $this->sharedAccountService->updateCounter(new AccountUpdateCounterRequestDto($id));
     }
 }

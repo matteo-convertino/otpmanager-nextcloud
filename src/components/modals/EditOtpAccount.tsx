@@ -22,7 +22,7 @@ export function EditOtpAccount() {
                     textSubmitButton="Edit"
                     iconSubmitButton={<IconEdit size="18px"/>}
                     isSecretKeyDisabled={true}
-                    isSharedAccount={otp !== undefined && otp.unlocked !== undefined}
+                    isSharedAccount={otp !== undefined && otp.unlocked !== null}
                 />
             </form>
         </Modal>

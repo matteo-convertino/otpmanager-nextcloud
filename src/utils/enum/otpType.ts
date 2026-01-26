@@ -1,4 +1,4 @@
-export enum AccountType {
+export enum OtpType {
     TOTP = 'totp',
     HOTP = 'hotp',
 }

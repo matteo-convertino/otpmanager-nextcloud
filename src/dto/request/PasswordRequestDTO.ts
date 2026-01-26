@@ -1,9 +1,17 @@
 import {z} from 'zod'
 
-export const passwordRequestSchema = z.object({
-    password: z.string()
-        .min(1, "Name is required")
-        .max(256, "Name cannot be longer than 256 characters"),
-})
+export const passwordFormCheckSchema = z.object({
+    password: z
+        .string()
+        .min(1, {message: 'Password cannot be empty'}),
+    savePassword: z.boolean(),
+});
 
-export type PasswordRequestDTO = z.infer<typeof passwordRequestSchema>
+export type passwordCreateFormType = {
+    password: string
+    confirmPassword: string
+};
+
+export type PasswordRequestDTO = {
+    password: string
+}

@@ -26,7 +26,7 @@ export const Password = () => {
                 {password === undefined ? (
                     <Loader/>
                 ) : (
-                    <Card w={500} h={500} shadow="xl" padding="lg" radius="lg" withBorder>
+                    <Card w={500} shadow="xl" padding="lg" radius="lg" withBorder>
                         <Stack justify="space-between" h="100%">
                             <Box>
                                 <Text size="lg" fw={700} ta="center">
@@ -41,7 +41,7 @@ export const Password = () => {
                                 <Divider my="md"/>
                                 <Flex justify="flex-end">
                                     <Button type="submit" form="form">
-                                        Submit
+                                        {password ? "Check" : "Create password"}
                                     </Button>
                                 </Flex>
                             </Box>

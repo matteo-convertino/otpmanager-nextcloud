@@ -9,19 +9,19 @@ export function ExportAccounts() {
         <>
             <Text>Select how you want to export your accounts.</Text>
             <Box>
-                <Text sx={{display: "inline"}}>
+                <Text span>
                     Choose based on your needs whether to export them securely
                 </Text>{" "}
-                <Text sx={{display: "inline"}} fw={700}>
+                <Text fw={700} span>
                     with your encrypted secret key
                 </Text>{" "}
                 or{" "}
-                <Text sx={{display: "inline"}} fw={700}>
+                <Text fw={700} span>
                     totally unencrypted
                 </Text>
             </Box>
 
-            <Group position="right">
+            <Group grow>
                 <Button
                     styles={{
                         icon: {

@@ -15,7 +15,7 @@ export function ImportExport() {
         <Modal
             opened={showImportExport}
             onClose={() => setShowImportExport(false)}
-            title="Import Accounts"
+            title={sectionValue == "export" ? "Export Accounts" : "Import Accounts"}
             centered
         >
             <Stack spacing="xl">

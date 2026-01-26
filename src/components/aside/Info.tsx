@@ -1,13 +1,12 @@
 import {Grid, Stack, Text} from "@mantine/core";
-import {convertValueIndexToEnum} from "@/utils/convertToEnum.ts";
-import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
+import {OtpType} from "@/utils/enum/otpType.ts";
 
 
 export default function AsideInfo() {
     const {showAsideInfo: otp} = useSidebarStore();
 
-    return otp == undefined ? <></> : (
+    return otp === undefined ? <></> : (
         <>
             <Stack spacing="xl">
                 <Grid grow justify="space-between" sx={{backgroundColor: ""}}>
@@ -50,7 +49,7 @@ export default function AsideInfo() {
                     <Grid.Col span={3}>Algorithm</Grid.Col>
                     <Grid.Col span={3}>
                         <Text ta="right" fs="italic" c="dimmed">
-                            {convertValueIndexToEnum(AccountAlgorithm, otp.algorithm)}
+                            {otp.algorithm}
                         </Text>
                     </Grid.Col>
                 </Grid>
@@ -64,7 +63,7 @@ export default function AsideInfo() {
                     </Grid.Col>
                 </Grid>
 
-                {otp.type == "hotp" && (
+                {otp.type === OtpType.HOTP && (
                     <Grid grow justify="space-between">
                         <Grid.Col span={3}>Counter</Grid.Col>
                         <Grid.Col span={3}>
@@ -104,12 +103,12 @@ export default function AsideInfo() {
                     </Grid>
                 )}
 
-                {otp.expired_at !== undefined && (
+                {otp.isShared && (
                     <Grid grow justify="space-between">
                         <Grid.Col span={3}>Expired At</Grid.Col>
                         <Grid.Col span={3}>
                             <Text ta="right" fs="italic" c="dimmed">
-                                {otp.expired_at == null ? "Never expires" : otp.expired_at.toString()}
+                                {otp.expiredAt === null ? "Never expires" : otp.expiredAt.toString()}
                             </Text>
                         </Grid.Col>
                     </Grid>

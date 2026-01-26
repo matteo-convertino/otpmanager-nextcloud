@@ -6,25 +6,29 @@ namespace OCA\OtpManager\Dto\Response;
 
 use JsonSerializable;
 use OCA\OtpManager\Db\Account;
+use OCA\OtpManager\Utils\OtpAlgorithm;
+use OCA\OtpManager\Utils\OtpDigit;
+use OCA\OtpManager\Utils\OtpPeriod;
+use OCA\OtpManager\Utils\OtpType;
 
 class AccountResponseDto implements JsonSerializable
 {
     public function __construct(
-        public readonly int     $id,
-        public readonly string  $secret,
-        public readonly string  $name,
-        public readonly string  $issuer,
-        public readonly int     $digits,
-        public readonly string  $type,
-        public readonly int     $period,
-        public readonly int     $algorithm,
-        public readonly ?int    $counter,
-        public readonly string  $icon,
-        public readonly int     $position,
-        public readonly string  $userId,
-        public readonly string  $createdAt,
-        public readonly string  $updatedAt,
-        public readonly ?string $deletedAt,
+        public readonly int          $id,
+        public readonly string       $secret,
+        public readonly string       $name,
+        public readonly string       $issuer,
+        public readonly OtpDigit     $digits,
+        public readonly OtpType      $type,
+        public readonly OtpPeriod    $period,
+        public readonly OtpAlgorithm $algorithm,
+        public readonly ?int         $counter,
+        public readonly string       $icon,
+        public readonly int          $position,
+        public readonly string       $userId,
+        public readonly string       $createdAt,
+        public readonly string       $updatedAt,
+        public readonly ?string      $deletedAt,
     )
     {
     }
@@ -40,10 +44,10 @@ class AccountResponseDto implements JsonSerializable
             secret: $account->getSecret(),
             name: $account->getName(),
             issuer: $account->getIssuer(),
-            digits: $account->getDigits(),
-            type: $account->getType(),
-            period: $account->getPeriod(),
-            algorithm: $account->getAlgorithm(),
+            digits: OtpDigit::tryFrom($account->getDigits()),
+            type: OtpType::tryFrom($account->getType()),
+            period: OtpPeriod::tryFrom($account->getPeriod()),
+            algorithm: OtpAlgorithm::tryFromInt($account->getAlgorithm()),
             counter: $account->getCounter(),
             icon: $account->getIcon(),
             position: $account->getPosition(),

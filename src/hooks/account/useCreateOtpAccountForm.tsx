@@ -1,10 +1,10 @@
 import useOtpManagerApi from "@/hooks/useOtpManagerApi.ts";
 import {useForm, zodResolver} from "@mantine/form";
 import {accountRequestSchema, type AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
-import {AccountType} from "@/utils/accountType.ts";
-import {AccountPeriod} from "@/utils/accountPeriod.ts";
-import {AccountAlgorithm} from "@/utils/accountAlgorithm.ts";
-import {AccountDigits} from "@/utils/accountDigits.ts";
+import {OtpType} from "@/utils/enum/otpType.ts";
+import {OtpPeriod} from "@/utils/enum/otpPeriod.ts";
+import {OtpAlgorithm} from "@/utils/enum/otpAlgorithm.ts";
+import {OtpDigits} from "@/utils/enum/otpDigits.ts";
 import AccountService from "@/services/AccountService.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
@@ -22,10 +22,10 @@ export default function useCreateOtpAccountForm() {
             name: "",
             issuer: "",
             secret: "",
-            type: AccountType.TOTP,
-            period: AccountPeriod.P30,
-            algorithm: AccountAlgorithm.SHA1,
-            digits: AccountDigits.D6,
+            type: OtpType.TOTP,
+            period: OtpPeriod.P30,
+            algorithm: OtpAlgorithm.SHA1,
+            digits: OtpDigits.D6,
         },
     });
 
@@ -34,8 +34,6 @@ export default function useCreateOtpAccountForm() {
             api: () => AccountService.getInstance().create({
                 ...accountRequestSchemaForm,
                 secret: encrypt(accountRequestSchemaForm.secret),
-                period: parseInt(accountRequestSchemaForm.period),
-                digits: parseInt(accountRequestSchemaForm.digits)
             }),
             titleOnSuccess: "Account created",
             messageOnSuccess: (accountRequestSchemaForm.issuer != ""

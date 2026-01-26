@@ -8,14 +8,14 @@ use JsonSerializable;
 
 class AccountUpdateCounterRequestDto implements JsonSerializable
 {
-    public function __construct(public readonly string $secret)
+    public function __construct(public readonly int $id)
     {
     }
 
     public function jsonSerialize(): array
     {
         return [
-            'secret' => $this->secret
+            'id' => $this->id
         ];
     }
 }

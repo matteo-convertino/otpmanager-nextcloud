@@ -42,9 +42,9 @@ export const OtpLayout = ({children, emotionCache, mantinePortalTarget, mantineD
 
     useEffect(() => {
         otpManagerApi({
-            api: PasswordService.getInstance().get,
+            api: PasswordService.getInstance().status,
             showNotifications: false,
-            onComplete: (passwordExists) => setPassword(passwordExists),
+            onComplete: (passwordResponseStatusDto) => setPassword(passwordResponseStatusDto.hasPassword),
         });
     }, []);
 
@@ -86,6 +86,7 @@ export const OtpLayout = ({children, emotionCache, mantinePortalTarget, mantineD
                     maxWidth: "440px", // default
                     top: "calc(50px + 16px)", // 50px (nextcloud header)
                 }}
+                notificationMaxHeight={"100%"}
             />
             <ModalsProvider>
                 <Box
@@ -96,7 +97,7 @@ export const OtpLayout = ({children, emotionCache, mantinePortalTarget, mantineD
                         margin: 0,
                     }}
                 >
-                    {auth ? children : <Password />}
+                    {auth ? children : <Password/>}
                 </Box>
             </ModalsProvider>
         </MantineProvider>

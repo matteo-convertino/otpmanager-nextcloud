@@ -5,12 +5,16 @@ import {SHA256} from "crypto-es";
 import {useSecretStore} from "@/context/useSecretStore.ts";
 import {getStrength} from "@/components/password/PasswordRequirement.tsx";
 import {passwordFormSaveSchema} from "@/dto/utils/passwordFormSaveSchema.ts";
-import type {passwordUpdateFormType} from "@/dto/utils/passwordFormUpdateType.ts";
+import type {passwordUpdateFormType} from "@/dto/request/PasswordUpdateRequestDTO.ts";
+import {useModalsStore} from "@/context/useModalsStore.ts";
+import {useAccountsStore} from "@/context/useAccountsStore.ts";
 
 
 export default function usePasswordUpdateForm() {
     const otpManagerApi = useOtpManagerApi();
     const {setIv, setPassword, setPasswordHash} = useSecretStore();
+    const {setShowChangePassword} = useModalsStore();
+    const {setAccounts, setIsFetching} = useAccountsStore();
 
     const form = useForm<passwordUpdateFormType>({
         initialValues: {
@@ -18,12 +22,15 @@ export default function usePasswordUpdateForm() {
             password: "",
             confirmPassword: "",
         },
-        validate: zodResolver(passwordFormSaveSchema({isChanging: false, getStrength: getStrength}))
+        validate: zodResolver(passwordFormSaveSchema({isChanging: true, getStrength: getStrength}))
     });
 
     const onSubmit = (values: passwordUpdateFormType) => {
         otpManagerApi({
-            api: () => PasswordService.getInstance().update(values),
+            api: () => PasswordService.getInstance().update({
+                oldPassword: values.oldPassword,
+                newPassword: values.password
+            }),
             titleOnLoading: "Password",
             messageOnLoading: "Password is being updated",
             titleOnSuccess: "Password",
@@ -32,6 +39,9 @@ export default function usePasswordUpdateForm() {
                 setIv(passwordResponseDTO.iv);
                 setPassword(true);
                 setPasswordHash(SHA256(values.password).toString());
+                setShowChangePassword(false);
+                setAccounts(undefined);
+                setIsFetching(true);
             },
         });
     }

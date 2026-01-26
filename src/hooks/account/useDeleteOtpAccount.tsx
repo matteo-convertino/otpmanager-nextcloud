@@ -12,10 +12,10 @@ export default function useDeleteOtpAccount() {
     function onDelete() {
         if (otp == undefined) return;
 
-        otpManagerApi({
-            api: () => otp.unlocked === undefined ?
-                AccountService.getInstance().delete(otp.id) :
-                SharedAccountService.getInstance().delete(otp.id),
+        otpManagerApi<any>({
+            api: () => otp.isShared ?
+                SharedAccountService.getInstance().delete(otp.id, null) :
+                AccountService.getInstance().delete(otp.id),
             titleOnLoading: "Deleting account",
             messageOnLoading: otp.issuer + " (" + otp.name + ") is being deleted",
             titleOnSuccess: "Account deleted",

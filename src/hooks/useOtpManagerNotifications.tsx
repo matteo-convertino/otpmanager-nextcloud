@@ -3,6 +3,8 @@ import {IconCheck, IconInfoCircle, IconX} from "@tabler/icons-react";
 import notificationRandomId from "@/utils/notificationRandomId.ts";
 import {NotificationType} from "@/utils/notificationType.ts";
 import type {ReactNode} from "react";
+import type {OcsMetaDTO} from "@/dto/OcsResponseDTO.ts";
+import {List, Stack, Text} from "@mantine/core";
 
 type NotificationParams = {
     title: string;
@@ -74,38 +76,71 @@ export default function useOtpManagerNotifications() {
     const showInfo = (params: NotificationParams) =>
         showNotification(NotificationType.Info, params);
 
-    const showErrors = ({errorDTO}: {
-        // errorDTO?: ErrorDTO
-        errorDTO?: undefined
-    }) => {
-        if (errorDTO === undefined) {
-            showError({
-                title: "Generic error",
-                message: "Internal server error",
+    const showErrors = ({errorDTO}: { errorDTO: OcsMetaDTO }) =>
+        handleErrors(errorDTO, showError);
+
+    const updateErrors = ({errorDTO}: { errorDTO: OcsMetaDTO }) =>
+        handleErrors(errorDTO, updateError);
+
+    const handleErrors = (
+        errorDTO: OcsMetaDTO,
+        handler: (params: NotificationParams) => void,
+    ) => {
+        const title = getTitleByStatus(errorDTO.statuscode);
+        const msg = errorDTO.message;
+
+        if (typeof msg === "string") {
+            handler({title, message: msg});
+        } else if (Array.isArray(msg)) {
+            handler({
+                title,
+                message: (
+                    // <Spoiler maxHeight={150} showLabel={"Show more"} hideLabel={"Hide"}>
+                    <List spacing={2} size="sm">
+                        {msg.map((v, i) => (
+                            <List.Item key={i}>{v}</List.Item>
+                        ))}
+                    </List>
+                    // </Spoiler>
+                ),
             });
-            /*} else {
-              const { error: title, message } = errorDTO;
+        } else {
+            const errors = Object.entries(msg);
 
-              if (typeof message === "string") {
-                if (notificationId === undefined) {
-                  showHireErrorNotification({ title, message });
-                } else {
-                  updateHireErrorNotification({ notificationId, title, message });
-                }
-              } else if (typeof message === "object") {
-                if (notificationId !== undefined) notifications.hide(notificationId);
+            handler({
+                title,
+                message: (
+                    // <Spoiler maxHeight={150} showLabel={"Show more"} hideLabel={"Hide"}>
+                    <Stack>
+                        {errors.map(([key, values]) => (
+                            <Stack key={key} spacing={0}>
+                                <Text fw={600}>{key}</Text>
 
-                for (const key in message) {
-                  const value = message[key];
-
-                  if (typeof value === "string") {
-                    showHireErrorNotification({ title, message: value });
-                  } else if (Array.isArray(value)) {
-                    value.forEach((msg) => showHireErrorNotification({ title, message: msg }));
-                  }
-                }
-              }*/
+                                <List spacing={2} size="sm">
+                                    {values.map((v, i) => (
+                                        <List.Item key={i}>{v}</List.Item>
+                                    ))}
+                                </List>
+                            </Stack>
+                        ))}
+                    </Stack>
+                    // </Spoiler>
+                ),
+            });
         }
+    };
+
+    const getTitleByStatus = (status: number) => {
+        if (status >= 500) return "Server error";
+        if (status === 404) return "Not found";
+        if (status === 401) return "Unauthorized";
+        if (status === 403) return "Access denied";
+        if (status === 400) return "Invalid request";
+        if (status === 409) return "Conflict";
+        if (status === 422) return "Validation error";
+        if (status >= 400) return "Request error";
+
+        return "Something went wrong";
     };
 
     return {
@@ -116,6 +151,7 @@ export default function useOtpManagerNotifications() {
         showInfo,
         updateError,
         showError,
+        updateErrors,
     };
 }
 

@@ -9,13 +9,29 @@ export default function useExportAccounts() {
         if (accounts === undefined) return;
 
         let accountsToExport = accounts.map((account) => {
-            const {decryptedSecret, id, createdAt, updatedAt, deletedAt, userId, position, code, ...rest} = account;
+            const {
+                decryptedSecret,
+                id,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                userId,
+                position,
+                code,
+                isShared,
+                unlocked,
+                expiredAt,
+                receiver,
+                ...rest
+            } = account;
 
             return {
                 ...rest,
                 secret: encrypted ? rest.secret : (decryptedSecret ?? rest.secret),
             };
         });
+
+        console.log(accountsToExport);
 
         const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
             JSON.stringify(

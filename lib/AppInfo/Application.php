@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\OtpManager\AppInfo;
 
-use OCA\OtpManager\Middleware\ExceptionHandler;
 use OCA\OtpManager\Middleware\RequestBodyValidator;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -29,7 +28,6 @@ class Application extends App implements IBootstrap
     {
         include_once __DIR__ . '/../../vendor/autoload.php';
 
-        $context->registerMiddleware(ExceptionHandler::class);
         $context->registerMiddleware(RequestBodyValidator::class);
     }
 

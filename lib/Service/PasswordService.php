@@ -43,7 +43,7 @@ class PasswordService
     }
 
     /**
-     * @return DataResponse<PasswordResponseDto>
+     * @return DataResponse<PasswordStatusResponseDto>
      * @throws OCSException
      */
     public function status(): DataResponse

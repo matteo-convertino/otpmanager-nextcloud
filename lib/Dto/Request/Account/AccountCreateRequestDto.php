@@ -31,6 +31,19 @@ final class AccountCreateRequestDto extends AccountUpdateRequestDto implements J
         );
     }
 
+    public static function fromArray(array $account): self {
+        return new AccountCreateRequestDto(
+            name: $account["name"],
+            issuer: $account["issuer"],
+            secret: $account["secret"],
+            type: $account["type"],
+            period: $account["period"],
+            algorithm: $account["algorithm"],
+            digits: $account["digits"],
+            counter: array_key_exists("counter", $account) ? $account["counter"] : null,
+        );
+    }
+
     public function jsonSerialize(): array
     {
         return parent::jsonSerialize() + ['counter' => $this->counter];

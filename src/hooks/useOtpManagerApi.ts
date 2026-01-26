@@ -1,6 +1,7 @@
-import {callApi} from "@/utils/callApi";
+import {callApi} from "@/hooks/utils/callApi.ts";
 import useOtpManagerNotifications from "@/hooks/useOtpManagerNotifications.tsx";
 import type {ReactNode} from "react";
+import type {OcsMetaDTO} from "@/dto/OcsResponseDTO.ts";
 
 export default function useOtpManagerApi() {
     const {
@@ -8,6 +9,8 @@ export default function useOtpManagerApi() {
         updateSuccess,
         updateError,
         showError,
+        showErrors,
+        updateErrors,
     } = useOtpManagerNotifications();
 
     return <T>(
@@ -20,7 +23,7 @@ export default function useOtpManagerApi() {
             messageOnLoading,
             messageOnGenericError = "Generic error",
             onComplete,
-            // onError,
+            onError,
             onGenericError,
             showNotifications = true
         }: {
@@ -32,7 +35,7 @@ export default function useOtpManagerApi() {
             messageOnLoading?: string,
             messageOnGenericError?: string,
             onComplete?: (_: T) => void,
-            // onError?: (_: ErrorDTO) => void,
+            onError?: (_: OcsMetaDTO) => void,
             onGenericError?: (_: unknown) => void,
             showNotifications?: boolean
         }): void => {
@@ -58,22 +61,16 @@ export default function useOtpManagerApi() {
 
                     onComplete?.(response);
                 },
-                /*onError: (error) => {
-                  if (error.status === 498) { // invalid jwt
-                    if (showNotifications) notifications.hide(notificationId!);
+                onError: (errorDto) => {
+                    if (showNotifications) {
+                        updateErrors({errorDTO: errorDto})
+                    } else {
+                        showErrors({errorDTO: errorDto});
 
-                    showHireInfoNotification({
-                      title: "Authentication",
-                      message: "Your session has expired. Please log in again."
-                    });
+                    }
 
-                    setUser(null);
-                  } else {
-                    showHireErrors({ notificationId: notificationId, errorDTO: error });
-                  }
-
-                  onError?.(error);
-                },*/
+                    onError?.(errorDto);
+                },
                 onGenericError: (error) => {
                     if (showNotifications) {
                         updateError({

@@ -10,7 +10,7 @@ final class SharedAccountDeleteRequestDto implements JsonSerializable
 {
     public function __construct(
         public readonly int $accountId,
-        public readonly ?int $receiverId
+        public readonly ?string $receiverId
     )
     {
     }

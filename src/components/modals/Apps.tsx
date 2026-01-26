@@ -1,4 +1,4 @@
-import {Modal, ScrollArea, Stack} from "@mantine/core";
+import {Modal, Stack} from "@mantine/core";
 
 import otpManager from "@/images/otp_manager.png";
 import firefoxImage from "@/images/firefox.svg";
@@ -17,7 +17,6 @@ export function Apps() {
       title="Apps"
       size="xl"
     >
-      <ScrollArea.Autosize mah="calc(100vh - (10vh * 2))">
         <Stack>
           <AppCard
             title="OTP Manager"
@@ -44,7 +43,7 @@ export function Apps() {
             image={otpManager}
             badges={[{ text: "iOS" }]}
             buttonText="Install from Apple Store"
-            link="https://apps.apple.com/us/app/nextcloud-otp-manager/id6471510170"
+            buttonDisabled={true}
           />
 
           <AppCard
@@ -79,7 +78,6 @@ export function Apps() {
             link="https://chromewebstore.google.com/detail/simple-otp-manager-browse/meopmcadkhpcpoaigkhkadagiemblecc"
           />
         </Stack>
-      </ScrollArea.Autosize>
     </Modal>
   );
 }

@@ -1,4 +1,4 @@
 
 export type UpdateCounterRequestDTO = {
-    secret: string;
+    id: number
 }

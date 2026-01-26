@@ -13,12 +13,14 @@ use OCA\OtpManager\Dto\Request\Account\AccountGetRequestDto;
 use OCA\OtpManager\Dto\Request\Account\AccountImportRequestDto;
 use OCA\OtpManager\Dto\Request\Account\AccountUpdateCounterRequestDto;
 use OCA\OtpManager\Dto\Request\Account\AccountUpdateRequestDto;
+use OCA\OtpManager\Dto\Response\AccountDatatableResponseDto;
 use OCA\OtpManager\Dto\Response\AccountResponseDto;
-use OCA\OtpManager\Dto\Response\SharedAccountResponseDto;
 use OCA\OtpManager\Utils\OtpAlgorithm;
+use OCA\OtpManager\Utils\OtpType;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
+use Psr\Log\LoggerInterface;
 
 class AccountService
 {
@@ -27,6 +29,7 @@ class AccountService
         private readonly AccountMapper       $accountMapper,
         private readonly SharedAccountMapper $sharedAccountMapper,
         private readonly EncryptionService   $encryption,
+        private readonly LoggerInterface $logger,
         private readonly ?string             $userId = null
     )
     {
@@ -49,7 +52,7 @@ class AccountService
     }
 
     /**
-     * @return DataResponse<SharedAccountResponseDto[]>
+     * @return DataResponse<AccountDatatableResponseDto[]>
      * @throws OCSException
      */
     public function getAll(): DataResponse
@@ -59,11 +62,11 @@ class AccountService
 
         return new DataResponse([
             ...array_map(
-                static fn(Account $a) => AccountResponseDto::accountToDto($a),
+                static fn(Account $a) => AccountDatatableResponseDto::accountToDto($a),
                 $accounts
             ),
             ...array_map(
-                static fn(mixed $a) => SharedAccountResponseDto::sharedAccountToDto($a),
+                static fn(mixed $a) => AccountDatatableResponseDto::sharedAccountToDto($a),
                 $sharedAccounts
             ),
         ]);
@@ -102,8 +105,9 @@ class AccountService
             $account->setType($accountCreateRequestDto->type);
             $account->setPeriod($accountCreateRequestDto->period);
             $account->setAlgorithm($algorithm);
-            $account->setCounter($accountCreateRequestDto->type == "totp" ? null : -1);
+            $account->setCounter($accountCreateRequestDto->type == OtpType::TOTP->value ? null : -1);
             $account->setPosition($position);
+            $account->setIcon("default");
             $account->setUserId($this->userId);
             $account->setCreatedAt(date("Y-m-d H:i:s"));
             $account->setUpdatedAt(date("Y-m-d H:i:s"));
@@ -190,30 +194,32 @@ class AccountService
      */
     public function import(AccountImportRequestDto $accountImportRequestDto): DataResponse
     {
-//        if (!array_key_exists("accounts", $data)) return new JSONResponse(["error" => "Invalid JSON file"], 400);
-//        if ($accountImportRequestDto->iv !== null && $accountImportRequestDto->passwordUsedOnExport === null) {
-//            throw new OCSBadRequestException("Password is required to decrypt accounts");
-//        }
-
         foreach ($accountImportRequestDto->accounts as $importedAccount) {
             if ($accountImportRequestDto->iv !== null) {
-                $importedAccount->secret = $this->encryption->decrypt(
+                $decryptedSecret = $this->encryption->decrypt(
                     data: $importedAccount->secret,
                     password: $accountImportRequestDto->passwordUsedOnExport,
                     iv: $accountImportRequestDto->iv
                 );
-                if ($importedAccount->secret === false) throw new OCSBadRequestException("Incorrect password");
+                if ($decryptedSecret === false) throw new OCSBadRequestException("Incorrect password");
+
+                $importedAccount->secret = $decryptedSecret;
             }
 
-            $importedAccount->secret = $this->encryption->encrypt(
+            $encryptedSecret = $this->encryption->encrypt(
                 data: strtoupper($importedAccount->secret),
                 password: $accountImportRequestDto->currentPassword,
                 userId: $this->userId,
                 isAlreadyHashed: true
             );
-            if ($importedAccount->secret === false) throw new OCSException("There was an error while importing accounts");
+            if ($encryptedSecret === false) throw new OCSException("There was an error while importing accounts");
 
-            $this->create($importedAccount);
+            $importedAccount->secret = $encryptedSecret;
+
+            try {
+                $this->create($importedAccount);
+            } catch (OCSBadRequestException|OCSException) {}
+
         }
 
         return new DataResponse(null);
@@ -227,13 +233,13 @@ class AccountService
     public function updateCounter(AccountUpdateCounterRequestDto $accountUpdateCounterRequestDto): DataResponse
     {
         $account = $this->accountMapper->find(
-            column: "secret",
-            value: $accountUpdateCounterRequestDto->secret,
-            userId:  $this->userId
+            column: "id",
+            value: $accountUpdateCounterRequestDto->id,
+            userId: $this->userId
         );
 
         if ($account === null) throw new OCSBadRequestException("This account does not exist");
-        if ($account->getType() === "totp") throw new OCSBadRequestException("You cannot update counter of a TOTP account");
+        if ($account->getType() === OtpType::TOTP->value) throw new OCSBadRequestException("You cannot update counter of a TOTP account");
 
         $account->setCounter($account->getCounter() + 1);
         $account = $this->accountMapper->update($account);
