@@ -22,16 +22,14 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
-use Psr\Log\LoggerInterface;
 
 class AccountController extends OCSController
 {
 
     public function __construct(
-        string                           $appName,
-        IRequest                         $request,
-        private readonly AccountService  $accountService,
-        private readonly LoggerInterface $logger
+        string                          $appName,
+        IRequest                        $request,
+        private readonly AccountService $accountService,
     )
     {
         parent::__construct($appName, $request);

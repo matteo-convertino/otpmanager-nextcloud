@@ -20,7 +20,6 @@ use OCA\OtpManager\Utils\OtpType;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
-use Psr\Log\LoggerInterface;
 
 class AccountService
 {
@@ -29,7 +28,6 @@ class AccountService
         private readonly AccountMapper       $accountMapper,
         private readonly SharedAccountMapper $sharedAccountMapper,
         private readonly EncryptionService   $encryption,
-        private readonly LoggerInterface $logger,
         private readonly ?string             $userId = null
     )
     {
@@ -218,7 +216,8 @@ class AccountService
 
             try {
                 $this->create($importedAccount);
-            } catch (OCSBadRequestException|OCSException) {}
+            } catch (OCSBadRequestException|OCSException) {
+            }
 
         }
 

@@ -11,7 +11,6 @@ use OCP\AppFramework\Middleware;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\IRequest;
-use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -25,7 +24,7 @@ final class RequestBodyValidator extends Middleware
 {
     private ValidatorInterface $validator;
 
-    public function __construct(private readonly IRequest $request, private readonly LoggerInterface $logger)
+    public function __construct(private readonly IRequest $request)
     {
         $this->validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
@@ -291,7 +290,7 @@ final class RequestBodyValidator extends Middleware
      * @return never
      * @throws OCSBadRequestException
      */
-    private function throwBadRequest(string | array $error): never
+    private function throwBadRequest(string|array $error): never
     {
         throw new OCSBadRequestException(is_array($error) ? json_encode($error) ?: '' : $error);
     }

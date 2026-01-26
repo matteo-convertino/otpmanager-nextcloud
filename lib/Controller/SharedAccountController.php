@@ -23,7 +23,6 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
-use Psr\Log\LoggerInterface;
 
 class SharedAccountController extends OCSController
 {
@@ -32,7 +31,6 @@ class SharedAccountController extends OCSController
         string                                $appName,
         IRequest                              $request,
         private readonly SharedAccountService $sharedAccountService,
-        private readonly LoggerInterface $logger,
     )
     {
         parent::__construct($appName, $request);
