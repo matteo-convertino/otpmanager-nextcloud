@@ -24,6 +24,22 @@ final class SharedAccountSyncRequestDto implements JsonSerializable
     {
     }
 
+    public static function fromArray(array $sharedAccount): self {
+        return new SharedAccountSyncRequestDto(
+            id: $sharedAccount["id"],
+            secret: $sharedAccount["secret"],
+            name: $sharedAccount["name"],
+            issuer: $sharedAccount["issuer"],
+            position: $sharedAccount["position"],
+            icon: $sharedAccount["icon"],
+            deleted: $sharedAccount["deleted"],
+            toUpdate: $sharedAccount["toUpdate"],
+            accountId: $sharedAccount["accountId"],
+            unlocked: $sharedAccount["unlocked"],
+            expiredAt: $sharedAccount["expiredAt"],
+        );
+    }
+
     public function jsonSerialize(): array
     {
         return [

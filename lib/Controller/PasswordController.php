@@ -45,7 +45,7 @@ class PasswordController extends OCSController
     public function check(string $password): DataResponse
     {
         return $this->passwordService->check(
-            new PasswordCreateRequestDto(password: $password)
+            new PasswordCheckRequestDto(password: $password)
         );
     }
 

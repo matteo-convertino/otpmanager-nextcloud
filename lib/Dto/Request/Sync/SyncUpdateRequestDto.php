@@ -6,6 +6,7 @@ namespace OCA\OtpManager\Dto\Request\Sync;
 
 use JsonSerializable;
 use OCA\OtpManager\AppInfo\Application;
+use OCA\OtpManager\Attribute\ValidateArrayOfDto;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -17,15 +18,10 @@ class SyncUpdateRequestDto implements JsonSerializable
      */
     public function __construct(
 
-        #[Assert\All([
-            new Assert\Type(type: AccountSyncRequestDto::class, message: 'Item must be a valid account'),
-        ])]
+        #[ValidateArrayOfDto(AccountSyncRequestDto::class)]
         public readonly array  $accounts,
 
-
-        #[Assert\All([
-            new Assert\Type(type: SharedAccountSyncRequestDto::class, message: 'Item must be a valid shared account'),
-        ])]
+        #[ValidateArrayOfDto(SharedAccountSyncRequestDto::class)]
         public readonly array  $sharedAccounts,
 
         #[Assert\Length(min: 1, minMessage: 'appVersion cannot be empty')]
@@ -43,7 +39,6 @@ class SyncUpdateRequestDto implements JsonSerializable
     {
         if (version_compare($this->appVersion, Application::MIN_MOBILE_VERSION, '<')) {
             $context->buildViolation('Please update mobile app to the latest version')
-                ->atPath('appVersion')
                 ->addViolation();
         }
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\OtpManager\Dto\Request\Sync;
 
 use JsonSerializable;
+use OCA\OtpManager\Dto\Request\Account\AccountCreateRequestDto;
 
 final class AccountSyncRequestDto implements JsonSerializable
 {
@@ -21,10 +22,29 @@ final class AccountSyncRequestDto implements JsonSerializable
         public readonly ?int    $counter,
         public readonly string  $icon,
         public readonly bool    $deleted,
-        public bool    $toUpdate,
+        public bool             $toUpdate,
         public readonly bool    $isNew,
     )
     {
+    }
+
+    public static function fromArray(array $account): self {
+        return new AccountSyncRequestDto(
+            id: $account["id"],
+            secret: $account["secret"],
+            name: $account["name"],
+            issuer: $account["issuer"],
+            algorithm: $account["algorithm"],
+            digits: $account["digits"],
+            type: $account["type"],
+            period: $account["period"],
+            position: $account["position"],
+            counter: $account["counter"],
+            icon: $account["icon"],
+            deleted: $account["deleted"],
+            toUpdate: $account["toUpdate"],
+            isNew: $account["isNew"],
+        );
     }
 
     public function jsonSerialize(): array

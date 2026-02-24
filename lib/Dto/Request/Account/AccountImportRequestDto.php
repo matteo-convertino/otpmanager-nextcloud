@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OCA\OtpManager\Dto\Request\Account;
 
 use JsonSerializable;
-use OCA\OtpManager\AppInfo\Application;
 use OCA\OtpManager\Attribute\ValidateArrayOfDto;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;

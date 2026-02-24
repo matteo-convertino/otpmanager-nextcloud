@@ -335,18 +335,19 @@ class SharedAccountMapper extends QBMapper
     }
 
     /**
-     * @param int $accountId
+     * @param string $column
+     * @param string|int $value
      * @param string $receiverId
      * @return Account|null
      */
-    public function findAccountById( int $accountId, string $receiverId): ?Account
+    public function findAccount(string $column, string|int $value, string $receiverId): ?Account
     {
         $qb = $this->db->getQueryBuilder();
 
         $qb->select('accounts.*')
             ->from($this->getTableName(), "shared_accounts")
             ->innerJoin('shared_accounts', Application::ACCOUNTS_DB, "accounts", "shared_accounts.account_id = accounts.id")
-            ->where($qb->expr()->eq("shared_accounts.account_id", $qb->createNamedParameter($accountId)))
+            ->where($qb->expr()->eq("shared_accounts.$column", $qb->createNamedParameter($value)))
             ->andWhere($qb->expr()->eq("shared_accounts.receiver_id", $qb->createNamedParameter($receiverId)))
             ->andWhere(
                 $qb->expr()->orX(

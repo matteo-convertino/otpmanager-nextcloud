@@ -37,18 +37,6 @@ class SharedAccountController extends OCSController
     }
 
     /**
-     * @return DataResponse<SharedAccountResponseDto[]>
-     * @throws OCSException
-     */
-    #[NoAdminRequired]
-    #[NoCSRFRequired]
-    #[ApiRoute(verb: 'GET', url: '/share')]
-    public function getByUser(): DataResponse
-    {
-        return $this->sharedAccountService->getByUser();
-    }
-
-    /**
      * @param int $accountId
      * @return DataResponse<SharedAccountResponseDto[]>
      * @throws OCSException
@@ -56,7 +44,7 @@ class SharedAccountController extends OCSController
     #[NoAdminRequired]
     #[NoCSRFRequired]
     #[ApiRoute(verb: 'GET', url: '/share/{accountId}')]
-//    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
+    #[ValidateRequestBodyDTO(SharedAccountGetRequestDto::class)]
     public function getByAccount(int $accountId): DataResponse
     {
         return $this->sharedAccountService->getByAccount(new SharedAccountGetRequestDto($accountId));
@@ -172,7 +160,8 @@ class SharedAccountController extends OCSController
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
+     * @param string|null $secret
      * @return DataResponse<AccountResponseDto>
      * @throws OCSBadRequestException
      * @throws OCSException
@@ -180,8 +169,10 @@ class SharedAccountController extends OCSController
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/share/update-counter')]
     #[ValidateRequestBodyDTO(AccountUpdateCounterRequestDto::class)]
-    public function updateCounter(int $id): DataResponse
+    public function updateCounter(?int $id, ?string $secret): DataResponse
     {
-        return $this->sharedAccountService->updateCounter(new AccountUpdateCounterRequestDto($id));
+        return $this->sharedAccountService->updateCounter(
+            new AccountUpdateCounterRequestDto(id: $id, secret: $secret)
+        );
     }
 }

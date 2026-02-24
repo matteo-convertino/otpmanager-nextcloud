@@ -7,6 +7,10 @@ namespace OCA\OtpManager\Dto\Response;
 use JsonSerializable;
 use OCA\OtpManager\Db\Account;
 use OCA\OtpManager\Db\SharedAccount;
+use OCA\OtpManager\Utils\OtpAlgorithm;
+use OCA\OtpManager\Utils\OtpDigit;
+use OCA\OtpManager\Utils\OtpPeriod;
+use OCA\OtpManager\Utils\OtpType;
 use PhpParser\Node\Expr\Cast\Object_;
 
 final class SharedAccountResponseDto implements JsonSerializable
@@ -21,15 +25,17 @@ final class SharedAccountResponseDto implements JsonSerializable
         public readonly string               $createdAt,
         public readonly string               $updatedAt,
         public readonly bool                 $unlocked,
-        public readonly ?int                 $digits = null,
-        public readonly ?string              $type = null,
-        public readonly ?int                 $period = null,
-        public readonly ?int                 $algorithm = null,
+        public readonly ?OtpDigit            $digits = null,
+        public readonly ?OtpType             $type = null,
+        public readonly ?OtpPeriod           $period = null,
+        public readonly ?OtpAlgorithm        $algorithm = null,
         public readonly ?int                 $counter = null,
         public readonly ?string              $userId = null,
         public readonly ?string              $deletedAt = null,
         public readonly ?ReceiverResponseDto $receiver = null,
         public readonly ?string              $expiredAt = null,
+        public readonly ?string              $password = null,
+        public readonly ?string              $iv = null,
     )
     {
     }
@@ -41,7 +47,7 @@ final class SharedAccountResponseDto implements JsonSerializable
      */
     public static function sharedAccountEntityToDto(
         SharedAccount       $sharedAccount,
-        ReceiverResponseDto $receiver
+        ReceiverResponseDto $receiver,
     ): self
     {
         return new self(
@@ -61,9 +67,10 @@ final class SharedAccountResponseDto implements JsonSerializable
 
     /**
      * @param mixed $sharedAccount
+     * @param bool $withPassword
      * @return self
      */
-    public static function sharedAccountToDto(mixed $sharedAccount): self
+    public static function sharedAccountToDto(mixed $sharedAccount, bool $withPassword = false): self
     {
         return new self(
             id: $sharedAccount['account_id'],
@@ -74,22 +81,23 @@ final class SharedAccountResponseDto implements JsonSerializable
             position: $sharedAccount['position'],
             createdAt: $sharedAccount['created_at'],
             updatedAt: $sharedAccount['updated_at'],
-            unlocked: $sharedAccount['unlocked'],
-            digits: $sharedAccount['digits'],
-            type: $sharedAccount['type'],
-            period: $sharedAccount['period'],
-            algorithm: $sharedAccount['algorithm'],
+            unlocked: (bool)$sharedAccount['unlocked'],
+            digits: OtpDigit::tryFrom($sharedAccount['digits']),
+            type: OtpType::tryFrom($sharedAccount['type']),
+            period: OtpPeriod::tryFrom($sharedAccount['period']),
+            algorithm: OtpAlgorithm::tryFromInt($sharedAccount['algorithm']),
             counter: $sharedAccount['counter'],
             userId: $sharedAccount['user_id'],
-            deletedAt: $sharedAccount['deleted_at'],
             receiver: new ReceiverResponseDto(id: $sharedAccount['receiver_id']),
             expiredAt: $sharedAccount['expired_at'],
+            password: $withPassword ? $sharedAccount['password'] : null,
+            iv: $withPassword ? $sharedAccount['iv'] : null,
         );
     }
 
     public function jsonSerialize(): array
     {
-        return [
+        $data = [
             'id' => $this->id,
             'secret' => $this->secret,
             'name' => $this->name,
@@ -109,5 +117,10 @@ final class SharedAccountResponseDto implements JsonSerializable
             'unlocked' => $this->unlocked,
             'expiredAt' => $this->expiredAt,
         ];
+
+        if ($this->password !== null) $data['password'] = $this->password;
+        if ($this->iv !== null) $data['iv'] = $this->iv;
+
+        return $data;
     }
 }

@@ -232,8 +232,8 @@ class AccountService
     public function updateCounter(AccountUpdateCounterRequestDto $accountUpdateCounterRequestDto): DataResponse
     {
         $account = $this->accountMapper->find(
-            column: "id",
-            value: $accountUpdateCounterRequestDto->id,
+            column: $accountUpdateCounterRequestDto->secret !== null ? "secret" : "id",
+            value: $accountUpdateCounterRequestDto->secret ?? $accountUpdateCounterRequestDto->id,
             userId: $this->userId
         );
 

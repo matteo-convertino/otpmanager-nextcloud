@@ -41,17 +41,6 @@ class SharedAccountService
     }
 
     /**
-     * @return DataResponse<SharedAccountResponseDto[]>
-     * @throws OCSException
-     */
-    public function getByUser(): DataResponse
-    {
-        return new DataResponse(
-            SharedAccountResponseDto::sharedAccountToDto($this->sharedAccountMapper->findAllByReceiverJoin($this->userId))
-        );
-    }
-
-    /**
      * @param SharedAccountGetRequestDto $sharedAccountGetRequestDto
      * @return DataResponse<SharedAccountResponseDto[]>
      * @throws OCSException
@@ -135,6 +124,7 @@ class SharedAccountService
 
                 $this->sharedAccountMapper->insert($accountShared);
             } else {
+                $accountShared->setSecret($sharedAccountCreateRequestDto->sharedSecret);
                 $accountShared->setPassword(
                     password_hash($sharedAccountCreateRequestDto->password, PASSWORD_DEFAULT)
                 );
@@ -273,8 +263,9 @@ class SharedAccountService
      */
     public function updateCounter(AccountUpdateCounterRequestDto $accountUpdateCounterRequestDto): DataResponse
     {
-        $account = $this->sharedAccountMapper->findAccountById(
-            accountId: $accountUpdateCounterRequestDto->id,
+        $account = $this->sharedAccountMapper->findAccount(
+            column: $accountUpdateCounterRequestDto->secret !== null ? "secret" : "account_id",
+            value: $accountUpdateCounterRequestDto->secret ?? $accountUpdateCounterRequestDto->id,
             receiverId: $this->userId
         );
 

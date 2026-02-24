@@ -192,10 +192,10 @@ class AccountController extends OCSController
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/accounts/update-counter')]
     #[ValidateRequestBodyDTO(AccountUpdateCounterRequestDto::class)]
-    public function updateCounter(int $id): DataResponse
+    public function updateCounter(?int $id, ?string $secret): DataResponse
     {
         return $this->accountService->updateCounter(
-            new AccountUpdateCounterRequestDto($id)
+            new AccountUpdateCounterRequestDto(id: $id, secret: $secret)
         );
     }
 }

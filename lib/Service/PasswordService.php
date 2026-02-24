@@ -6,6 +6,7 @@ namespace OCA\OtpManager\Service;
 
 use OCA\OtpManager\Db\Setting;
 use OCA\OtpManager\Db\SettingMapper;
+use OCA\OtpManager\Dto\Request\Password\PasswordCheckRequestDto;
 use OCA\OtpManager\Dto\Request\Password\PasswordCreateRequestDto;
 use OCA\OtpManager\Dto\Request\Password\PasswordUpdateRequestDto;
 use OCA\OtpManager\Dto\Response\Password\PasswordResponseDto;
@@ -26,11 +27,11 @@ class PasswordService
     }
 
     /**
-     * @param PasswordCreateRequestDto $passwordRequestDto
+     * @param PasswordCheckRequestDto $passwordRequestDto
      * @return DataResponse<PasswordResponseDto>
      * @throws OCSBadRequestException
      */
-    public function check(PasswordCreateRequestDto $passwordRequestDto): DataResponse
+    public function check(PasswordCheckRequestDto $passwordRequestDto): DataResponse
     {
         $setting = $this->settingMapper->find($this->userId);
 
