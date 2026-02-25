@@ -12,6 +12,7 @@ import {Apps} from "../modals/Apps";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {DeleteOtpAccount} from "@/components/modals/DeleteOtpAccount.tsx";
+import {Support} from "@/components/modals/Support.tsx";
 
 export function AppShellContent() {
     const {showNavbarSmallDevice, setShowNavbarSmallDevice} = useSidebarStore();
@@ -75,6 +76,8 @@ export function AppShellContent() {
             <UnlockSharedAccount/>
 
             <Apps/>
+
+            <Support/>
         </>
     );
 }

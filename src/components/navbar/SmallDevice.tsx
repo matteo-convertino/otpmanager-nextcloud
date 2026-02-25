@@ -1,5 +1,5 @@
 import {Drawer, Stack} from "@mantine/core";
-import {navbarStyles} from "./Styles";
+import {navbarStyles} from "@/styles/components/NavbarStyles.tsx";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import {useNavbar} from "@/hooks/useNavbar.tsx";
 

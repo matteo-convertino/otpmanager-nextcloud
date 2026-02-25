@@ -32,19 +32,19 @@ export function Apps() {
             link="https://play.google.com/store/apps/details?id=com.convertino.otp_manager"
           />
 
-          <AppCard
-            title="OTP Manager"
-            description="OTP Manager is an iOS application designed to simplify the
-            management of OTP (One-Time Password) codes and allow you to
-            access to your OTP codes in a secure and convenient way. The
-            application has been developed to work in synergy with your
-            personal Nextcloud server, which allows you to store and manage
-            your OTP codes securely and accessibly from anywhere."
-            image={otpManager}
-            badges={[{ text: "iOS" }]}
-            buttonText="Install from Apple Store"
-            buttonDisabled={true}
-          />
+          {/*<AppCard*/}
+          {/*  title="OTP Manager"*/}
+          {/*  description="OTP Manager is an iOS application designed to simplify the*/}
+          {/*  management of OTP (One-Time Password) codes and allow you to*/}
+          {/*  access to your OTP codes in a secure and convenient way. The*/}
+          {/*  application has been developed to work in synergy with your*/}
+          {/*  personal Nextcloud server, which allows you to store and manage*/}
+          {/*  your OTP codes securely and accessibly from anywhere."*/}
+          {/*  image={otpManager}*/}
+          {/*  badges={[{ text: "iOS" }]}*/}
+          {/*  buttonText="Install from Apple Store"*/}
+          {/*  buttonDisabled={true}*/}
+          {/*/>*/}
 
           <AppCard
             title="OTP Manager"

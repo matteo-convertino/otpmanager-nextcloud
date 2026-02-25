@@ -9,6 +9,7 @@ interface ModalsStore {
     showChangePassword: boolean;
     showImportExport: boolean;
     showApps: boolean;
+    showSupport: boolean;
     setShowCreateAccount: (showCreateAccount: boolean) => void;
     setShowEditOtpAccount: (showEditOtpAccount?: AccountResponseDatatable) => void;
     setShowDeleteOtpAccount: (showDeleteOtpAccount?: AccountResponseDatatable) => void;
@@ -16,6 +17,7 @@ interface ModalsStore {
     setShowChangePassword: (showChangePassword: boolean) => void;
     setShowImportExport: (showImportExport: boolean) => void;
     setShowApps: (showApps: boolean) => void;
+    setShowSupport: (showSupport: boolean) => void;
 }
 
 export const useModalsStore = create<ModalsStore>((set) => ({
@@ -26,6 +28,7 @@ export const useModalsStore = create<ModalsStore>((set) => ({
     showChangePassword: false,
     showImportExport: false,
     showApps: false,
+    showSupport: false,
     setShowCreateAccount: (showCreateAccount: boolean) => set({showCreateAccount}),
     setShowEditOtpAccount: (showEditOtpAccount?: AccountResponseDatatable) => set({showEditOtpAccount}),
     setShowDeleteOtpAccount: (showDeleteOtpAccount?: AccountResponseDatatable) => set({showDeleteOtpAccount}),
@@ -33,4 +36,5 @@ export const useModalsStore = create<ModalsStore>((set) => ({
     setShowChangePassword: (showChangePassword: boolean) => set({showChangePassword}),
     setShowImportExport: (showImportExport: boolean) => set({showImportExport}),
     setShowApps: (showApps: boolean) => set({showApps}),
+    setShowSupport: (showSupport: boolean) => set({showSupport}),
 }));

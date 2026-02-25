@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {ActionIcon, Box, Checkbox, Collapse, Flex, Group, Text} from "@mantine/core";
+import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, Text} from "@mantine/core";
 import {
     IconApps,
     IconChevronLeft,
@@ -13,11 +13,15 @@ import {
     IconSettings,
     IconSun,
 } from "@tabler/icons-react";
-import {navbarStyles} from "../components/navbar/Styles.tsx";
+import {navbarStyles} from "@/styles/components/NavbarStyles.tsx";
 import {useSettingsStore} from "@/context/useSettingsStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import useSettingsForm from "@/hooks/useSettingsForm.tsx";
 import {LOCAL_STORAGE_CACHED_PASSWORD_KEY} from "@/utils/localStorageKey.ts";
+import birdWavingLottie from "@/assets/bird_waving.json";
+import Lottie from "lottie-react";
+import useLottie from "@/hooks/useLottie.tsx";
+
 
 export function useNavbar() {
     const [active/*, setActive*/] = useState("All accounts");
@@ -28,8 +32,10 @@ export function useNavbar() {
     const [passwordSaved, setPasswordSaved] = useState(
         Boolean(localStorage.getItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY))
     );
-    const {setShowChangePassword, setShowImportExport, setShowApps} = useModalsStore();
+    const {setShowChangePassword, setShowImportExport, setShowApps, setShowSupport} = useModalsStore();
     const {isFetching: isFetchingSettings, onUpdate: onUpdateSettings} = useSettingsForm();
+
+    const {lottieRef: birdWavingLottieRef, onDOMLoaded: onBirdWavingLottieLoaded} = useLottie(0.5);
 
     const header = (
         <Text fw={700} fz="lg" ta="center">
@@ -50,6 +56,25 @@ export function useNavbar() {
 
     const footer = (
         <div>
+            <Button
+                leftIcon={
+                    <Lottie
+                        lottieRef={birdWavingLottieRef}
+                        animationData={birdWavingLottie}
+                        loop={true}
+                        autoplay={false}
+                        onDOMLoaded={onBirdWavingLottieLoaded}
+                        style={{height: 30, width: 30}}
+                    />
+                }
+                variant="gradient"
+                gradient={{from: 'yellow.2', to: 'yellow.4'}}
+                fullWidth
+                mb={"md"}
+                onClick={() => setShowSupport(true)}>
+                <Text c={'yellow.9'}>Support me</Text>
+            </Button>
+
             <div
                 className={classes.link}
                 onClick={() => setShowApps(true)}
@@ -81,7 +106,7 @@ export function useNavbar() {
             <Collapse in={showSettings}>
                 <Checkbox
                     checked={showCodes}
-                    onChange={() => onUpdateSettings({showCodes: !showCodes}) }
+                    onChange={() => onUpdateSettings({showCodes: !showCodes})}
                     className={classes.innerLink}
                     label="Show codes"
                     disabled={isFetchingSettings}
