@@ -5,7 +5,7 @@ SPDX-License-Identifier: CC0-1.0
 
 # OTP Manager
 
-[<img src="img/bmc-button.png" height="80">](https://www.paypal.me/matteoconvertino0)
+<a href='https://ko-fi.com/M4M01NZ540' target='_blank'><img height='80' style='border:0px;height:80px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 *Official Nextcloud OTP Manager app repository: [otpmanager-app](https://github.com/matteo-convertino/otpmanager-app)*
 
@@ -59,15 +59,8 @@ php ./occ migrations:execute <app-folder-name> <version-number>
 npm install
 make composer
 ```
-    
-# Planned Features
-- [ ] Implement research
-- [ ] Be able to move accounts into the datatable
-- [ ] Develop recycle bin
-- [ ] Multiple elimination
-- [ ] [Folders to organize many OTP-entries](https://github.com/matteo-convertino/otpmanager-nextcloud/issues/12)
 
-## Contributors ✨
+# Contributors ✨
 
 Special thanks go to these wonderful people:
 <table>
