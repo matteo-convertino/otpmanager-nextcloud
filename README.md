@@ -13,6 +13,10 @@ SPDX-License-Identifier: CC0-1.0
 
 *Simple OTP Manager Browser Extension repository (third-party): [simple-otpmanager-browser](https://github.com/beatles1/simple-otpmanager-browser)*
 
+*API documentation: [docs/API.md](docs/API.md)*
+
+*OpenAPI specification: [docs/openapi.yaml](docs/openapi.yaml)*
+
 # Screenshots
 <img src="img/screenshots/2.png">
 

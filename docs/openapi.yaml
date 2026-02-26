@@ -1,0 +1,965 @@
+openapi: 3.0.3
+info:
+  title: OTP Manager API
+  version: 1.0.0
+  description: OpenAPI spec for OTP Manager backend (Nextcloud OCS API)
+servers:
+  - url: /ocs/v2.php/apps/otpmanager/api/v1
+    description: Nextcloud OCS base path
+
+tags:
+  - name: Account
+  - name: Sync
+  - name: Settings
+  - name: Password
+  - name: SharedAccount
+
+paths:
+  # Account (GET -> POST -> PUT -> DELETE)
+  /accounts:
+    get:
+      tags: [Account]
+      summary: Get all accounts (owned + shared)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsAccountDatatableListResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Account]
+      summary: Create account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountCreateRequest'
+      responses:
+        '200':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [Account]
+      summary: Update account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountUpdateRequest'
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /accounts/{id}:
+    get:
+      tags: [Account]
+      summary: Get account by id
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Account or null
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsNullableAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    delete:
+      tags: [Account]
+      summary: Delete account
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsNullDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /accounts/import:
+    post:
+      tags: [Account]
+      summary: Import accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountImportRequest'
+      responses:
+        '200':
+          description: Imported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsNullDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /accounts/update-counter:
+    post:
+      tags: [Account]
+      summary: Increment HOTP counter (owned account)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCounterRequest'
+      responses:
+        '200':
+          description: Counter updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # Sync (GET -> POST -> PUT -> DELETE)
+  /accounts/sync:
+    post:
+      tags: [Sync]
+      summary: Sync accounts and shared accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncUpdateRequest'
+      responses:
+        '200':
+          description: Sync result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsSyncResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # Settings (GET -> POST -> PUT -> DELETE)
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get current user settings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsSettingsResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    post:
+      tags: [Settings]
+      summary: Save current user settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingSaveRequest'
+      responses:
+        '200':
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsSettingsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # Password (GET -> POST -> PUT -> DELETE)
+  /password/status:
+    get:
+      tags: [Password]
+      summary: Password status for current user
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsPasswordStatusResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /password/check:
+    post:
+      tags: [Password]
+      summary: Validate password and get IV
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordCheckRequest'
+      responses:
+        '200':
+          description: Password valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsPasswordResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /password:
+    post:
+      tags: [Password]
+      summary: Create app password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordCreateRequest'
+      responses:
+        '200':
+          description: Password created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsPasswordResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [Password]
+      summary: Update app password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdateRequest'
+      responses:
+        '200':
+          description: Password updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsPasswordResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  # SharedAccount (GET -> POST -> PUT -> DELETE)
+  /get-users/{accountId}:
+    get:
+      tags: [SharedAccount]
+      summary: Get users available for sharing
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsReceiverListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /share/{accountId}:
+    get:
+      tags: [SharedAccount]
+      summary: Get shares for an account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Shares list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsSharedAccountListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags: [SharedAccount]
+      summary: Unshare account
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: receiverId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unshared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsNullDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /share:
+    post:
+      tags: [SharedAccount]
+      summary: Share account with users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SharedAccountCreateRequest'
+      responses:
+        '200':
+          description: Shared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsNullDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    put:
+      tags: [SharedAccount]
+      summary: Update shared account metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SharedAccountUpdateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsSharedAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /share/unlock:
+    post:
+      tags: [SharedAccount]
+      summary: Unlock shared account secret
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SharedAccountUnlockRequest'
+      responses:
+        '200':
+          description: Unlocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsNullDataResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /share/update-counter:
+    post:
+      tags: [SharedAccount]
+      summary: Increment HOTP counter (shared account)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCounterRequest'
+      responses:
+        '200':
+          description: Counter updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcsAccountResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  responses:
+    BadRequest:
+      description: Validation/business error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OcsEnvelope'
+          example:
+            meta:
+              status: failure
+              statuscode: 400
+              message: Validation error
+            data: null
+    InternalError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OcsEnvelope'
+          example:
+            meta:
+              status: failure
+              statuscode: 500
+              message: Internal server error
+            data: null
+
+  schemas:
+    OcsMeta:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        statuscode:
+          type: integer
+          example: 100
+        message:
+          type: string
+      required: [status, statuscode, message]
+
+    OcsEnvelope:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/OcsMeta'
+        data:
+          nullable: true
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+      required: [meta, data]
+
+    AccountCreateRequest:
+      allOf:
+        - $ref: '#/components/schemas/AccountUpdateRequest'
+        - type: object
+          required: [name, secret, type, period, algorithm, digits]
+          properties:
+            counter:
+              type: integer
+              nullable: true
+
+    AccountUpdateRequest:
+      type: object
+      required: [name, secret, type, period, algorithm, digits]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 256
+        issuer:
+          type: string
+          nullable: true
+          maxLength: 256
+        secret:
+          type: string
+          minLength: 16
+          maxLength: 512
+        type:
+          type: string
+          enum: [totp, hotp]
+        period:
+          type: integer
+          enum: [30, 45, 60]
+        algorithm:
+          type: string
+          enum: [SHA1, SHA256, SHA512]
+        digits:
+          type: integer
+          enum: [4, 6]
+
+    UpdateCounterRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        secret:
+          type: string
+          nullable: true
+      description: Exactly one between id and secret must be provided.
+
+    AccountImportRequest:
+      type: object
+      required: [accounts, currentPassword]
+      properties:
+        accounts:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AccountCreateRequest'
+        iv:
+          type: string
+          nullable: true
+        passwordUsedOnExport:
+          type: string
+          nullable: true
+        currentPassword:
+          type: string
+
+    SyncUpdateRequest:
+      type: object
+      required: [accounts, sharedAccounts, appVersion]
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSyncRequest'
+        sharedAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SharedAccountSyncRequest'
+        appVersion:
+          type: string
+          pattern: '^\\d+\\.\\d+\\.\\d+$'
+          example: 2.1.0
+
+    AccountSyncRequest:
+      type: object
+      required: [id, secret, name, algorithm, digits, type, period, icon, deleted, toUpdate, isNew]
+      properties:
+        id:
+          type: integer
+        secret:
+          type: string
+        name:
+          type: string
+        issuer:
+          type: string
+          nullable: true
+        algorithm:
+          type: string
+        digits:
+          type: integer
+        type:
+          type: string
+        period:
+          type: integer
+        position:
+          type: integer
+          nullable: true
+        counter:
+          type: integer
+          nullable: true
+        icon:
+          type: string
+        deleted:
+          type: boolean
+        toUpdate:
+          type: boolean
+        isNew:
+          type: boolean
+
+    SharedAccountSyncRequest:
+      type: object
+      required: [id, secret, name, icon, deleted, toUpdate, accountId, unlocked]
+      properties:
+        id:
+          type: integer
+        secret:
+          type: string
+        name:
+          type: string
+        issuer:
+          type: string
+          nullable: true
+        position:
+          type: integer
+          nullable: true
+        icon:
+          type: string
+        deleted:
+          type: boolean
+        toUpdate:
+          type: boolean
+        accountId:
+          type: integer
+        unlocked:
+          type: boolean
+        expiredAt:
+          type: string
+          nullable: true
+
+    SettingSaveRequest:
+      type: object
+      properties:
+        showCodes:
+          type: boolean
+          nullable: true
+        darkMode:
+          type: boolean
+          nullable: true
+        recordsPerPage:
+          type: string
+          nullable: true
+
+    PasswordCheckRequest:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+
+    PasswordCreateRequest:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+          minLength: 6
+
+    PasswordUpdateRequest:
+      type: object
+      required: [oldPassword, newPassword]
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+
+    SharedAccountCreateRequest:
+      type: object
+      required: [users, accountSecret, sharedSecret, password, iv]
+      properties:
+        users:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        accountSecret:
+          type: string
+          minLength: 1
+        sharedSecret:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+        iv:
+          type: string
+          minLength: 1
+        expirationDate:
+          type: string
+          format: date
+          nullable: true
+
+    SharedAccountUpdateRequest:
+      type: object
+      required: [name, secret]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 256
+        issuer:
+          type: string
+          nullable: true
+          maxLength: 256
+        secret:
+          type: string
+          minLength: 1
+
+    SharedAccountUnlockRequest:
+      type: object
+      required: [accountId, currentPassword, tempPassword]
+      properties:
+        accountId:
+          type: integer
+        currentPassword:
+          type: string
+          minLength: 1
+        tempPassword:
+          type: string
+          minLength: 1
+
+    AccountResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        secret: { type: string }
+        name: { type: string }
+        issuer: { type: string }
+        digits: { type: integer, enum: [4, 6] }
+        type: { type: string, enum: [totp, hotp] }
+        period: { type: integer, enum: [30, 45, 60] }
+        algorithm: { type: string, enum: [SHA1, SHA256, SHA512] }
+        counter: { type: integer, nullable: true }
+        icon: { type: string }
+        position: { type: integer }
+        userId: { type: string }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+        deletedAt: { type: string, nullable: true }
+
+    ReceiverResponse:
+      type: object
+      properties:
+        id: { type: string }
+        label: { type: string, nullable: true }
+        value: { type: string, nullable: true }
+        image: { type: string, nullable: true }
+
+    AccountDatatableResponse:
+      allOf:
+        - $ref: '#/components/schemas/AccountResponse'
+        - type: object
+          properties:
+            isShared: { type: boolean }
+            receiver:
+              allOf:
+                - $ref: '#/components/schemas/ReceiverResponse'
+              nullable: true
+            unlocked: { type: boolean, nullable: true }
+            expiredAt: { type: string, nullable: true }
+
+    SettingResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        showCodes: { type: boolean }
+        darkMode: { type: boolean }
+        recordsPerPage: { type: string }
+        userId: { type: string }
+
+    PasswordResponse:
+      type: object
+      properties:
+        iv: { type: string }
+
+    PasswordStatusResponse:
+      type: object
+      properties:
+        hasPassword: { type: boolean }
+
+    SharedAccountResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        secret: { type: string }
+        name: { type: string }
+        issuer: { type: string }
+        icon: { type: string }
+        position: { type: integer }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+        unlocked: { type: boolean }
+        digits: { type: integer, enum: [4, 6], nullable: true }
+        type: { type: string, enum: [totp, hotp], nullable: true }
+        period: { type: integer, enum: [30, 45, 60], nullable: true }
+        algorithm: { type: string, enum: [SHA1, SHA256, SHA512], nullable: true }
+        counter: { type: integer, nullable: true }
+        userId: { type: string, nullable: true }
+        deletedAt: { type: string, nullable: true }
+        receiver:
+          allOf:
+            - $ref: '#/components/schemas/ReceiverResponse'
+          nullable: true
+        expiredAt: { type: string, nullable: true }
+        password: { type: string, nullable: true }
+        iv: { type: string, nullable: true }
+
+    SyncAccountsResponse:
+      type: object
+      properties:
+        toAdd:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountResponse'
+        toEdit:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountResponse'
+        toDelete:
+          type: array
+          items:
+            type: integer
+
+    SyncSharedAccountsResponse:
+      type: object
+      properties:
+        toAdd:
+          type: array
+          items:
+            $ref: '#/components/schemas/SharedAccountResponse'
+        toEdit:
+          type: array
+          items:
+            $ref: '#/components/schemas/SharedAccountResponse'
+        toDelete:
+          type: array
+          items:
+            type: integer
+
+    SyncResponse:
+      type: object
+      properties:
+        accounts:
+          $ref: '#/components/schemas/SyncAccountsResponse'
+        sharedAccounts:
+          $ref: '#/components/schemas/SyncSharedAccountsResponse'
+
+    OcsAccountResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/AccountResponse'
+
+    OcsNullableAccountResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/AccountResponse'
+              nullable: true
+
+    OcsAccountDatatableListResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AccountDatatableResponse'
+
+    OcsSettingsResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SettingResponse'
+
+    OcsPasswordResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/PasswordResponse'
+
+    OcsPasswordStatusResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/PasswordStatusResponse'
+
+    OcsSharedAccountResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SharedAccountResponse'
+
+    OcsSharedAccountListResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/SharedAccountResponse'
+
+    OcsReceiverListResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReceiverResponse'
+
+    OcsSyncResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/SyncResponse'
+
+    OcsNullDataResponse:
+      allOf:
+        - $ref: '#/components/schemas/OcsEnvelope'
+        - type: object
+          properties:
+            data:
+              nullable: true
