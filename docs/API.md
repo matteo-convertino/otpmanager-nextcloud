@@ -117,3 +117,6 @@ Error response example:
   }
 }
 ```
+
+> [!TIP]
+> If you're reading this documentation, I assume you want to contribute to the project or develop your own OTP Manager client. In any case, in addition to using this documentation as a reference, I recommend checking how the API requests/responses were developed on the web app.
