@@ -3,7 +3,6 @@
 # Table of Contents
 
 - [Description](#description)
-  - [What is OTP Manager API](#what-is-otp-manager-api)
   - [Base URL](#base-url)
   - [Headers](#headers)
 - [API Endpoints](#api-endpoints)
@@ -17,22 +16,19 @@
 
 ## Description
 
-### What is OTP Manager API
-
-OTP Manager API e il backend Nextcloud dell'app OTP Manager.  
-Gestisce account OTP, sincronizzazione multi-device, password di cifratura, impostazioni utente e condivisione account.
-
 ### Base URL
 
-Gli endpoint API sono esposti tramite OCS:
+Typically, the base URL for each Nextcloud OCS API for this app is:
 
-`/ocs/v2.php/apps/otpmanager/api/v1`
+`/ocs/v2.php/apps/otpmanager/`
 
-Esempio:
+Example:
 
-`GET /ocs/v2.php/apps/otpmanager/api/v1/accounts`
+`GET /ocs/v2.php/apps/otpmanager/accounts`
 
 ### Headers
+
+It is recommended to add these headers for all requests in order to avoid any issues:
 
 - `OCS-APIRequest: true`
 - `Accept: application/json`

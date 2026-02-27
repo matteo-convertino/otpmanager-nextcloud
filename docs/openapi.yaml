@@ -2,10 +2,10 @@ openapi: 3.0.3
 info:
   title: OTP Manager API
   version: 1.0.0
-  description: OpenAPI spec for OTP Manager backend (Nextcloud OCS API)
+  description: OpenAPI spec for OTP Manager backend
 servers:
-  - url: /ocs/v2.php/apps/otpmanager/api/v1
-    description: Nextcloud OCS base path
+  - url: /ocs/v2.php/apps/otpmanager/
+    description: Default base url
 
 tags:
   - name: Account
