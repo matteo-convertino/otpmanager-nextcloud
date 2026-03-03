@@ -132,7 +132,8 @@ appstore:
 	--exclude="/Makefile" \
 	--exclude="/*.log" \
 	--exclude="/phpunit*xml" \
-	--exclude="/composer.*" \
+	--exclude="/composer.phar" \
+	--exclude="/composer.lock" \
 	--exclude="/js/node_modules" \
 	--exclude="/js/tests" \
 	--exclude="/js/test" \
@@ -180,6 +181,9 @@ appstore:
 	--exclude=webpack.common.config.js \
 	--exclude=webpack.config.js \
 	. $(appstore_sign_directory)
+
+	cd $(appstore_sign_directory) && ../../../../composer.phar install --no-dev --prefer-dist --optimize-autoloader --classmap-authoritative
+
 	@if [ -f ../../otpmanager.key ]; then \
 		echo "Signing app files..."; \
 		php ../../occ integrity:sign-app \
