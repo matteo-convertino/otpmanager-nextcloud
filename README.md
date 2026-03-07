@@ -7,15 +7,13 @@ SPDX-License-Identifier: CC0-1.0
 
 <a href='https://ko-fi.com/M4M01NZ540' target='_blank'><img height='80' style='border:0px;height:80px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-*Official Nextcloud OTP Manager app repository: [otpmanager-app](https://github.com/matteo-convertino/otpmanager-app)*
-
-*Nextcloud App Store: [otpmanager](https://apps.nextcloud.com/apps/otpmanager)*
-
-*Simple OTP Manager Browser Extension repository (third-party): [simple-otpmanager-browser](https://github.com/beatles1/simple-otpmanager-browser)*
-
-*API documentation: [docs/API.md](docs/API.md)*
-
-*OpenAPI specification: [docs/openapi.yaml](docs/openapi.yaml)*
+# Useful Links
+- *Official Nextcloud OTP Manager app repository: [otpmanager-app](https://github.com/matteo-convertino/otpmanager-app)*
+- *Nextcloud App Store: [otpmanager](https://apps.nextcloud.com/apps/otpmanager)*
+- *Simple OTP Manager Browser Extension repository (third-party): [simple-otpmanager-browser](https://github.com/beatles1/simple-otpmanager-browser)*
+- *API documentation: [docs/API.md](docs/API.md)*
+- *OpenAPI specification: [docs/openapi.yaml](docs/openapi.yaml)*
+- *Medium article: [How to develop a Nextcloud App Extension (Part-1): A practical guide based on a real project](https://medium.com/@matteo-convertino/how-to-develop-a-nextcloud-app-extension-part-1-a-practical-guide-based-on-a-real-project-00b4395a64f7)*
 
 # Screenshots
 <img src="img/screenshots/2.png">
