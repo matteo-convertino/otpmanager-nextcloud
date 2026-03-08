@@ -84,7 +84,7 @@ export default function CustomDatatable(
             striped
             highlightOnHover
             withBorder
-            // sx={{backgroundColor: "", marginTop: "0px"}}
+            borderRadius="md"
             onRowClick={(account) => {
                 if (account.unlocked === false) {
                     setShowSharedAccountToUnlock(account);
@@ -95,46 +95,36 @@ export default function CustomDatatable(
                 }
             }}
             columns={[
-                {accessor: "position", sortable: true, width: 70, title: "#"},
-                {accessor: "name", sortable: true, width: 250},
-                {accessor: "issuer", sortable: true, width: 400},
+                {accessor: "name", sortable: true, width: 180, ellipsis: true},
+                {accessor: "issuer", sortable: true, width: 150, ellipsis: true},
                 {
                     accessor: "code",
-                    width: 300,
+                    width: 100,
                     render: (account) => {
                         let canCopyCode = account.code !== undefined && account.code !== null;
+                        let shouldShowCode = showCodes || isTouchDevice || account.unlocked === false;
 
                         return (
                             <>
                                 <Box
                                     sx={{
-                                        "&:hover>#hiddenCode": {display: "none"},
-                                        "&:hover>#code": {display: "flex"},
+                                        "&:hover>.hiddenCode": {display: "none"},
+                                        "&:hover>.code": {display: "flex"},
                                     }}
                                 >
                                     <Text
+                                        className="hiddenCode"
                                         sx={{
-                                            display:
-                                                showCodes ||
-                                                isTouchDevice ||
-                                                account.unlocked === false
-                                                    ? "none"
-                                                    : "block",
+                                            display: shouldShowCode ? "none" : "block",
                                         }}
-                                        id="hiddenCode"
                                     >
                                         {"*".repeat(account.digits)}
                                     </Text>
                                     <Group
+                                        className="code"
                                         spacing={0}
-                                        id="code"
                                         sx={{
-                                            display:
-                                                showCodes ||
-                                                isTouchDevice ||
-                                                account.unlocked === false
-                                                    ? "flex"
-                                                    : "none",
+                                            display: shouldShowCode ? "flex" : "none",
                                         }}
                                         onClick={(event) => {
                                             if (account.code !== undefined && account.code !== null) {
@@ -158,6 +148,7 @@ export default function CustomDatatable(
                 },
                 {
                     accessor: "actions",
+                    width: 150,
                     title: <Text mr="xs">Actions</Text>,
                     textAlignment: "right",
                     render: (account) => (

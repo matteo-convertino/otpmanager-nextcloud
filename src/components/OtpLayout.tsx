@@ -51,6 +51,7 @@ export const OtpLayout = ({children, emotionCache, mantinePortalTarget, mantineD
     return (
         <MantineProvider
             theme={{
+                defaultRadius: 'md',
                 colorScheme:
                     darkMode === undefined
                         ? nextcloudTheme
