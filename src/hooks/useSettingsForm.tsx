@@ -18,7 +18,7 @@ export default function useSettingsForm() {
             onComplete: (settingsResponseDTO) => {
                 setShowCodes(settingsResponseDTO.showCodes);
                 setDarkMode(settingsResponseDTO.darkMode);
-                setRecordsPerPage(parseInt(settingsResponseDTO.recordsPerPage));
+                setRecordsPerPage(settingsResponseDTO.recordsPerPage === "All" ?  -1 : parseInt(settingsResponseDTO.recordsPerPage));
                 setIsFetching(false);
             }
         });

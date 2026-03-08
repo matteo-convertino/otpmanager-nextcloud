@@ -1,8 +1,8 @@
 import {Modal, Stack} from "@mantine/core";
 
-import otpManager from "@/images/otp_manager.png";
-import firefoxImage from "@/images/firefox.svg";
-import chromeImage from "@/images/chrome.svg";
+import otpManager from "@/assets/otp_manager.png";
+import firefoxImage from "@/assets/firefox.svg";
+import chromeImage from "@/assets/chrome.svg";
 
 import {AppCard} from "../utils/AppCard";
 import {useModalsStore} from "@/context/useModalsStore.ts";
