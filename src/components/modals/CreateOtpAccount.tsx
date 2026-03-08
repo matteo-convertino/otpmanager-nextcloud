@@ -21,7 +21,7 @@ export function CreateOtpAccount() {
             >
                 <ModalContent
                     form={form}
-                    textSubmitButton="Add"
+                    textSubmitButton="Create"
                     iconSubmitButton={<IconPlus size="18px"/>}
                     isSecretKeyDisabled={false}
                     isSharedAccount={false}
