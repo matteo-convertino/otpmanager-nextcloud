@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import sortBy from "lodash/sortBy";
 
 import Datatable from "./Datatable";
@@ -15,16 +15,22 @@ export function AccountsTable() {
         columnAccessor: "position",
         direction: "asc",
     });
-    const [timer, setTimer] = useState<number | undefined>(undefined);
+    const sortStatusRef = useRef(sortStatus);
     const {accounts, setAccounts, isFetching, setIsFetching} = useAccountsStore();
     const otpManagerApi = useOtpManagerApi();
     const {generateCodes} = useAccountsCodeGeneration();
     const {setPageOptions} = useSettingsStore();
 
-    const sortValue = (account: AccountResponseDatatable) => {
-        const value = account[sortStatus.columnAccessor as keyof AccountResponseDatatable];
-        return typeof value === "string" ? value.toLowerCase() : value;
-    };
+    const sortAccounts = useCallback((accounts: AccountResponseDatatable[]) => {
+        const currentSortStatus = sortStatusRef.current;
+
+        accounts = sortBy(accounts, (a) => {
+            const value = a[currentSortStatus.columnAccessor as keyof AccountResponseDatatable];
+            return typeof value === "string" ? value.toLowerCase() : value;
+        });
+
+        return currentSortStatus.direction === "desc" ? accounts.reverse() : accounts;
+    }, []);
 
     useEffect(() => {
         if (!isFetching) return;
@@ -35,11 +41,10 @@ export function AccountsTable() {
             api: AccountService.getInstance().getAll,
             showNotifications: false,
             onComplete: (accountsResponseDatatable) => {
-                accountsResponseDatatable = sortBy(accountsResponseDatatable, sortValue);
+                accountsResponseDatatable = sortAccounts(accountsResponseDatatable);
+                setAccounts(accountsResponseDatatable);
 
-                if (timer !== undefined) clearTimeout(timer);
-
-                generateCodes({accounts: accountsResponseDatatable, setTimer: setTimer});
+                generateCodes({accounts: accountsResponseDatatable, sortAccounts: sortAccounts});
 
                 setPageOptions([
                     ...PAGE_SIZES.filter((n) => n < accountsResponseDatatable.length),
@@ -51,12 +56,10 @@ export function AccountsTable() {
     }, [isFetching]);
 
     useEffect(() => {
+        sortStatusRef.current = sortStatus;
         if (accounts === undefined) return;
 
-        let response = sortBy(accounts, sortValue);
-        if (sortStatus.direction === "desc") response = response.reverse();
-
-        setAccounts(response);
+        setAccounts(sortAccounts(accounts));
     }, [sortStatus]);
 
     return (

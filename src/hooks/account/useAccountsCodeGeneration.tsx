@@ -1,3 +1,4 @@
+import {useRef} from "react";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useEncryption from "@/hooks/useEncryption.tsx";
 import {HOTP, TOTP} from "otpauth";
@@ -7,11 +8,14 @@ import {OtpType} from "@/utils/enum/otpType.ts";
 export default function useAccountsCodeGeneration() {
     const {setAccounts} = useAccountsStore();
     const {decrypt} = useEncryption();
+    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-    function generateCodes({accounts, setTimer}: {
+    function generateCodes({accounts, sortAccounts}: {
         accounts: AccountResponseDatatable[],
-        setTimer: (timer: number) => void
+        sortAccounts: (accounts: AccountResponseDatatable[]) => AccountResponseDatatable[]
     }): void {
+        if (timerRef.current !== undefined) clearTimeout(timerRef.current);
+
         for (let i = 0; i < accounts.length; i++) {
             const account = accounts[i];
 
@@ -52,17 +56,14 @@ export default function useAccountsCodeGeneration() {
             }
         }
 
-        setAccounts(accounts);
+        setAccounts(sortAccounts(accounts));
 
         // Regenerate codes when the current 30s window expires
-        setTimer(
-            setTimeout(
-                () => generateCodes({accounts: accounts, setTimer: setTimer}),
-                Math.round((30 - ((Date.now() / 1000) % 30)) * 1000)
-            )
+        timerRef.current = setTimeout(
+            () => generateCodes({accounts: accounts, sortAccounts: sortAccounts}),
+            Math.round((30 - ((Date.now() / 1000) % 30)) * 1000)
         );
     }
 
     return {generateCodes};
 }
-
