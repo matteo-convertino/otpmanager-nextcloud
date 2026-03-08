@@ -8,6 +8,7 @@ import AccountService from "@/services/AccountService.ts";
 import type {DataTableSortStatus} from "mantine-datatable";
 import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
 import {PAGE_SIZES, useSettingsStore} from "@/context/useSettingsStore.ts";
+import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
 
 export function AccountsTable() {
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
@@ -20,6 +21,11 @@ export function AccountsTable() {
     const {generateCodes} = useAccountsCodeGeneration();
     const {setPageOptions} = useSettingsStore();
 
+    const sortValue = (account: AccountResponseDatatable) => {
+        const value = account[sortStatus.columnAccessor as keyof AccountResponseDatatable];
+        return typeof value === "string" ? value.toLowerCase() : value;
+    };
+
     useEffect(() => {
         if (!isFetching) return;
 
@@ -29,24 +35,16 @@ export function AccountsTable() {
             api: AccountService.getInstance().getAll,
             showNotifications: false,
             onComplete: (accountsResponseDatatable) => {
-                // let accountsResponseDatatable: AccountResponseDatatable[] = [];
-                //
-                // accountsResponseDatatable.push(...allAccounts.accounts);
-                //
-                // accountsResponseDatatable.push(...allAccounts.shared_accounts);
+                accountsResponseDatatable = sortBy(accountsResponseDatatable, sortValue);
 
-                accountsResponseDatatable = sortBy(accountsResponseDatatable, sortStatus.columnAccessor);
-
-                if (timer !== undefined) {
-                    clearTimeout(timer);
-                }
+                if (timer !== undefined) clearTimeout(timer);
 
                 generateCodes({accounts: accountsResponseDatatable, setTimer: setTimer});
 
                 setPageOptions([
                     ...PAGE_SIZES.filter((n) => n < accountsResponseDatatable.length),
-                    accountsResponseDatatable.length]
-                );
+                    accountsResponseDatatable.length
+                ]);
                 setIsFetching(false);
             }
         });
@@ -55,8 +53,9 @@ export function AccountsTable() {
     useEffect(() => {
         if (accounts === undefined) return;
 
-        let response = sortBy(accounts, sortStatus.columnAccessor);
+        let response = sortBy(accounts, sortValue);
         if (sortStatus.direction === "desc") response = response.reverse();
+
         setAccounts(response);
     }, [sortStatus]);
 
