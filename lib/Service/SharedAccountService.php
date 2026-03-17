@@ -196,13 +196,14 @@ class SharedAccountService
         );
 
         $receivers = array_map(function ($user) {
-            $uid = $user['uid'];
+            $uid = $user->getUID();
 
             return new ReceiverResponseDto(
                 id: $uid,
-                label: $user['displayname'] ?? $uid,
+                label: $user->getDisplayName(),
                 value: $uid,
                 image: $this->serverUrl . "avatar/$uid/64",
+                isExternal: $user->getBackendClassName() !== 'Database',
             );
         }, $result);
 

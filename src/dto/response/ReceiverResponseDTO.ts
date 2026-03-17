@@ -3,4 +3,5 @@ export type ReceiverResponseDTO = {
     label: string | null
     value: string | null
     image: string | null
+    isExternal: boolean | null
 }

@@ -9,10 +9,11 @@ use JsonSerializable;
 final class ReceiverResponseDto implements JsonSerializable
 {
     public function __construct(
-        public readonly string $id,
+        public readonly string  $id,
         public readonly ?string $label = null,
         public readonly ?string $value = null,
-        public readonly ?string $image = null
+        public readonly ?string $image = null,
+        public readonly ?bool   $isExternal = false,
     )
     {
     }
@@ -23,7 +24,8 @@ final class ReceiverResponseDto implements JsonSerializable
             'id' => $this->id,
             'label' => $this->label,
             'value' => $this->value,
-            'image' => $this->image
+            'image' => $this->image,
+            'isExternal' => $this->isExternal,
         ];
     }
 }

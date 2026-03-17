@@ -12,7 +12,11 @@ use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\Group\Backend\INamedBackend;
 use OCP\IDBConnection;
+use OCP\IUser;
+use OCP\IUserManager;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 /**
@@ -20,13 +24,15 @@ use Throwable;
  */
 class SharedAccountMapper extends QBMapper
 {
-    private AccountMapper $accountMapper;
 
-    public function __construct(IDBConnection $db, AccountMapper $accountMapper)
+    public function __construct(
+        IDBConnection                  $db,
+        private readonly AccountMapper $accountMapper,
+        private readonly IUserManager  $userManager,
+        private readonly  LoggerInterface $logger,
+    )
     {
         parent::__construct($db, Application::SHARED_ACCOUNTS_DB, SharedAccount::class);
-
-        $this->accountMapper = $accountMapper;
     }
 
     /**
@@ -283,32 +289,29 @@ class SharedAccountMapper extends QBMapper
     /**
      * @param string $userId
      * @param int $accountId
-     * @return array
+     * @return array<IUser>
      * @throws OCSException
      */
     public function findUsers(string $userId, int $accountId): array
     {
-        $qb = $this->db->getQueryBuilder();
-
-        $qb->select('uid', 'displayname')
-            ->from("users")
-            ->where($qb->expr()->neq('uid', $qb->createNamedParameter($userId)));
-
-        $usersAlreadyShared = $this->findUsersAlreadyShared($accountId);
-
-        if (count($usersAlreadyShared) > 0)
-            $qb->andWhere($qb->expr()->notIn('uid', $qb->createNamedParameter($usersAlreadyShared)));
-
         try {
-            $result = $qb->executeQuery();
+            $usersAlreadyShared = $this->findUsersAlreadyShared($accountId);
+            $excludedUsers = array_flip([...$usersAlreadyShared, $userId]);
+
+            $users = [];
+
+            foreach ($this->userManager->searchDisplayName('') as $user) {
+                $uid = $user->getUID();
+
+                if (isset($excludedUsers[$uid])) continue;
+
+                $users[] = $user;
+            }
         } catch (\Exception) {
             throw new OCSException("There was an error while fetching all nextcloud users", 500);
         }
 
-        $rows = $result->fetchAll();
-        $result->closeCursor();
-
-        return $rows;
+        return $users;
     }
 
     /**

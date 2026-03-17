@@ -1,18 +1,18 @@
 import {forwardRef, type Ref} from "react";
 import {
     ActionIcon,
-    Avatar,
+    Avatar, Box,
     Button,
     Card,
-    Center,
+    Center, CloseButton,
     Divider,
     Group,
     Loader,
-    MultiSelect,
-    PasswordInput,
+    MultiSelect, type MultiSelectValueProps,
+    PasswordInput, rem,
     ScrollArea,
     Stack,
-    Text,
+    Text, Tooltip,
 } from "@mantine/core";
 import {IconShareOff} from "@tabler/icons-react";
 import {DatePickerInput} from "@mantine/dates";
@@ -28,8 +28,19 @@ export default function AsideShare() {
             <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
                 <Stack spacing="lg">
                     <MultiSelect
-                        itemComponent={SelectItem}
-                        data={nextcloudUsers}
+                        itemComponent={Item}
+                        valueComponent={Value}
+                        data={nextcloudUsers.map((user) => ({
+                            ...user,
+                            group: user.isExternal ? "External users" : "Internal users",
+                        }))}
+                        filter={(searchValue, selected, item) => {
+                            if (selected) return false;
+
+                            return [item.label!, item.value].some((field) =>
+                                field.toLowerCase().trim().includes(searchValue.toLowerCase().trim())
+                            );
+                        }}
                         label="Share account to an other user"
                         placeholder="Select users"
                         searchable
@@ -85,6 +96,10 @@ export default function AsideShare() {
                     <ScrollArea h="100%">
                         {activeShares.map((activeShare) => {
                             let receiver = activeShare.receiver;
+                            const isValueOverflow = receiver.value!.length > 5;
+                            const shortValue = isValueOverflow
+                                ? `${receiver.value!.slice(0, 5)}...`
+                                : receiver.value;
 
                             return (
                                 <Card
@@ -98,22 +113,31 @@ export default function AsideShare() {
                                         <Group noWrap={true}>
                                             <Avatar src={receiver.image} radius="xl"/>
                                             <Stack spacing="0">
-                                                <Text fw={700}>{receiver.label}</Text>
-                                                <>
-                                                    <Group spacing={"5px"} noWrap={true}>
-                                                        <Text fz="sm">{receiver.value}</Text>
-                                                        <Text fz="sm">|</Text>
-                                                        <Text fz="sm" fs="italic">
-                                                            {activeShare.expiredAt === null
-                                                                ? "Never expires"
-                                                                : `Expires on ${moment(
-                                                                    activeShare.expiredAt
-                                                                ).format("D/MM/YYYY")}`}
+                                                <Text fw={700} truncate>{receiver.label}</Text>
+
+                                                <Group spacing={"5px"} noWrap={true}>
+                                                    <Tooltip
+                                                        label={receiver.value}
+                                                        openDelay={300}
+                                                        disabled={!isValueOverflow}
+                                                    >
+                                                        <Text fz="sm">
+                                                            {shortValue}
                                                         </Text>
-                                                    </Group>
-                                                </>
+                                                    </Tooltip>
+                                                    <Text fz="sm">|</Text>
+                                                    <Text fz="sm" fs="italic">
+                                                        {activeShare.expiredAt === null
+                                                            ? "Never expires"
+                                                            : `Expires on ${moment(
+                                                                activeShare.expiredAt
+                                                            ).format("D/MM/YYYY")}`}
+                                                    </Text>
+                                                </Group>
+
                                             </Stack>
                                         </Group>
+
                                         <ActionIcon
                                             color="red"
                                             onClick={() => onDelete(activeShare.id, receiver)}
@@ -133,16 +157,16 @@ export default function AsideShare() {
     );
 }
 
-const SelectItem = forwardRef(
+const Item = forwardRef(
     ({
-         id, label, value, image, ...others
+         id, label, value, image, isExternal, ...others
      }: ReceiverResponseDTO, ref: Ref<HTMLDivElement> | undefined) =>
         <div ref={ref} {...others}>
             <Group noWrap>
                 <Avatar src={image} radius="xl"/>
 
                 <div>
-                    <Text>{label == null ? value : label}</Text>
+                    <Text>{label}</Text>
                     <Text size="xs" color="dimmed">
                         {value}
                     </Text>
@@ -150,3 +174,46 @@ const SelectItem = forwardRef(
             </Group>
         </div>
 );
+
+
+function Value(
+    {
+        id,
+        label,
+        value,
+        image,
+        isExternal,
+        onRemove,
+        classNames,
+        ...others
+    }: MultiSelectValueProps & ReceiverResponseDTO) {
+    return (
+        <div {...others}>
+            <Box
+                sx={(theme) => ({
+                    display: 'flex',
+                    cursor: 'default',
+                    alignItems: 'center',
+                    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
+                    border: `${rem(1)} solid ${
+                        theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[4]
+                    }`,
+                    paddingLeft: "4px",
+                    paddingBottom: "4px",
+                    paddingTop: "4px",
+                    borderRadius: theme.radius.md,
+                })}
+            >
+                <Avatar size="sm" src={image} radius="xl" mr={"sm"}/>
+                <Box sx={{lineHeight: 1, fontSize: rem(12)}}>{label}</Box>
+                <CloseButton
+                    onMouseDown={onRemove}
+                    variant="transparent"
+                    size={22}
+                    iconSize={14}
+                    tabIndex={-1}
+                />
+            </Box>
+        </div>
+    );
+}
