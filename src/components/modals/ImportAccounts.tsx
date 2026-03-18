@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {Alert, Anchor, Button, FileInput, Group, PasswordInput,} from "@mantine/core";
+import {Alert, Anchor, Button, FileInput, Group, List, PasswordInput,} from "@mantine/core";
 import {IconFileImport, IconInfoCircle,} from "@tabler/icons-react";
 import useImportAccountsForm from "@/hooks/account/useImportAccountsForm.tsx";
 
@@ -13,18 +13,27 @@ export function ImportAccounts() {
             <Alert
                 variant="light"
                 color="blue"
-                radius="md"
-                title="Other way to import"
+                title="Migrate from other app"
                 icon={<IconInfoCircle/>}
             >
-                If you're using <Anchor href="https://github.com/helloworld1/FreeOTPPlus" target="_blank">FreeOTP
-                Plus</Anchor> and you want to import your accounts here, take
-                a look at{" "}
-                <Anchor href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/20#issue-2066571171"
-                        target="_blank">
-                    this script
-                </Anchor>
-                .
+                <List>
+                    <List.Item>
+                        <Anchor
+                            href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/20#issue-2066571171"
+                            target="_blank"
+                        >
+                            FreeOTP Plus
+                        </Anchor>
+                    </List.Item>
+                    <List.Item>
+                        <Anchor
+                            href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/72"
+                            target="_blank"
+                        >
+                            LastPass Authenticator
+                        </Anchor>
+                    </List.Item>
+                </List>
             </Alert>
 
             <FileInput

@@ -10,13 +10,10 @@ use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
-use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\Group\Backend\INamedBackend;
 use OCP\IDBConnection;
 use OCP\IUser;
 use OCP\IUserManager;
-use Psr\Log\LoggerInterface;
 use Throwable;
 
 /**
@@ -29,7 +26,6 @@ class SharedAccountMapper extends QBMapper
         IDBConnection                  $db,
         private readonly AccountMapper $accountMapper,
         private readonly IUserManager  $userManager,
-        private readonly  LoggerInterface $logger,
     )
     {
         parent::__construct($db, Application::SHARED_ACCOUNTS_DB, SharedAccount::class);
