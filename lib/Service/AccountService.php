@@ -103,7 +103,7 @@ class AccountService
             $account->setType($accountCreateRequestDto->type);
             $account->setPeriod($accountCreateRequestDto->period);
             $account->setAlgorithm($algorithm);
-            $account->setCounter($accountCreateRequestDto->type == OtpType::TOTP->value ? null : -1);
+            $account->setCounter($accountCreateRequestDto->type == OtpType::TOTP->value ? null : $accountCreateRequestDto->counter ?? -1);
             $account->setPosition($position);
             $account->setIcon("default");
             $account->setUserId($this->userId);

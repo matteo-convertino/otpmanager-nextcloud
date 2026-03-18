@@ -19,6 +19,14 @@ export function ImportAccounts() {
                 <List>
                     <List.Item>
                         <Anchor
+                            href="https://gist.github.com/matteo-convertino/952c69a93a43243420d0a462e8111ea2"
+                            target="_blank"
+                        >
+                            Stratum
+                        </Anchor>
+                    </List.Item>
+                    <List.Item>
+                        <Anchor
                             href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/20#issue-2066571171"
                             target="_blank"
                         >
