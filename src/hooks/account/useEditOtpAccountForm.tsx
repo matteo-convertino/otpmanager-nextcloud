@@ -24,6 +24,7 @@ export default function useEditOtpAccountForm() {
                 secret: otp.decryptedSecret!,
                 type: otp.type,
                 period: otp.period,
+                counter: otp.counter,
                 algorithm: otp.algorithm,
                 digits: otp.digits,
             })
@@ -37,6 +38,7 @@ export default function useEditOtpAccountForm() {
             secret: "",
             type: OtpType.TOTP,
             period: OtpPeriod.P30,
+            counter: null,
             algorithm: OtpAlgorithm.SHA1,
             digits: OtpDigits.D6,
         },

@@ -21,7 +21,7 @@ export function EditOtpAccount() {
                     form={form}
                     textSubmitButton="Save"
                     iconSubmitButton={<IconEdit size="18px"/>}
-                    isSecretKeyDisabled={true}
+                    isEditing={true}
                     isSharedAccount={otp !== undefined && otp.unlocked !== null}
                 />
             </form>

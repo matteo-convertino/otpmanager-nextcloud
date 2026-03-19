@@ -24,6 +24,7 @@ export default function useCreateOtpAccountForm() {
             secret: "",
             type: OtpType.TOTP,
             period: OtpPeriod.P30,
+            counter: null,
             algorithm: OtpAlgorithm.SHA1,
             digits: OtpDigits.D6,
         },

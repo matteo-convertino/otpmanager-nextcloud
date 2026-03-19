@@ -1,4 +1,4 @@
-import {Button, Grid, Group, Select, Stack, TextInput} from "@mantine/core";
+import {Button, Grid, Group, NumberInput, Select, Stack, TextInput} from "@mantine/core";
 import {IconAbc, IconKey, IconShieldLock} from "@tabler/icons-react";
 import type {UseFormReturnType} from "@mantine/form";
 import type {AccountRequestSchemaForm} from "@/dto/request/AccountRequestDTO.ts";
@@ -13,13 +13,13 @@ export default function CreateEditContent(
         form,
         textSubmitButton,
         iconSubmitButton,
-        isSecretKeyDisabled,
+        isEditing,
         isSharedAccount,
     }: {
         form: UseFormReturnType<AccountRequestSchemaForm>,
         textSubmitButton: string,
         iconSubmitButton: ReactNode,
-        isSecretKeyDisabled: boolean,
+        isEditing: boolean,
         isSharedAccount: boolean
     }) {
     return (
@@ -40,13 +40,13 @@ export default function CreateEditContent(
                 <>
                     <TextInput
                         label="Secret key"
-                        disabled={isSecretKeyDisabled}
+                        disabled={isEditing}
                         withAsterisk
                         rightSection={<IconKey/>}
                         {...form.getInputProps("secret")}
                     />
                     <Grid grow>
-                        <Grid.Col span={8}>
+                        <Grid.Col span={7}>
                             <Select
                                 label="Type of code"
                                 defaultValue={OtpType.TOTP}
@@ -57,8 +57,8 @@ export default function CreateEditContent(
                                 {...form.getInputProps("type")}
                             />
                         </Grid.Col>
-                        {form.values.type === OtpType.TOTP && (
-                            <Grid.Col span={4}>
+                        {form.values.type === OtpType.TOTP ? (
+                            <Grid.Col span={5}>
                                 <Select
                                     label="Interval"
                                     defaultValue={OtpPeriod.P30.toString()}
@@ -70,6 +70,19 @@ export default function CreateEditContent(
                                     value={form.values.period.toString()}
                                     onChange={period => {
                                         if(period !== null) form.setFieldValue("period", parseInt(period));
+                                    }}
+                                />
+                            </Grid.Col>
+                        ) : (
+                            <Grid.Col span={5}>
+                                <NumberInput
+                                    label="Counter"
+                                    placeholder="Initial counter"
+                                    min={0}
+                                    disabled={isEditing}
+                                    value={form.values.counter ?? ""}
+                                    onChange={counter => {
+                                        form.setFieldValue("counter", counter === "" ? null : counter);
                                     }}
                                 />
                             </Grid.Col>

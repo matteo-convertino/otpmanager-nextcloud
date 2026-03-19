@@ -15,6 +15,7 @@ export const accountRequestSchema = z.object({
         .max(512, "Secret key cannot be longer than 16 characters")
         .regex(/^[A-Z2-7]+=*$/i, "Secret key is not Base32-encodable"),
     type: z.nativeEnum(OtpType),
+    counter: z.number().nullable(),
     period: z.nativeEnum(OtpPeriod),
     algorithm: z.nativeEnum(OtpAlgorithm),
     digits: z.nativeEnum(OtpDigits),

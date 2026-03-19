@@ -23,7 +23,7 @@ export function CreateOtpAccount() {
                     form={form}
                     textSubmitButton="Create"
                     iconSubmitButton={<IconPlus size="18px"/>}
-                    isSecretKeyDisabled={false}
+                    isEditing={false}
                     isSharedAccount={false}
                 />
             </form>
