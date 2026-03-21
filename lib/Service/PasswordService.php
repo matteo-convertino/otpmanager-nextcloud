@@ -114,7 +114,7 @@ class PasswordService
 
         if (is_null($setting->getPassword()))
             throw new OCSBadRequestException("No password set yet");
-        else if (!password_verify(hash("sha256", $passwordUpdateRequestDto->oldPassword), $setting->getPassword()))
+        else if (!password_verify($passwordUpdateRequestDto->oldPassword, $setting->getPassword()))
             throw new OCSBadRequestException("The old password is incorrect");
 
         $newPassword = hash("sha256", $passwordUpdateRequestDto->newPassword);
@@ -126,7 +126,7 @@ class PasswordService
         }
 
         $this->encryption->changeAccountsEncryption(
-            oldPassword: hash("sha256", $passwordUpdateRequestDto->oldPassword),
+            oldPassword: $passwordUpdateRequestDto->oldPassword,
             newPassword: $newPassword,
             oldIv: $setting->getIv(),
             newIv: $newIv,

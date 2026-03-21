@@ -28,7 +28,7 @@ export default function usePasswordUpdateForm() {
     const onSubmit = (values: passwordUpdateFormType) => {
         otpManagerApi({
             api: () => PasswordService.getInstance().update({
-                oldPassword: values.oldPassword,
+                oldPassword: SHA256(values.oldPassword).toString(),
                 newPassword: values.password
             }),
             titleOnLoading: "Password",
