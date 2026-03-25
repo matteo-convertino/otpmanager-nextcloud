@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace OCA\OtpManager\Dto\Response;
 
 use JsonSerializable;
-use OCA\OtpManager\Db\Account;
 use OCA\OtpManager\Db\SharedAccount;
 use OCA\OtpManager\Utils\OtpAlgorithm;
 use OCA\OtpManager\Utils\OtpDigit;
 use OCA\OtpManager\Utils\OtpPeriod;
 use OCA\OtpManager\Utils\OtpType;
-use PhpParser\Node\Expr\Cast\Object_;
 
 final class SharedAccountResponseDto implements JsonSerializable
 {
@@ -81,7 +79,7 @@ final class SharedAccountResponseDto implements JsonSerializable
             position: $sharedAccount['position'],
             createdAt: $sharedAccount['created_at'],
             updatedAt: $sharedAccount['updated_at'],
-            unlocked: (bool)$sharedAccount['unlocked'],
+            unlocked: is_bool($sharedAccount['unlocked']) ? $sharedAccount['unlocked'] : $sharedAccount['unlocked'] === 1,
             digits: OtpDigit::tryFrom($sharedAccount['digits']),
             type: OtpType::tryFrom($sharedAccount['type']),
             period: OtpPeriod::tryFrom($sharedAccount['period']),

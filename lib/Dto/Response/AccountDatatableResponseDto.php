@@ -6,12 +6,10 @@ namespace OCA\OtpManager\Dto\Response;
 
 use JsonSerializable;
 use OCA\OtpManager\Db\Account;
-use OCA\OtpManager\Db\SharedAccount;
 use OCA\OtpManager\Utils\OtpAlgorithm;
 use OCA\OtpManager\Utils\OtpDigit;
 use OCA\OtpManager\Utils\OtpPeriod;
 use OCA\OtpManager\Utils\OtpType;
-use PhpParser\Node\Expr\Cast\Object_;
 
 final class AccountDatatableResponseDto implements JsonSerializable
 {
@@ -88,7 +86,7 @@ final class AccountDatatableResponseDto implements JsonSerializable
             updatedAt: $sharedAccount['updated_at'],
             isShared: true,
             receiver: new ReceiverResponseDto(id: $sharedAccount['receiver_id']),
-            unlocked: $sharedAccount['unlocked'] === 1,
+            unlocked: is_bool($sharedAccount['unlocked']) ? $sharedAccount['unlocked'] : $sharedAccount['unlocked'] === 1,
             expiredAt: $sharedAccount['expired_at'],
         );
     }

@@ -34,7 +34,7 @@ This way, the migration from Google Authenticator to OTP Manager will be quick a
 * [Simple Chrome Browser Extension](https://chromewebstore.google.com/detail/simple-otp-manager-browse/meopmcadkhpcpoaigkhkadagiemblecc)
 ]]>
   </description>
-  <version>1.1.0</version>
+  <version>1.1.1</version>
   <licence>agpl</licence>
   <author mail="matteo@convertino.cloud" homepage="https://www.convertino.cloud">Matteo Convertino</author>
   <namespace>OtpManager</namespace>
