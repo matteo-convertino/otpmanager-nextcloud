@@ -1,26 +1,29 @@
 import {useState} from "react";
 
-import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, Text} from "@mantine/core";
+import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, SegmentedControl, Text} from "@mantine/core";
 import {
     IconApps,
     IconChevronLeft,
     IconChevronRight,
     IconFileInvoice,
+    IconGridDots,
     IconKey,
     IconList,
     IconLockOff,
     IconMoonStars,
     IconSettings,
     IconSun,
+    IconTable,
 } from "@tabler/icons-react";
 import {navbarStyles} from "@/styles/components/NavbarStyles.tsx";
 import {useSettingsStore} from "@/context/useSettingsStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
-import useSettingsForm from "@/hooks/useSettingsForm.tsx";
+import useSettingsForm from "@/hooks/settings/useSettingsForm.tsx";
 import {LOCAL_STORAGE_CACHED_PASSWORD_KEY} from "@/utils/localStorageKey.ts";
 import birdWavingLottie from "@/assets/bird_waving.json";
 import Lottie from "lottie-react";
 import useLottie from "@/hooks/useLottie.tsx";
+import {OtpViewMode} from "@/utils/enum/otpViewMode.ts";
 
 
 export function useNavbar() {
@@ -28,12 +31,12 @@ export function useNavbar() {
     const {classes, cx} = navbarStyles();
     const [showSettings, setShowSettings] = useState(false);
     const ChevronIcon = !showSettings ? IconChevronRight : IconChevronLeft;
-    const {darkMode, showCodes} = useSettingsStore();
+    const {darkMode, showCodes, viewMode, isFetching: isFetchingSettings} = useSettingsStore();
     const [passwordSaved, setPasswordSaved] = useState(
         Boolean(localStorage.getItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY))
     );
     const {setShowChangePassword, setShowImportExport, setShowApps, setShowSupport} = useModalsStore();
-    const {isFetching: isFetchingSettings, onUpdate: onUpdateSettings} = useSettingsForm();
+    const {onUpdate: onUpdateSettings} = useSettingsForm();
 
     const {lottieRef: birdWavingLottieRef, onDOMLoaded: onBirdWavingLottieLoaded} = useLottie(0.5);
 
@@ -74,6 +77,29 @@ export function useNavbar() {
                 onClick={() => setShowSupport(true)}>
                 <Text c={'yellow.9'}>Support me</Text>
             </Button>
+
+            <SegmentedControl
+                fullWidth
+                mb={"md"}
+                value={viewMode}
+                onChange={(v) => onUpdateSettings({viewMode: v as OtpViewMode})}
+                data={[
+                    {
+                        label: <Group spacing={"xs"}>
+                            <IconTable size={20}/>
+                            <Text inline>Table view</Text>
+                        </Group>,
+                        value: OtpViewMode.TABLE
+                    },
+                    {
+                        label: <Group spacing={"xs"}>
+                            <IconGridDots size={20}/>
+                            <Text inline>Grid view</Text>
+                        </Group>,
+                        value: OtpViewMode.GRID
+                    },
+                ]}
+            />
 
             <div
                 className={classes.link}

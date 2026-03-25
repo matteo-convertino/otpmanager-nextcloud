@@ -6,6 +6,7 @@ namespace OCA\OtpManager\Dto\Response;
 
 use JsonSerializable;
 use OCA\OtpManager\Db\Setting;
+use OCA\OtpManager\Utils\OtpViewMode;
 
 class SettingResponseDto implements JsonSerializable
 {
@@ -14,6 +15,7 @@ class SettingResponseDto implements JsonSerializable
         public readonly bool   $showCodes,
         public readonly bool   $darkMode,
         public readonly string $recordsPerPage,
+        public readonly OtpViewMode $viewMode,
         public readonly string $userId,
     )
     {
@@ -26,6 +28,7 @@ class SettingResponseDto implements JsonSerializable
             showCodes: $setting->getShowCodes(),
             darkMode: $setting->getDarkMode(),
             recordsPerPage: $setting->getRecordsPerPage(),
+            viewMode: OtpViewMode::tryFrom($setting->getViewMode()),
             userId: $setting->getUserId(),
         );
     }
@@ -37,6 +40,7 @@ class SettingResponseDto implements JsonSerializable
             'showCodes' => $this->showCodes,
             'darkMode' => $this->darkMode,
             'recordsPerPage' => $this->recordsPerPage,
+            'viewMode' => $this->viewMode,
             'userId' => $this->userId
         ];
     }

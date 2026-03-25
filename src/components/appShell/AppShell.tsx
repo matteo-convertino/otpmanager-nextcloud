@@ -9,10 +9,15 @@ import Aside from "./../aside/Aside";
 import AsideInfo from "./../aside/Info";
 import AsideShare from "./../aside/Share";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
+import useLoadSettings from "@/hooks/settings/useLoadSettings.tsx";
+import useLoadAccounts from "@/hooks/account/useLoadAccounts.tsx";
 
 export default function MainAppShell() {
     const smallScreen = useMediaQuery("(max-width: 991px)");
     const {showAsideInfo, showAsideShare, setShowAsideInfo, setShowAsideShare} = useSidebarStore();
+
+    useLoadSettings();
+    useLoadAccounts();
 
     return (
         <>

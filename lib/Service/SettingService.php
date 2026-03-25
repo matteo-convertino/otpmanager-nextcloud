@@ -42,6 +42,7 @@ class SettingService
         if ($settingSaveRequestDto->showCodes !== null) $setting->setShowCodes($settingSaveRequestDto->showCodes);
         if ($settingSaveRequestDto->darkMode !== null) $setting->setDarkMode($settingSaveRequestDto->darkMode);
         if ($settingSaveRequestDto->recordsPerPage !== null) $setting->setRecordsPerPage($settingSaveRequestDto->recordsPerPage);
+        if ($settingSaveRequestDto->viewMode !== null) $setting->setViewMode($settingSaveRequestDto->viewMode);
 
         return new DataResponse(
             SettingResponseDto::settingToDto($this->settingMapper->update($setting))

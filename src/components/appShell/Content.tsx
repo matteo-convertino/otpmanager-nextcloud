@@ -1,7 +1,6 @@
-import {ActionIcon, Anchor, Breadcrumbs, Burger, Flex, Group, Header, Text,} from "@mantine/core";
+import {ActionIcon, Anchor, Breadcrumbs, Burger, Center, Flex, Group, Header, Loader, Text,} from "@mantine/core";
 import {IconCirclePlus} from "@tabler/icons-react";
 
-import {AccountsTable} from "./accountsTable/AccountsTable";
 import {CreateOtpAccount} from "../modals/CreateOtpAccount";
 import {EditOtpAccount} from "../modals/EditOtpAccount";
 import {ChangePassword} from "../modals/ChangePassword";
@@ -13,10 +12,41 @@ import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {DeleteOtpAccount} from "@/components/modals/DeleteOtpAccount.tsx";
 import {Support} from "@/components/modals/Support.tsx";
+import {useSettingsStore} from "@/context/useSettingsStore.ts";
+import {OtpViewMode} from "@/utils/enum/otpViewMode.ts";
+import {useCallback, useEffect, useRef, useState} from "react";
+import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
+import {useAccountsStore} from "@/context/useAccountsStore.ts";
+import type {DataTableSortStatus} from "mantine-datatable";
+import {AccountsGrid} from "@/components/appShell/grid/AccountsGrid.tsx";
+import AccountsDatatable from "@/components/appShell/table/AccountsDatatable.tsx";
+import {sortAccounts as sortAccountsByStatus} from "@/utils/sortAccounts.ts";
 
 export function AppShellContent() {
     const {showNavbarSmallDevice, setShowNavbarSmallDevice} = useSidebarStore();
     const {setShowCreateAccount} = useModalsStore();
+    const {viewMode} = useSettingsStore();
+
+    const {accounts, setAccounts} = useAccountsStore();
+    const {isFetching: isFetchingSettings} = useSettingsStore();
+
+    const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
+        columnAccessor: "position",
+        direction: "asc",
+    });
+    const sortStatusRef = useRef(sortStatus);
+
+    const sortAccounts = useCallback((accounts: AccountResponseDatatable[]) => {
+        const currentSortStatus = sortStatusRef.current;
+        return sortAccountsByStatus(accounts, currentSortStatus);
+    }, []);
+
+    useEffect(() => {
+        sortStatusRef.current = sortStatus;
+        if (accounts === undefined) return;
+
+        setAccounts(sortAccounts(accounts));
+    }, [sortStatus]);
 
     return (
         <>
@@ -59,8 +89,22 @@ export function AppShellContent() {
                     height: "calc(100vh - 44px - 50px)",
                 })}
                 grow
+                align={"start"}
             >
-                <AccountsTable/>
+
+                {
+                    isFetchingSettings
+                        ? <Center h={"100%"}>
+                            <Loader/>
+                        </Center>
+                        : viewMode === OtpViewMode.TABLE
+                            ? <AccountsDatatable
+                                sortStatus={sortStatus}
+                                setSortStatus={setSortStatus}
+                            />
+                            : <AccountsGrid/>
+                }
+
             </Group>
 
             <CreateOtpAccount/>

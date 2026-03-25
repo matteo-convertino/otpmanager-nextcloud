@@ -5,6 +5,9 @@ import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatat
 import AccountService from "@/services/AccountService.ts";
 import type {UpdateCounterRequestDTO} from "@/dto/request/UpdateCounterRequestDTO.ts";
 import SharedAccountService from "@/services/SharedAccountService.ts";
+import {useAccountsStore} from "@/context/useAccountsStore.ts";
+import type {SharedAccountResponseDTO} from "@/dto/response/SharedAccountResponseDTO.ts";
+import type {AccountResponseDTO} from "@/dto/response/AccountResponseDTO.ts";
 
 export default function useUpdateCounter() {
     const otpManagerApi = useOtpManagerApi();
@@ -15,26 +18,34 @@ export default function useUpdateCounter() {
 
         const data: UpdateCounterRequestDTO = {id: account.id};
 
-        otpManagerApi<any>({
+        otpManagerApi<SharedAccountResponseDTO | AccountResponseDTO>({
             api: () => account.isShared
                 ? SharedAccountService.getInstance().updateCounter(data)
                 : AccountService.getInstance().updateCounter(data),
             showNotifications: false,
             onComplete: (accountResponseDTO) => {
+                if (accountResponseDTO.counter === null) return;
+
                 account.counter = accountResponseDTO.counter;
 
-                if (account.counter !== null) {
-                    let hotp = new HOTP({
-                        issuer: account.issuer,
-                        label: account.name,
-                        algorithm: account.algorithm,
-                        digits: account.digits,
-                        counter: account.counter,
-                        secret: account.decryptedSecret,
-                    });
+                let hotp = new HOTP({
+                    issuer: account.issuer,
+                    label: account.name,
+                    algorithm: account.algorithm,
+                    digits: account.digits,
+                    counter: account.counter,
+                    secret: account.decryptedSecret,
+                });
 
-                    account.code = hotp.generate();
-                }
+                account.code = hotp.generate();
+
+                useAccountsStore.setState(
+                    (state) => ({
+                        accounts: state.accounts?.map((a) =>
+                            a.id === account.id ? account : a
+                        ),
+                    })
+                );
 
                 setIsUpdating(false);
             }
@@ -43,4 +54,3 @@ export default function useUpdateCounter() {
 
     return {isUpdating, onUpdate};
 }
-

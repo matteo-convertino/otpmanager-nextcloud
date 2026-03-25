@@ -49,13 +49,14 @@ class SettingController extends OCSController
     #[NoAdminRequired]
     #[ApiRoute(verb: 'POST', url: '/settings')]
     #[ValidateRequestBodyDTO(SettingSaveRequestDto::class)]
-    public function save(?bool $showCodes, ?bool $darkMode, ?string $recordsPerPage): DataResponse
+    public function save(?bool $showCodes, ?bool $darkMode, ?string $recordsPerPage, ?string $viewMode): DataResponse
     {
         return $this->settingService->save(
             new SettingSaveRequestDto(
                 showCodes: $showCodes,
                 darkMode: $darkMode,
-                recordsPerPage: $recordsPerPage
+                recordsPerPage: $recordsPerPage,
+                viewMode: $viewMode,
             )
         );
     }

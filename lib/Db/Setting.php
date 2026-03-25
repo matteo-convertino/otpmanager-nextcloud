@@ -18,6 +18,9 @@ use OCP\AppFramework\Db\Entity;
  * @method string|null getRecordsPerPage()
  * @method void setRecordsPerPage(string|null $recordsPerPage)
  *
+ * @method string getViewMode()
+ * @method void setViewMode(string $viewMode)
+ *
  * @method string|null getPassword()
  * @method void setPassword(string|null $password)
  *
@@ -33,6 +36,7 @@ class Setting extends Entity implements JsonSerializable
     protected $showCodes;
     protected $darkMode;
     protected $recordsPerPage;
+    protected $viewMode;
     protected $password;
     protected $iv;
     protected $userId;
@@ -51,6 +55,7 @@ class Setting extends Entity implements JsonSerializable
             'show_codes' => $this->showCodes,
             'dark_mode' => $this->darkMode,
             'records_per_page' => $this->recordsPerPage,
+            'view_mode' => $this->viewMode,
             'user_id' => $this->userId
         ];
     }

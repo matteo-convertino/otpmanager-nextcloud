@@ -44,7 +44,7 @@ export const navbarStyles = createStyles((theme, _params) => {
                     ? theme.colors.dark[1]
                     : theme.colors.gray[7],
             padding: `${theme.spacing.xs} ${theme.spacing.sm}`,
-            borderRadius: theme.radius.sm,
+            borderRadius: theme.radius.md,
             fontWeight: 500,
 
             "&:hover": {
