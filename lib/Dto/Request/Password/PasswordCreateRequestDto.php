@@ -27,10 +27,11 @@ final class PasswordCreateRequestDto implements JsonSerializable
             message: 'Password must contain at least one number.'
         )]
         #[Assert\Regex(
-            pattern: "/[$&+,:;=?@#|'<>.^*()%!-]/",
+            pattern: '/[[:punct:]]/',
             message: 'Password must contain at least one special character.'
         )]
-        public readonly string $password)
+        public readonly string $password
+    )
     {
     }
 
