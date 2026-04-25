@@ -50,11 +50,11 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
                         }
                     </Box>
 
-                    <Box style={{flexGrow: 1}}>
+                    <Box style={{flexGrow: 1, minWidth: 0}}>
                         <Group align={"start"} spacing={"xl"} noWrap mb={"xl"} w={"100%"}>
-                            <Box style={{flexGrow: 1}}>
-                                <Text fz="lg">{issuerNotEmpty ? account.issuer : account.name}</Text>
-                                <Text c="dimmed">{issuerNotEmpty ? account.name : ''}</Text>
+                            <Box style={{flexGrow: 1, minWidth: 0}}>
+                                <Text fz="lg" truncate>{issuerNotEmpty ? account.issuer : account.name} sdadsa d as ds ad asdas dsad asd sa</Text>
+                                <Text c="dimmed" truncate>{issuerNotEmpty ? account.name : ''} das dsa d ad asdas d as das dsa dsa ds</Text>
                             </Box>
                             <AccountActions account={account} groupProps={{spacing: "xs"}}/>
                         </Group>
