@@ -1,5 +1,6 @@
 import {AppShell} from "@mantine/core";
 import {useMediaQuery} from "@mantine/hooks";
+import {useEffect} from "react";
 
 import {NavbarLargeDevice} from "./../navbar/LargeDevice";
 import {NavbarSmallDevice} from "./../navbar/SmallDevice";
@@ -11,13 +12,21 @@ import AsideShare from "./../aside/Share";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import useLoadSettings from "@/hooks/settings/useLoadSettings.tsx";
 import useLoadAccounts from "@/hooks/account/useLoadAccounts.tsx";
+import {useAccountsStore} from "@/context/useAccountsStore.ts";
+import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
 
 export default function MainAppShell() {
     const smallScreen = useMediaQuery("(max-width: 991px)");
     const {showAsideInfo, showAsideShare, setShowAsideInfo, setShowAsideShare} = useSidebarStore();
+    const {startTotpTimers} = useAccountsStore();
+    const {generateCodes} = useAccountsCodeGeneration();
 
     useLoadSettings();
     useLoadAccounts();
+
+    useEffect(() => {
+        startTotpTimers((period) => generateCodes({period}));
+    }, [generateCodes, startTotpTimers]);
 
     return (
         <>

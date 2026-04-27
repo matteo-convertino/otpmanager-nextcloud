@@ -28,11 +28,11 @@ export function AccountCode(
         <Group
             ref={hovered === undefined ? ref : undefined}
             spacing={"xs"}
-            onClick={(event) => {
+            onClick={canCopyCode(account) ? (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 copyCode(account);
-            }}
+            } : undefined}
         >
             <Text {...textProps}>
                 {showCode ? getCodeLabel(account) : "*".repeat(account.digits)}

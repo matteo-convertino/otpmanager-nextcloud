@@ -2,6 +2,7 @@ import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatat
 import {useHover} from "@mantine/hooks";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import {Box, Group, Paper, Text} from "@mantine/core";
+import {useEffect, useState} from "react";
 import SpotlightCard from "@/components/utils/SpotlightCard.tsx";
 import {AccountCode} from "@/components/appShell/shared/AccountCode.tsx";
 import AccountActions from "@/components/appShell/shared/AccountActions.tsx";
@@ -10,19 +11,37 @@ import {OtpType} from "@/utils/enum/otpType.ts";
 import {OtpPeriod} from "@/utils/enum/otpPeriod.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import useUpdateCounter from "@/hooks/useUpdateCounter.tsx";
+import {useAccountsStore} from "@/context/useAccountsStore.ts";
+import useAccountCode from "@/hooks/account/useAccountCode.ts";
 
 export default function AccountCard({account}: { account: AccountResponseDatatable }) {
     const {hovered, ref} = useHover();
     const {setShowAsideInfo} = useSidebarStore();
     const {setShowSharedAccountToUnlock} = useModalsStore();
     const {onUpdate: onUpdateCounter} = useUpdateCounter();
+    const {getTotpRemainingPercent} = useAccountsStore();
+    const [, setNow] = useState(Date.now());
+    const {canCopyCode} = useAccountCode();
 
     const issuerNotEmpty = account.issuer !== "";
+    const canShowTTL = account.type === OtpType.TOTP && canCopyCode(account);
+    const progressWidth = canShowTTL
+        ? `${getTotpRemainingPercent(account.period)}%`
+        : "0%";
+
+
+    useEffect(() => {
+        if (!canShowTTL) return;
+
+        const interval = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <Paper
             ref={ref}
-            style={{cursor: "pointer"}}
+            style={{cursor: "pointer", overflow: "hidden"}}
+            pos={"relative"}
             shadow={"sm"}
             withBorder
             h={150}
@@ -53,8 +72,10 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
                     <Box style={{flexGrow: 1, minWidth: 0}}>
                         <Group align={"start"} spacing={"xl"} noWrap mb={"xl"} w={"100%"}>
                             <Box style={{flexGrow: 1, minWidth: 0}}>
-                                <Text fz="lg" truncate>{issuerNotEmpty ? account.issuer : account.name} sdadsa d as ds ad asdas dsad asd sa</Text>
-                                <Text c="dimmed" truncate>{issuerNotEmpty ? account.name : ''} das dsa d ad asdas d as das dsa dsa ds</Text>
+                                <Text fz="lg" truncate>{issuerNotEmpty ? account.issuer : account.name} sdadsa d as ds
+                                    ad asdas dsad asd sa</Text>
+                                <Text c="dimmed" truncate>{issuerNotEmpty ? account.name : ''} das dsa d ad asdas d as
+                                    das dsa dsa ds</Text>
                             </Box>
                             <AccountActions account={account} groupProps={{spacing: "xs"}}/>
                         </Group>
@@ -65,12 +86,30 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
                             textProps={{fz: "xl", c: "blue"}}
                         />
                     </Box>
-
-
                 </Group>
 
-            </SpotlightCard>
+                {/*{*/}
+                {/*    isTotp &&*/}
+                {/*    <Box bg={"gray.2"} h={4} mt={"sm"} style={{overflow: "hidden", borderRadius: 999}}>*/}
+                {/*        <Box bg={"blue"} h={4} style={{width: progressWidth,}/>*/}
+                {/*    </Box>*/}
+                {/*}*/}
 
+
+            </SpotlightCard>
+            {
+                canShowTTL &&
+                <Box
+                    bg={"gray.2"}
+                    h={4}
+                    pos={"absolute"}
+                    left={0}
+                    right={0}
+                    bottom={0}
+                >
+                    <Box bg={"blue"} h={4} w={progressWidth}/>
+                </Box>
+            }
         </Paper>
     );
 }

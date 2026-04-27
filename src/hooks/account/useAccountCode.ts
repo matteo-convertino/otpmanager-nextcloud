@@ -34,7 +34,7 @@ export default function useAccountCode() {
     }
 
     function copyCode(account: AccountResponseDatatable) {
-        if (!canCopyCode(account)) return;
+        // if (!canCopyCode(account)) return;
 
         copy(account.code as string);
     }

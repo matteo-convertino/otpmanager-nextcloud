@@ -30,7 +30,6 @@ export default function useLoadAccounts() {
                 setAccounts(sortedAccounts);
                 generateCodes({
                     accounts: sortedAccounts,
-                    sortAccounts: (accounts) => sortAccounts(accounts, defaultSortStatus),
                 });
                 setPageOptions([
                     ...PAGE_SIZES.filter((n) => n < sortedAccounts.length),
