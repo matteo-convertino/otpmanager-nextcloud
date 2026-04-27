@@ -27,6 +27,14 @@ export function ImportAccounts() {
                     </List.Item>
                     <List.Item>
                         <Anchor
+                            href="https://gist.github.com/matteo-convertino/f9720aca02d3c317710e97dd701456ec"
+                            target="_blank"
+                        >
+                            Authy
+                        </Anchor>
+                    </List.Item>
+                    <List.Item>
+                        <Anchor
                             href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/20#issue-2066571171"
                             target="_blank"
                         >
