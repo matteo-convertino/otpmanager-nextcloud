@@ -72,10 +72,8 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
                     <Box style={{flexGrow: 1, minWidth: 0}}>
                         <Group align={"start"} spacing={"xl"} noWrap mb={"xl"} w={"100%"}>
                             <Box style={{flexGrow: 1, minWidth: 0}}>
-                                <Text fz="lg" truncate>{issuerNotEmpty ? account.issuer : account.name} sdadsa d as ds
-                                    ad asdas dsad asd sa</Text>
-                                <Text c="dimmed" truncate>{issuerNotEmpty ? account.name : ''} das dsa d ad asdas d as
-                                    das dsa dsa ds</Text>
+                                <Text fz="lg" truncate>{issuerNotEmpty ? account.issuer : account.name}</Text>
+                                <Text c="dimmed" truncate>{issuerNotEmpty ? account.name : ''}</Text>
                             </Box>
                             <AccountActions account={account} groupProps={{spacing: "xs"}}/>
                         </Group>
@@ -87,14 +85,6 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
                         />
                     </Box>
                 </Group>
-
-                {/*{*/}
-                {/*    isTotp &&*/}
-                {/*    <Box bg={"gray.2"} h={4} mt={"sm"} style={{overflow: "hidden", borderRadius: 999}}>*/}
-                {/*        <Box bg={"blue"} h={4} style={{width: progressWidth,}/>*/}
-                {/*    </Box>*/}
-                {/*}*/}
-
 
             </SpotlightCard>
             {
