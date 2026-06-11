@@ -10,6 +10,8 @@ interface ModalsStore {
     showImportExport: boolean;
     showApps: boolean;
     showSupport: boolean;
+    showFeedbackIosApp: boolean;
+    showUpdateNews?: string;
     setShowCreateAccount: (showCreateAccount: boolean) => void;
     setShowEditOtpAccount: (showEditOtpAccount?: AccountResponseDatatable) => void;
     setShowDeleteOtpAccount: (showDeleteOtpAccount?: AccountResponseDatatable) => void;
@@ -18,6 +20,8 @@ interface ModalsStore {
     setShowImportExport: (showImportExport: boolean) => void;
     setShowApps: (showApps: boolean) => void;
     setShowSupport: (showSupport: boolean) => void;
+    setShowFeedbackIosApp: (showFeedbackIosApp: boolean) => void;
+    setShowUpdateNews: (showUpdateNews?: string) => void;
 }
 
 export const useModalsStore = create<ModalsStore>((set) => ({
@@ -29,6 +33,8 @@ export const useModalsStore = create<ModalsStore>((set) => ({
     showImportExport: false,
     showApps: false,
     showSupport: false,
+    showFeedbackIosApp: false,
+    showUpdateNews: undefined,
     setShowCreateAccount: (showCreateAccount: boolean) => set({showCreateAccount}),
     setShowEditOtpAccount: (showEditOtpAccount?: AccountResponseDatatable) => set({showEditOtpAccount}),
     setShowDeleteOtpAccount: (showDeleteOtpAccount?: AccountResponseDatatable) => set({showDeleteOtpAccount}),
@@ -37,4 +43,6 @@ export const useModalsStore = create<ModalsStore>((set) => ({
     setShowImportExport: (showImportExport: boolean) => set({showImportExport}),
     setShowApps: (showApps: boolean) => set({showApps}),
     setShowSupport: (showSupport: boolean) => set({showSupport}),
+    setShowFeedbackIosApp: (showFeedbackIosApp: boolean) => set({showFeedbackIosApp}),
+    setShowUpdateNews: (showUpdateNews?: string) => set({showUpdateNews: showUpdateNews}),
 }));

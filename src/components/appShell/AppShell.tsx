@@ -14,6 +14,7 @@ import useLoadSettings from "@/hooks/settings/useLoadSettings.tsx";
 import useLoadAccounts from "@/hooks/account/useLoadAccounts.tsx";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
+import {UpdateNews} from "@/components/modals/updateNews/UpdateNews.tsx";
 
 export default function MainAppShell() {
     const smallScreen = useMediaQuery("(max-width: 991px)");
@@ -30,6 +31,8 @@ export default function MainAppShell() {
 
     return (
         <>
+            <UpdateNews/>
+
             <Aside
                 showAside={showAsideInfo !== undefined}
                 setShowAside={setShowAsideInfo}

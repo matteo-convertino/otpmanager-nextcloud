@@ -3,6 +3,7 @@ import {useState} from "react";
 import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, SegmentedControl, Text} from "@mantine/core";
 import {
     IconApps,
+    IconBrandApple,
     IconChevronLeft,
     IconChevronRight,
     IconFileInvoice,
@@ -35,7 +36,13 @@ export function useNavbar() {
     const [passwordSaved, setPasswordSaved] = useState(
         Boolean(localStorage.getItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY))
     );
-    const {setShowChangePassword, setShowImportExport, setShowApps, setShowSupport} = useModalsStore();
+    const {
+        setShowChangePassword,
+        setShowImportExport,
+        setShowApps,
+        setShowSupport,
+        setShowFeedbackIosApp,
+    } = useModalsStore();
     const {onUpdate: onUpdateSettings} = useSettingsForm();
 
     const {lottieRef: birdWavingLottieRef, onDOMLoaded: onBirdWavingLottieLoaded} = useLottie(0.5);
@@ -76,6 +83,21 @@ export function useNavbar() {
                 mb={"md"}
                 onClick={() => setShowSupport(true)}>
                 <Text c={'yellow.9'}>Support me</Text>
+            </Button>
+
+            <Button
+                styles={{
+                    icon: {
+                        display: "inline",
+                    },
+                }}
+                leftIcon={<IconBrandApple/>}
+                variant="outline"
+                fullWidth
+                mb={"md"}
+                onClick={() => setShowFeedbackIosApp(true)}
+            >
+                iOS App
             </Button>
 
             <SegmentedControl

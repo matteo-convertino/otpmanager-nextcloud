@@ -35,7 +35,7 @@ export function ImportAccounts() {
                     </List.Item>
                     <List.Item>
                         <Anchor
-                            href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/20#issue-2066571171"
+                            href="https://gist.github.com/matteo-convertino/39ed696ff5b462f27b7b7070f7a4753a"
                             target="_blank"
                         >
                             FreeOTP Plus
@@ -43,7 +43,7 @@ export function ImportAccounts() {
                     </List.Item>
                     <List.Item>
                         <Anchor
-                            href="https://github.com/matteo-convertino/otpmanager-nextcloud/issues/72"
+                            href="https://gist.github.com/matteo-convertino/647bcc07a58408a5db6f9dc94ed052e6"
                             target="_blank"
                         >
                             LastPass Authenticator

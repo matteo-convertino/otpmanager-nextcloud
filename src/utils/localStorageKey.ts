@@ -1,1 +1,2 @@
 export const LOCAL_STORAGE_CACHED_PASSWORD_KEY = 'otpmanager_cached_password'
+export const LOCAL_STORAGE_LAST_SEEN_UPDATE_NEWS_VERSION_KEY = 'otpmanager_last_seen_update_news_version'

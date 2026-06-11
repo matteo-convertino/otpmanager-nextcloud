@@ -31,8 +31,6 @@ export default function useExportAccounts() {
             };
         });
 
-        console.log(accountsToExport);
-
         const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
             JSON.stringify(
                 encrypted
