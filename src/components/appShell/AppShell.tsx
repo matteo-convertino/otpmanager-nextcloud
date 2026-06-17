@@ -15,6 +15,8 @@ import useLoadAccounts from "@/hooks/account/useLoadAccounts.tsx";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useAccountsCodeGeneration from "@/hooks/account/useAccountsCodeGeneration.tsx";
 import {UpdateNews} from "@/components/modals/updateNews/UpdateNews.tsx";
+import {useNavbarPageStore} from "@/context/useNavbarPageStore.ts";
+import {NavbarPage} from "@/utils/enum/navbarPage.ts";
 
 export default function MainAppShell() {
     const smallScreen = useMediaQuery("(max-width: 991px)");
@@ -26,7 +28,11 @@ export default function MainAppShell() {
     useLoadAccounts();
 
     useEffect(() => {
-        startTotpTimers((period) => generateCodes({period}));
+        startTotpTimers((period) => {
+            if (useNavbarPageStore.getState().activePage === NavbarPage.TRASH) return;
+
+            generateCodes({period});
+        });
     }, [generateCodes, startTotpTimers]);
 
     return (

@@ -9,6 +9,7 @@ use OCA\OtpManager\Utils\AccountPositionHelper;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\AppFramework\OCS\OCSException;
+use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 use Throwable;
@@ -33,7 +34,7 @@ class AccountMapper extends QBMapper
         try {
             return parent::findEntities($query);
         } catch (\Exception) {
-            throw new OCSException("There was an error while finding accounts" , 500);
+            throw new OCSException("There was an error while finding accounts", 500);
         }
     }
 
@@ -107,6 +108,22 @@ class AccountMapper extends QBMapper
 
     /**
      * @param string $userId
+     * @return array
+     * @throws OCSException
+     */
+    public function findAllDeletedByUser(string $userId): array
+    {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('*')
+            ->from($this->getTableName())
+            ->where($qb->expr()->isNotNull('deleted_at'))
+            ->andWhere($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
+
+        return $this->findEntities($qb);
+    }
+
+    /**
+     * @param string $userId
      * @return int
      */
     public function findMaxPosition(string $userId): int
@@ -162,20 +179,19 @@ class AccountMapper extends QBMapper
         return $this->findEntities($qb);
     }
 
-    /*public function destroy(int $accountId, string $userId): ?Account
+    /**
+     * @param Account $account
+     * @return Account
+     * @throws OCSException
+     */
+    public function destroy(Account $account): Account
     {
-        $account = $this->find("id", $accountId, $userId);
-
-        if ($account != null) {
-            try {
-                $account = $this->delete($account);
-            } catch (Throwable) {
-                $account = null;
-            }
+        try {
+            return $this->delete($account);
+        } catch (Throwable) {
+            throw new OCSException("There was an error while deleting account with id:" . $account->getId(), 500);
         }
-
-        return $account;
-    }*/
+    }
 
     /**
      * @param Account $account

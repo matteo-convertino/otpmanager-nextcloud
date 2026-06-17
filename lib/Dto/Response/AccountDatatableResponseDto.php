@@ -24,7 +24,7 @@ final class AccountDatatableResponseDto implements JsonSerializable
         public readonly OtpAlgorithm         $algorithm,
         public readonly ?int                 $counter,
         public readonly string               $icon,
-        public readonly int                  $position,
+        public readonly ?int                 $position,
         public readonly string               $userId,
         public readonly string               $createdAt,
         public readonly string               $updatedAt,

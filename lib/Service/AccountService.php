@@ -71,6 +71,20 @@ class AccountService
     }
 
     /**
+     * @return DataResponse<AccountDatatableResponseDto[]>
+     * @throws OCSException
+     */
+    public function getAllDeleted(): DataResponse
+    {
+        $accounts = $this->accountMapper->findAllDeletedByUser($this->userId);
+
+        return new DataResponse(array_map(
+            static fn(Account $a) => AccountDatatableResponseDto::accountToDto($a),
+            $accounts
+        ));
+    }
+
+    /**
      * @param AccountCreateRequestDto $accountCreateRequestDto
      * @return DataResponse<AccountResponseDto>
      * @throws OCSBadRequestException | OCSException
@@ -181,6 +195,65 @@ class AccountService
         $this->sharedAccountMapper->destroy($account);
 
         $this->accountMapper->safeDelete($account);
+
+        return new DataResponse(null);
+    }
+
+    /**
+     * @param AccountDeleteRequestDto $accountDeleteRequestDto
+     * @return DataResponse<AccountResponseDto>
+     * @throws OCSBadRequestException | OCSException
+     */
+    public function restore(AccountDeleteRequestDto $accountDeleteRequestDto): DataResponse
+    {
+        $account = $this->accountMapper->find(
+            column: "id",
+            value: $accountDeleteRequestDto->id,
+            userId: $this->userId
+        );
+
+        if ($account === null) {
+            throw new OCSBadRequestException("This account does not exist");
+        }
+
+        if ($account->getDeletedAt() === null) {
+            throw new OCSBadRequestException("This account has not been deleted");
+        }
+
+        $maxSharedAccountPos = $this->sharedAccountMapper->findMaxPosition($this->userId);
+        $maxAccountPos = $this->accountMapper->findMaxPosition($this->userId);
+
+        $account->setPosition(max($maxSharedAccountPos, $maxAccountPos) + 1);
+        $account->setDeletedAt(null);
+        $account->setUpdatedAt(date("Y-m-d H:i:s"));
+
+        $account = $this->accountMapper->update($account);
+
+        return new DataResponse(AccountResponseDto::accountToDto($account));
+    }
+
+    /**
+     * @param AccountDeleteRequestDto $accountDeleteRequestDto
+     * @return DataResponse<null>
+     * @throws OCSBadRequestException | OCSException
+     */
+    public function destroy(AccountDeleteRequestDto $accountDeleteRequestDto): DataResponse
+    {
+        $account = $this->accountMapper->find(
+            column: "id",
+            value: $accountDeleteRequestDto->id,
+            userId: $this->userId
+        );
+
+        if ($account === null) {
+            throw new OCSBadRequestException("This account does not exist");
+        }
+
+        if ($account->getDeletedAt() === null) {
+            throw new OCSBadRequestException("This account has not been deleted");
+        }
+
+        $this->accountMapper->destroy($account);
 
         return new DataResponse(null);
     }

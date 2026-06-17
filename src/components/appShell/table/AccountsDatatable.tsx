@@ -19,9 +19,11 @@ export default function AccountsDatatable(
     {
         sortStatus,
         setSortStatus,
+        isTrash = false,
     }: {
         sortStatus: DataTableSortStatus,
-        setSortStatus: (sortStatus: DataTableSortStatus) => void
+        setSortStatus: (sortStatus: DataTableSortStatus) => void,
+        isTrash?: boolean,
     }) {
     const getRecordsPerPage = (p: number) => p === -1 && accounts !== undefined ? accounts.length : p;
 
@@ -40,7 +42,8 @@ export default function AccountsDatatable(
 
     const {canCopyCode} = useAccountCode();
 
-    const canShowTTL = (account: AccountResponseDatatable) => account.type === OtpType.TOTP && canCopyCode(account);
+    const canShowTTL = (account: AccountResponseDatatable) => !isTrash && account.type === OtpType.TOTP && canCopyCode(account);
+    const emptyMessage = isTrash ? "Trash is empty" : "Add your first OTP account";
 
     useEffect(() => {
         if (accounts === undefined) {
@@ -73,6 +76,11 @@ export default function AccountsDatatable(
             withBorder
             borderRadius="md"
             onRowClick={(account) => {
+                if (isTrash) {
+                    setShowAsideInfo(account);
+                    return;
+                }
+
                 if (account.unlocked === false) {
                     setShowSharedAccountToUnlock(account);
                 } else if (account.type === OtpType.HOTP && account.counter !== null && account.counter < 0) {
@@ -84,33 +92,35 @@ export default function AccountsDatatable(
             columns={[
                 {accessor: "name", sortable: true, width: 180, ellipsis: true},
                 {accessor: "issuer", sortable: true, width: 150, ellipsis: true},
-                {
-                    accessor: "code",
-                    width: 100,
-                    render: (account) => <AccountCode account={account}/>
-                },
-                {
-                    accessor: "ttl",
-                    title: "TTL",
-                    width: 48,
-                    textAlignment: "center",
-                    render: (account) => {
-                        if (!canShowTTL(account)) return;
+                ...(!isTrash ? [
+                    {
+                        accessor: "code",
+                        width: 100,
+                        render: (account: AccountResponseDatatable) => <AccountCode account={account}/>
+                    },
+                    {
+                        accessor: "ttl",
+                        title: "TTL",
+                        width: 48,
+                        textAlignment: "center" as const,
+                        render: (account: AccountResponseDatatable) => {
+                            if (!canShowTTL(account)) return;
 
-                        return (
-                            <Badge variant="light" w={48}>
-                                {getTotpRemainingSeconds(account.period)}s
-                            </Badge>
-                        );
-                    }
-                },
+                            return (
+                                <Badge variant="light" w={48}>
+                                    {getTotpRemainingSeconds(account.period)}s
+                                </Badge>
+                            );
+                        }
+                    },
+                ] : []),
                 {
                     accessor: "actions",
                     width: 150,
                     title: <Text mr="xs">Actions</Text>,
                     textAlignment: "right",
                     render: (account) => (
-                        <AccountActions account={account} groupProps={{position: "right"}}/>
+                        <AccountActions account={account} groupProps={{position: "right"}} isTrash={isTrash}/>
                     ),
                 },
             ]}
@@ -128,7 +138,7 @@ export default function AccountsDatatable(
                 setPage(1);
                 onUpdateSettings({recordsPerPage: p.toString()});
             }}
-            emptyState={<AccountsEmpty/>}
+            emptyState={<AccountsEmpty message={emptyMessage}/>}
         />
     );
 }

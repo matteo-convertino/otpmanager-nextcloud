@@ -34,6 +34,12 @@ export default class AccountService {
         ).then(res => res.data);
     }
 
+    public async getAllDeleted(): Promise<AccountResponseDatatable[]> {
+        return otpManagerAxiosClient.get<AccountResponseDatatable[]>(
+            AccountRoutes.GET_ALL_DELETED
+        ).then(res => res.data);
+    }
+
     public async getById(id: number): Promise<AccountResponseDTO> {
         return otpManagerAxiosClient.get<AccountResponseDTO>(
             AccountRoutes.GET_BY_ID(id)
@@ -50,6 +56,18 @@ export default class AccountService {
     public async delete(id: number): Promise<AccountResponseDTO> {
         return otpManagerAxiosClient.delete<AccountResponseDTO>(
             AccountRoutes.DELETE(id),
+        ).then(res => res.data);
+    }
+
+    public async restore(id: number): Promise<AccountResponseDTO> {
+        return otpManagerAxiosClient.post<AccountResponseDTO>(
+            AccountRoutes.RESTORE(id),
+        ).then(res => res.data);
+    }
+
+    public async destroy(id: number): Promise<void> {
+        return otpManagerAxiosClient.delete<void>(
+            AccountRoutes.DESTROY(id),
         ).then(res => res.data);
     }
 

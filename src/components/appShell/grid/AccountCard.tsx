@@ -14,7 +14,7 @@ import useUpdateCounter from "@/hooks/useUpdateCounter.tsx";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import useAccountCode from "@/hooks/account/useAccountCode.ts";
 
-export default function AccountCard({account}: { account: AccountResponseDatatable }) {
+export default function AccountCard({account, isTrash = false}: { account: AccountResponseDatatable, isTrash?: boolean }) {
     const {hovered, ref} = useHover();
     const {setShowAsideInfo} = useSidebarStore();
     const {setShowSharedAccountToUnlock} = useModalsStore();
@@ -24,7 +24,7 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
     const {canCopyCode} = useAccountCode();
 
     const issuerNotEmpty = account.issuer !== "";
-    const canShowTTL = account.type === OtpType.TOTP && canCopyCode(account);
+    const canShowTTL = !isTrash && account.type === OtpType.TOTP && canCopyCode(account);
     const progressWidth = canShowTTL
         ? `${getTotpRemainingPercent(account.period)}%`
         : "0%";
@@ -46,6 +46,11 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
             withBorder
             h={150}
             onClick={() => {
+                if (isTrash) {
+                    setShowAsideInfo(account);
+                    return;
+                }
+
                 if (account.unlocked === false) {
                     setShowSharedAccountToUnlock(account);
                 } else if (account.type === OtpType.HOTP && account.counter !== null && account.counter < 0) {
@@ -75,14 +80,16 @@ export default function AccountCard({account}: { account: AccountResponseDatatab
                                 <Text fz="lg" truncate>{issuerNotEmpty ? account.issuer : account.name}</Text>
                                 <Text c="dimmed" truncate>{issuerNotEmpty ? account.name : ''}</Text>
                             </Box>
-                            <AccountActions account={account} groupProps={{spacing: "xs"}}/>
+                            <AccountActions account={account} groupProps={{spacing: "xs"}} isTrash={isTrash}/>
                         </Group>
 
-                        <AccountCode
-                            account={account}
-                            hovered={hovered}
-                            textProps={{fz: "xl", c: "blue"}}
-                        />
+                        {!isTrash && (
+                            <AccountCode
+                                account={account}
+                                hovered={hovered}
+                                textProps={{fz: "xl", c: "blue"}}
+                            />
+                        )}
                     </Box>
                 </Group>
 

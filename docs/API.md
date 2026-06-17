@@ -38,15 +38,18 @@ It is recommended to add these headers for all requests in order to avoid any is
 
 ### Account
 
-| Method | Endpoint                        | Response                     | Exceptions |
-|--------|---------------------------------|------------------------------|------------|
-| GET    | `/accounts`                     | `List<AccountDatatableResponseDto>` | `OCSException` |
-| GET    | `/accounts/{id}`                | `AccountResponseDto \| null` | `OCSBadRequestException` |
-| POST   | `/accounts`                     | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
-| PUT    | `/accounts`                     | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
-| DELETE | `/accounts/{id}`                | `null`                       | `OCSBadRequestException`, `OCSException` |
-| POST   | `/accounts/import`              | `null`                       | `OCSBadRequestException`, `OCSException` |
-| POST   | `/accounts/update-counter`      | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
+| Method | Endpoint                   | Response                     | Exceptions |
+|--------|----------------------------|------------------------------|------------|
+| GET    | `/accounts`                | `List<AccountDatatableResponseDto>` | `OCSException` |
+| GET    | `/accounts/deleted`        | `List<AccountDatatableResponseDto>` | `OCSException` |
+| GET    | `/accounts/{id}`           | `AccountResponseDto \| null` | `OCSBadRequestException` |
+| POST   | `/accounts`                | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
+| PUT    | `/accounts`                | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
+| DELETE | `/accounts/{id}`           | `null`                       | `OCSBadRequestException`, `OCSException` |
+| POST   | `/accounts/{id}/restore`   | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
+| DELETE | `/accounts/{id}/destroy`   | `null`                       | `OCSBadRequestException`, `OCSException` |
+| POST   | `/accounts/import`         | `null`                       | `OCSBadRequestException`, `OCSException` |
+| POST   | `/accounts/update-counter` | `AccountResponseDto`         | `OCSBadRequestException`, `OCSException` |
 
 ### Sync
 

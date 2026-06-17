@@ -36,6 +36,18 @@ class AccountController extends OCSController
     }
 
     /**
+     * @return DataResponse<AccountDatatableResponseDto[]>
+     * @throws OCSException
+     */
+    #[NoAdminRequired]
+    #[NoCSRFRequired]
+    #[ApiRoute(verb: 'GET', url: '/accounts/deleted')]
+    public function getAllDeleted(): DataResponse
+    {
+        return $this->accountService->getAllDeleted();
+    }
+
+    /**
      * @param int $id
      * @return DataResponse<AccountResponseDto | null>
      */
@@ -152,6 +164,32 @@ class AccountController extends OCSController
     }
 
     /**
+     * @param int $id
+     * @return DataResponse<AccountResponseDto>
+     * @throws OCSBadRequestException
+     * @throws OCSException
+     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'POST', url: '/accounts/{id}/restore')]
+    public function restore(int $id): DataResponse
+    {
+        return $this->accountService->restore(new AccountDeleteRequestDto($id));
+    }
+
+    /**
+     * @param int $id
+     * @return DataResponse<null>
+     * @throws OCSBadRequestException
+     * @throws OCSException
+     */
+    #[NoAdminRequired]
+    #[ApiRoute(verb: 'DELETE', url: '/accounts/{id}/destroy')]
+    public function destroy(int $id): DataResponse
+    {
+        return $this->accountService->destroy(new AccountDeleteRequestDto($id));
+    }
+
+    /**
      * @param AccountCreateRequestDto[] $accounts
      * @param string|null $iv
      * @param string|null $passwordUsedOnExport
@@ -184,7 +222,8 @@ class AccountController extends OCSController
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
+     * @param string|null $secret
      * @return DataResponse<AccountResponseDto>
      * @throws OCSBadRequestException
      * @throws OCSException

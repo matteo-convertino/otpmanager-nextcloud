@@ -3,12 +3,13 @@ import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import {AccountsEmpty} from "@/components/appShell/shared/AccountsEmpty.tsx";
 import AccountCard from "@/components/appShell/grid/AccountCard.tsx";
 
-export function AccountsGrid() {
+export function AccountsGrid({isTrash = false}: { isTrash?: boolean }) {
     const {accounts, isFetching} = useAccountsStore();
+    const emptyMessage = isTrash ? "Trash is empty" : "Add your first OTP account";
 
     const skeletonData = [...Array(24)].map((_, __) => <Skeleton height={150} width={"100%"}/>);
 
-    if (!isFetching && (accounts === undefined || accounts.length === 0)) return <AccountsEmpty/>;
+    if (!isFetching && (accounts === undefined || accounts.length === 0)) return <AccountsEmpty message={emptyMessage}/>;
 
     return (
         <ScrollArea h={"100%"} offsetScrollbars scrollbarSize={4}>
@@ -25,7 +26,7 @@ export function AccountsGrid() {
                     isFetching
                         ? skeletonData
                         : accounts?.map((account) =>
-                            <AccountCard key={account.id} account={account}/>
+                            <AccountCard key={account.id} account={account} isTrash={isTrash}/>
                         )
                 }
             </SimpleGrid>

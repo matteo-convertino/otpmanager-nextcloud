@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, SegmentedControl, Text} from "@mantine/core";
+import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, SegmentedControl, Stack, Text} from "@mantine/core";
 import {
     IconApps,
     IconBrandApple,
@@ -15,6 +15,7 @@ import {
     IconSettings,
     IconSun,
     IconTable,
+    IconTrash,
 } from "@tabler/icons-react";
 import {navbarStyles} from "@/styles/components/NavbarStyles.tsx";
 import {useSettingsStore} from "@/context/useSettingsStore.ts";
@@ -25,10 +26,12 @@ import birdWavingLottie from "@/assets/bird_waving.json";
 import Lottie from "lottie-react";
 import useLottie from "@/hooks/useLottie.tsx";
 import {OtpViewMode} from "@/utils/enum/otpViewMode.ts";
+import {useNavbarPageStore} from "@/context/useNavbarPageStore.ts";
+import {NavbarPage} from "@/utils/enum/navbarPage.ts";
+import {useAccountsStore} from "@/context/useAccountsStore.ts";
 
 
 export function useNavbar() {
-    const [active/*, setActive*/] = useState("All accounts");
     const {classes, cx} = navbarStyles();
     const [showSettings, setShowSettings] = useState(false);
     const ChevronIcon = !showSettings ? IconChevronRight : IconChevronLeft;
@@ -44,6 +47,8 @@ export function useNavbar() {
         setShowFeedbackIosApp,
     } = useModalsStore();
     const {onUpdate: onUpdateSettings} = useSettingsForm();
+    const {activePage, setActivePage} = useNavbarPageStore();
+    const {setAccounts, setIsFetching} = useAccountsStore();
 
     const {lottieRef: birdWavingLottieRef, onDOMLoaded: onBirdWavingLottieLoaded} = useLottie(0.5);
 
@@ -53,15 +58,36 @@ export function useNavbar() {
         </Text>
     );
 
+    const onChangePage = (page: NavbarPage) => {
+        if (page === activePage) return;
+
+        setActivePage(page);
+        setAccounts(undefined);
+        setIsFetching(true);
+    };
+
     const body = (
-        <a
-            className={cx(classes.link, {
-                [classes.linkActive]: "All accounts" === active,
-            })}
-        >
-            <IconList className={classes.linkIcon} stroke={1.5}/>
-            <span>All accounts</span>
-        </a>
+        <Stack>
+            <a
+                className={cx(classes.link, {
+                    [classes.linkActive]: NavbarPage.ALL === activePage,
+                })}
+                onClick={() => onChangePage(NavbarPage.ALL)}
+            >
+                <IconList className={classes.linkIcon} stroke={1.5}/>
+                <span>{NavbarPage.ALL}</span>
+            </a>
+
+            <a
+                className={cx(classes.link, {
+                    [classes.linkActive]: NavbarPage.TRASH === activePage,
+                })}
+                onClick={() => onChangePage(NavbarPage.TRASH)}
+            >
+                <IconTrash className={classes.linkIcon} stroke={1.5}/>
+                <span>{NavbarPage.TRASH}</span>
+            </a>
+        </Stack>
     );
 
     const footer = (

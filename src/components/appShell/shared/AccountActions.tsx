@@ -1,24 +1,54 @@
 import {ActionIcon, Avatar, Group, type GroupProps} from "@mantine/core";
 import {generateUrl} from "@nextcloud/router";
-import {IconEdit, IconLockOpen, IconReload, IconShare, IconTrash} from "@tabler/icons-react";
+import {IconEdit, IconLockOpen, IconReload, IconShare, IconTrash, IconTrashX} from "@tabler/icons-react";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
 import useUpdateCounter from "@/hooks/useUpdateCounter.tsx";
 import {OtpType} from "@/utils/enum/otpType.ts";
+import useTrashOtpAccount from "@/hooks/account/useTrashOtpAccount.tsx";
 
 export default function AccountActions(
     {
         account,
         groupProps,
+        isTrash = false,
     }: {
         account: AccountResponseDatatable;
         groupProps?: GroupProps;
+        isTrash?: boolean;
     }
 ) {
     const {setShowSharedAccountToUnlock, setShowEditOtpAccount, setShowDeleteOtpAccount} = useModalsStore();
     const {setShowAsideShare} = useSidebarStore();
     const {isUpdating: isUpdatingCounter, onUpdate: onUpdateCounter} = useUpdateCounter();
+    const {onRestore, onDeletePermanently} = useTrashOtpAccount();
+
+    if (isTrash) {
+        return (
+            <Group spacing={4} noWrap {...groupProps}>
+                <ActionIcon
+                    color="blue"
+                    onClick={(event: MouseEvent) => {
+                        event.stopPropagation();
+                        onRestore(account);
+                    }}
+                >
+                    <IconReload size={18}/>
+                </ActionIcon>
+
+                <ActionIcon
+                    color="red"
+                    onClick={(event: MouseEvent) => {
+                        event.stopPropagation();
+                        onDeletePermanently(account);
+                    }}
+                >
+                    <IconTrashX size={18}/>
+                </ActionIcon>
+            </Group>
+        );
+    }
 
     return (
         <Group spacing={4} noWrap {...groupProps}>

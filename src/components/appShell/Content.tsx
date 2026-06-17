@@ -22,6 +22,8 @@ import type {DataTableSortStatus} from "mantine-datatable";
 import {AccountsGrid} from "@/components/appShell/grid/AccountsGrid.tsx";
 import AccountsDatatable from "@/components/appShell/table/AccountsDatatable.tsx";
 import {sortAccounts as sortAccountsByStatus} from "@/utils/sortAccounts.ts";
+import {useNavbarPageStore} from "@/context/useNavbarPageStore.ts";
+import {NavbarPage} from "@/utils/enum/navbarPage.ts";
 
 export function AppShellContent() {
     const {showNavbarSmallDevice, setShowNavbarSmallDevice} = useSidebarStore();
@@ -30,6 +32,8 @@ export function AppShellContent() {
 
     const {accounts, setAccounts} = useAccountsStore();
     const {isFetching: isFetchingSettings} = useSettingsStore();
+    const {activePage} = useNavbarPageStore();
+    const isTrash = activePage === NavbarPage.TRASH;
 
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
         columnAccessor: "position",
@@ -63,17 +67,19 @@ export function AppShellContent() {
 
                     <Breadcrumbs separator="→" ml="md">
                         <Anchor href="#" variant="text" color="dimmed">
-                            <Text c="dimmed">All accounts</Text>
+                            <Text c="dimmed">{activePage}</Text>
                         </Anchor>
 
-                        <ActionIcon
-                            sx={{display: "inline"}}
-                            variant="transparent"
-                            color="blue"
-                            onClick={() => setShowCreateAccount(true)}
-                        >
-                            <IconCirclePlus/>
-                        </ActionIcon>
+                        {!isTrash && (
+                            <ActionIcon
+                                sx={{display: "inline"}}
+                                variant="transparent"
+                                color="blue"
+                                onClick={() => setShowCreateAccount(true)}
+                            >
+                                <IconCirclePlus/>
+                            </ActionIcon>
+                        )}
                     </Breadcrumbs>
                 </Flex>
             </Header>
@@ -102,8 +108,9 @@ export function AppShellContent() {
                             ? <AccountsDatatable
                                 sortStatus={sortStatus}
                                 setSortStatus={setSortStatus}
+                                isTrash={isTrash}
                             />
-                            : <AccountsGrid/>
+                            : <AccountsGrid isTrash={isTrash}/>
                 }
 
             </Group>
