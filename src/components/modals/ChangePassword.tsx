@@ -18,12 +18,7 @@ export function ChangePassword() {
 
                 <Group position="right">
                     <Button
-                        styles={{
-                            icon: {
-                                display: "inline",
-                            },
-                        }}
-                        rightIcon={<IconKey/>}
+                        leftIcon={<IconKey/>}
                         type="submit"
                         form="form"
                     >

@@ -77,7 +77,7 @@ export function ImportAccounts() {
                             display: "inline",
                         },
                     }}
-                    rightIcon={<IconFileImport/>}
+                    leftIcon={<IconFileImport/>}
                     type="submit"
                     onClick={onSubmit}
                 >

@@ -126,7 +126,7 @@ export default function CreateEditContent(
                             display: "inline",
                         },
                     }}
-                    rightIcon={iconSubmitButton}
+                    leftIcon={iconSubmitButton}
                     type="submit"
                 >
                     {textSubmitButton}

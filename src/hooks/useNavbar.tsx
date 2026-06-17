@@ -1,19 +1,19 @@
 import {useState} from "react";
 
-import {ActionIcon, Box, Button, Checkbox, Collapse, Flex, Group, SegmentedControl, Stack, Text} from "@mantine/core";
+import {Box, Button, Checkbox, Collapse, Group, SegmentedControl, Stack, Text} from "@mantine/core";
 import {
     IconApps,
     IconBrandApple,
+    IconBulb,
     IconChevronLeft,
     IconChevronRight,
+    IconEye,
     IconFileInvoice,
     IconGridDots,
     IconKey,
     IconList,
     IconLockOff,
-    IconMoonStars,
     IconSettings,
-    IconSun,
     IconTable,
     IconTrash,
 } from "@tabler/icons-react";
@@ -67,7 +67,7 @@ export function useNavbar() {
     };
 
     const body = (
-        <Stack>
+        <Stack spacing={"sm"}>
             <a
                 className={cx(classes.link, {
                     [classes.linkActive]: NavbarPage.ALL === activePage,
@@ -75,7 +75,7 @@ export function useNavbar() {
                 onClick={() => onChangePage(NavbarPage.ALL)}
             >
                 <IconList className={classes.linkIcon} stroke={1.5}/>
-                <span>{NavbarPage.ALL}</span>
+                <Text>{NavbarPage.ALL}</Text>
             </a>
 
             <a
@@ -85,7 +85,7 @@ export function useNavbar() {
                 onClick={() => onChangePage(NavbarPage.TRASH)}
             >
                 <IconTrash className={classes.linkIcon} stroke={1.5}/>
-                <span>{NavbarPage.TRASH}</span>
+                <Text>{NavbarPage.TRASH}</Text>
             </a>
         </Stack>
     );
@@ -154,7 +154,7 @@ export function useNavbar() {
                 onClick={() => setShowApps(true)}
             >
                 <IconApps className={classes.linkIcon} stroke={1.5}/>
-                <span>Apps</span>
+                <Text>Apps</Text>
             </div>
 
             <Group
@@ -179,87 +179,52 @@ export function useNavbar() {
 
             <Collapse in={showSettings}>
                 <Checkbox
+                    size={"md"}
+                    className={classes.innerLink}
+                    icon={IconEye}
                     checked={showCodes}
                     onChange={() => onUpdateSettings({showCodes: !showCodes})}
-                    className={classes.innerLink}
-                    label="Show codes"
+                    label={<Text fz={"sm"}>Show codes</Text>}
                     disabled={isFetchingSettings}
                 />
-                <Flex className={classes.innerLink} align="center">
-                    <ActionIcon
-                        variant="outline"
-                        color={darkMode ? "yellow" : "blue"}
-                        onClick={() => onUpdateSettings({darkMode: !darkMode})}
-                        sx={{
-                            width: "20px",
-                            height: "20px",
-                            minWidth: "20px",
-                            minHeight: "20px",
-                        }}
-                        title="Toggle color scheme"
-                        disabled={isFetchingSettings}
-                    >
-                        {darkMode ? (
-                            <IconSun style={{width: 16}}/>
-                        ) : (
-                            <IconMoonStars style={{width: 16}}/>
-                        )}
-                    </ActionIcon>
-                    <Text
-                        sx={{
-                            fontSize: "14px",
-                            color: "#C1C2C5",
-                            marginLeft: "12px",
-                        }}
-                    >
-                        {"Switch to " +
-                            (darkMode ? "light mode" : "dark mode")}
-                    </Text>
-                </Flex>
-
-                <Flex className={classes.innerLink} align="center">
-                    <ActionIcon
-                        variant="outline"
-                        color="red"
-                        onClick={() => {
-                            localStorage.removeItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY);
-                            setPasswordSaved(false);
-                        }}
-                        disabled={!passwordSaved}
-                        sx={{
-                            width: "20px",
-                            height: "20px",
-                            minWidth: "20px",
-                            minHeight: "20px",
-                        }}
-                        title="Remove saved password"
-                    >
-                        <IconLockOff style={{width: 16}}/>
-                    </ActionIcon>
-                    <Text
-                        sx={{
-                            fontSize: "14px",
-                            color: "#C1C2C5",
-                            marginLeft: "12px",
-                        }}
-                    >
-                        Remove saved password
-                    </Text>
-                </Flex>
+                <Checkbox
+                    size={"md"}
+                    className={classes.innerLink}
+                    icon={IconBulb}
+                    color={"yellow"}
+                    label={<Text fz={"sm"}>{"Switch to " + (darkMode ? "light mode" : "dark mode")}</Text>}
+                    checked={!darkMode}
+                    onClick={() => onUpdateSettings({darkMode: !darkMode})}
+                    disabled={isFetchingSettings}
+                />
+                <Checkbox
+                    size={"md"}
+                    className={classes.innerLink}
+                    icon={IconLockOff}
+                    label={<Text fz={"sm"}>Remove saved password</Text>}
+                    color={"red"}
+                    indeterminate
+                    defaultChecked={passwordSaved}
+                    onClick={() => {
+                        localStorage.removeItem(LOCAL_STORAGE_CACHED_PASSWORD_KEY);
+                        setPasswordSaved(false);
+                    }}
+                    disabled={!passwordSaved}
+                />
 
                 <div
                     className={classes.link}
                     onClick={() => setShowChangePassword(true)}
                 >
-                    <IconKey className={classes.linkIcon} stroke={1.5}/>
-                    <span>Change password</span>
+                    <IconKey className={classes.linkIcon}/>
+                    <Text>Change password</Text>
                 </div>
                 <div
                     className={classes.link}
                     onClick={() => setShowImportExport(true)}
                 >
-                    <IconFileInvoice className={classes.linkIcon} stroke={1.5}/>
-                    <span>Import / Export</span>
+                    <IconFileInvoice className={classes.linkIcon}/>
+                    <Text>Import / Export</Text>
                 </div>
             </Collapse>
         </div>

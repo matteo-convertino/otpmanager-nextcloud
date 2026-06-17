@@ -3,19 +3,20 @@ import {useModalsStore} from "@/context/useModalsStore.ts";
 import useDeleteOtpAccount from "@/hooks/account/useDeleteOtpAccount.tsx";
 
 export function DeleteOtpAccount() {
-    const {showDeleteOtpAccount: otp, setShowDeleteOtpAccount} = useModalsStore();
+    const {showDeleteOtpAccount: otp, deleteOtpAccountAction, setShowDeleteOtpAccount} = useModalsStore();
     const {onDelete} = useDeleteOtpAccount();
+    const isDestroy = deleteOtpAccountAction === "destroy";
 
     return (
         <Modal
             opened={otp !== undefined}
             onClose={() => setShowDeleteOtpAccount(undefined)}
-            title="Delete Account"
+            title={isDestroy ? "Delete Account Permanently" : "Delete Account"}
             centered
         >
             <Stack spacing={"xl"}>
                 <Text size="sm">
-                    Are you sure that you want to remove{" "}
+                    Are you sure that you want to {isDestroy ? "permanently delete" : "remove"}{" "}
                     {otp?.issuer != ""
                         ? otp?.issuer + " (" + otp?.name + ")"
                         : otp.name}
@@ -27,7 +28,7 @@ export function DeleteOtpAccount() {
                         Cancel
                     </Button>
                     <Button onClick={onDelete} color={"red"}>
-                        Delete
+                        {isDestroy ? "Delete permanently" : "Delete"}
                     </Button>
                 </Group>
             </Stack>

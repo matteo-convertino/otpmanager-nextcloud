@@ -25,7 +25,7 @@ export default function useTrashOtpAccount() {
         });
     }
 
-    function onDeletePermanently(account: AccountResponseDatatable) {
+    function onDestroy(account: AccountResponseDatatable) {
         otpManagerApi({
             api: () => AccountService.getInstance().destroy(account.id),
             titleOnLoading: "Deleting account permanently",
@@ -38,5 +38,5 @@ export default function useTrashOtpAccount() {
         });
     }
 
-    return {onRestore, onDeletePermanently};
+    return {onRestore, onDestroy};
 }

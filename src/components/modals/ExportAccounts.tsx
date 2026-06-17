@@ -28,7 +28,7 @@ export function ExportAccounts() {
                             display: "inline",
                         },
                     }}
-                    rightIcon={<IconLock/>}
+                    leftIcon={<IconLock/>}
                     type="submit"
                     onClick={() => onExport(true)}
                 >
@@ -41,7 +41,7 @@ export function ExportAccounts() {
                             display: "inline",
                         },
                     }}
-                    rightIcon={<IconLockOpen/>}
+                    leftIcon={<IconLockOpen/>}
                     type="submit"
                     color="red"
                     onClick={() => onExport(false)}

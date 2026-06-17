@@ -1,4 +1,4 @@
-import {ActionIcon, Anchor, Breadcrumbs, Burger, Center, Flex, Group, Header, Loader, Text,} from "@mantine/core";
+import {ActionIcon, Breadcrumbs, Burger, Center, Flex, Group, Header, Loader, Text,} from "@mantine/core";
 import {IconCirclePlus} from "@tabler/icons-react";
 
 import {CreateOtpAccount} from "../modals/CreateOtpAccount";
@@ -66,9 +66,7 @@ export function AppShellContent() {
                     />
 
                     <Breadcrumbs separator="→" ml="md">
-                        <Anchor href="#" variant="text" color="dimmed">
-                            <Text c="dimmed">{activePage}</Text>
-                        </Anchor>
+                        <Text c="dimmed">{activePage}</Text>
 
                         {!isTrash && (
                             <ActionIcon

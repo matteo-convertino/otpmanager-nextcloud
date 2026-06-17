@@ -74,6 +74,14 @@ export const OtpLayout = ({children, emotionCache, mantinePortalTarget, mantineD
                                 right: "0px"
                             },
                         }
+                    },
+                    Text: {
+                        styles: {
+                            root: {
+                                transform: 'translateY(1px)',
+                                lineHeight: 'inherit'
+                            }
+                        }
                     }
                 },
             }}

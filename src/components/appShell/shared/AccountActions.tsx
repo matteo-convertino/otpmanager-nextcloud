@@ -22,7 +22,7 @@ export default function AccountActions(
     const {setShowSharedAccountToUnlock, setShowEditOtpAccount, setShowDeleteOtpAccount} = useModalsStore();
     const {setShowAsideShare} = useSidebarStore();
     const {isUpdating: isUpdatingCounter, onUpdate: onUpdateCounter} = useUpdateCounter();
-    const {onRestore, onDeletePermanently} = useTrashOtpAccount();
+    const {onRestore} = useTrashOtpAccount();
 
     if (isTrash) {
         return (
@@ -41,7 +41,7 @@ export default function AccountActions(
                     color="red"
                     onClick={(event: MouseEvent) => {
                         event.stopPropagation();
-                        onDeletePermanently(account);
+                        setShowDeleteOtpAccount(account, "destroy");
                     }}
                 >
                     <IconTrashX size={18}/>
