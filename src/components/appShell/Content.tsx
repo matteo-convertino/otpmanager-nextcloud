@@ -1,5 +1,5 @@
-import {ActionIcon, Breadcrumbs, Burger, Center, Flex, Group, Header, Loader, Text,} from "@mantine/core";
-import {IconCirclePlus} from "@tabler/icons-react";
+import {ActionIcon, Breadcrumbs, Burger, Center, Flex, Group, Header, Loader, Text, TextInput,} from "@mantine/core";
+import {IconCirclePlus, IconSearch, IconX} from "@tabler/icons-react";
 
 import {CreateOtpAccount} from "../modals/CreateOtpAccount";
 import {EditOtpAccount} from "../modals/EditOtpAccount";
@@ -15,7 +15,7 @@ import {Support} from "@/components/modals/Support.tsx";
 import {FeedbackIosApp} from "@/components/modals/FeedbackIosApp.tsx";
 import {useSettingsStore} from "@/context/useSettingsStore.ts";
 import {OtpViewMode} from "@/utils/enum/otpViewMode.ts";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import type {AccountResponseDatatable} from "@/dto/response/AccountResponseDatatable.ts";
 import {useAccountsStore} from "@/context/useAccountsStore.ts";
 import type {DataTableSortStatus} from "mantine-datatable";
@@ -39,7 +39,18 @@ export function AppShellContent() {
         columnAccessor: "position",
         direction: "asc",
     });
+    const [searchValue, setSearchValue] = useState("");
     const sortStatusRef = useRef(sortStatus);
+
+    const filteredAccounts = useMemo(() => {
+        const normalizedSearchValue = searchValue.trim().toLowerCase();
+        if (accounts === undefined || normalizedSearchValue.length === 0) return accounts;
+
+        return accounts.filter((account) =>
+            account.name.toLowerCase().includes(normalizedSearchValue)
+            || account.issuer.toLowerCase().includes(normalizedSearchValue)
+        );
+    }, [accounts, searchValue]);
 
     const sortAccounts = useCallback((accounts: AccountResponseDatatable[]) => {
         const currentSortStatus = sortStatusRef.current;
@@ -56,29 +67,53 @@ export function AppShellContent() {
     return (
         <>
             <Header height={44} mb={0}>
-                <Flex align="center" h="100%">
-                    <Burger
-                        opened={showNavbarSmallDevice}
-                        onClick={() => setShowNavbarSmallDevice(true)}
-                        size="sm"
-                        ml={4}
-                        display={{base: "block", md: "none"}}
-                    />
+                <Flex align="center" justify="space-between" h="100%">
+                    <Flex align="center">
+                        <Burger
+                            opened={showNavbarSmallDevice}
+                            onClick={() => setShowNavbarSmallDevice(true)}
+                            size="sm"
+                            ml={4}
+                            display={{base: "block", md: "none"}}
+                        />
 
-                    <Breadcrumbs separator="→" ml="md">
-                        <Text c="dimmed">{activePage}</Text>
+                        <Breadcrumbs separator="→" ml="md">
+                            <Text c="dimmed">{activePage}</Text>
 
-                        {!isTrash && (
+                            {!isTrash && (
+                                <ActionIcon
+                                    sx={{display: "inline"}}
+                                    variant="transparent"
+                                    color="blue"
+                                    onClick={() => setShowCreateAccount(true)}
+                                >
+                                    <IconCirclePlus/>
+                                </ActionIcon>
+                            )}
+                        </Breadcrumbs>
+                    </Flex>
+
+                    <TextInput
+                        display={{base: "none", md: "block"}}
+                        value={searchValue}
+                        onChange={(event) => setSearchValue(event.currentTarget.value)}
+                        placeholder="Search accounts"
+                        icon={<IconSearch size={16}/>}
+                        rightSection={searchValue.length > 0 && (
                             <ActionIcon
-                                sx={{display: "inline"}}
-                                variant="transparent"
-                                color="blue"
-                                onClick={() => setShowCreateAccount(true)}
+                                variant="subtle"
+                                color="gray"
+                                size="xs"
+                                onClick={() => setSearchValue("")}
                             >
-                                <IconCirclePlus/>
+                                <IconX size={16}/>
                             </ActionIcon>
                         )}
-                    </Breadcrumbs>
+                        size="xs"
+                        mr="md"
+                        w={300}
+                    />
+
                 </Flex>
             </Header>
 
@@ -107,8 +142,9 @@ export function AppShellContent() {
                                 sortStatus={sortStatus}
                                 setSortStatus={setSortStatus}
                                 isTrash={isTrash}
+                                accounts={filteredAccounts}
                             />
-                            : <AccountsGrid isTrash={isTrash}/>
+                            : <AccountsGrid isTrash={isTrash} accounts={filteredAccounts}/>
                 }
 
             </Group>

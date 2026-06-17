@@ -20,14 +20,16 @@ export default function AccountsDatatable(
         sortStatus,
         setSortStatus,
         isTrash = false,
+        accounts,
     }: {
         sortStatus: DataTableSortStatus,
         setSortStatus: (sortStatus: DataTableSortStatus) => void,
         isTrash?: boolean,
+        accounts?: AccountResponseDatatable[],
     }) {
     const getRecordsPerPage = (p: number) => p === -1 && accounts !== undefined ? accounts.length : p;
 
-    const {accounts, isFetching, getTotpRemainingSeconds} = useAccountsStore();
+    const {isFetching, getTotpRemainingSeconds} = useAccountsStore();
     const {recordsPerPage, setRecordsPerPage, pageOptions} = useSettingsStore();
     const {setShowSharedAccountToUnlock} = useModalsStore();
     const {setShowAsideInfo} = useSidebarStore();
@@ -57,6 +59,10 @@ export default function AccountsDatatable(
         setFrom(from);
         setTo(from + p);
     }, [accounts, page, recordsPerPage]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [accounts?.length]);
 
     useEffect(() => {
         if (!accounts?.some((account) => canShowTTL(account))) return;
