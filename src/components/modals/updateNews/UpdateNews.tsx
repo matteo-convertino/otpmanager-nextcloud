@@ -35,6 +35,7 @@ export function UpdateNews() {
             title={`Release notes ${activeUpdateNews?.version}`}
             opened={activeUpdateNews !== undefined}
             onClose={closeModal}
+            size={activeUpdateNews?.size}
             centered
         >
             {Content && <Content/>}

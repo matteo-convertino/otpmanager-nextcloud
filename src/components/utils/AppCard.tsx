@@ -1,23 +1,25 @@
 import {Card, Button, Text, Group, Image, Badge} from "@mantine/core";
 import React from "react";
 
+type AppCardButton = {
+    text: string,
+    link?: string,
+    disabled?: boolean
+}
+
 export function AppCard(
     {
         title,
         description,
         badges,
         image,
-        buttonText,
-        link = "#",
-        buttonDisabled = false,
+        buttons,
     }: {
         title: string,
         description: string,
         badges: { text: string, color?: string }[],
         image: string,
-        buttonText: string,
-        link?: string,
-        buttonDisabled?: boolean
+        buttons: AppCardButton[],
     }) {
 
     return (
@@ -45,22 +47,25 @@ export function AppCard(
                 {description}
             </Text>
 
-            <Button
-                onClick={buttonDisabled ? (event: React.MouseEvent<HTMLAnchorElement>) => event.preventDefault() : undefined}
-                component="a"
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="light"
-                color="blue"
-                fullWidth
-                mt="md"
-                radius="md"
-                disabled={buttonDisabled}
-                sx={{"&[data-disabled]": {pointerEvents: "all"}}}
-            >
-                {buttonText}
-            </Button>
+            {buttons.map((button, i) => (
+                <Button
+                    key={`${button.text}-${i}`}
+                    onClick={button.disabled ? (event: React.MouseEvent<HTMLAnchorElement>) => event.preventDefault() : undefined}
+                    component="a"
+                    href={button.link ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant={i === 0 ? "light" : "subtle"}
+                    color="blue"
+                    fullWidth
+                    mt="md"
+                    radius="md"
+                    disabled={button.disabled}
+                    sx={{"&[data-disabled]": {pointerEvents: "all"}}}
+                >
+                    {button.text}
+                </Button>
+            ))}
         </Card>
     );
 }
