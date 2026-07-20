@@ -50,7 +50,6 @@ class Version000008Date20231004101500 extends SimpleMigrationStep
 
             $table->setPrimaryKey(['id']);
             $table->addUniqueIndex(['user_id'], 'otpmanager_sett_user_id_uindex');
-            $table->addIndex(['user_id'], 'otpmanager_sett_user_id_index');
         }
 
         return $schema;
