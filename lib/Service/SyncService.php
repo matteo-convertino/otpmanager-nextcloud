@@ -76,6 +76,8 @@ class SyncService
 
             if ($localAccount->deleted) {
                 if ($serverAccount !== null) {
+                    $this->sharedAccountMapper->unshareAll($serverAccount);
+
                     $serverAccount->setPosition(null);
                     $serverAccount->setDeletedAt(date("Y-m-d H:i:s"));
                     $this->accountMapper->update($serverAccount);

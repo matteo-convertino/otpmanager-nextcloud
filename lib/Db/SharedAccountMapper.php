@@ -378,6 +378,16 @@ class SharedAccountMapper extends QBMapper
             $this->update($a);
         }
 
+        $this->unshareAll($account);
+    }
+
+    /**
+     * @param Account $account
+     * @return void
+     * @throws OCSException
+     */
+    public function unshareAll(Account $account): void
+    {
         $sharedAccounts = $this->findAllByAccountAndUserId($account->getId(), $account->getUserId());
 
         // loop users it was shared with

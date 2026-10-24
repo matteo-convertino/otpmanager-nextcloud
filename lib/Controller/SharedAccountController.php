@@ -21,6 +21,7 @@ use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
+use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 
@@ -40,6 +41,7 @@ class SharedAccountController extends OCSController
      * @param int $accountId
      * @return DataResponse<SharedAccountResponseDto[]>
      * @throws OCSException
+     * @throws OCSNotFoundException
      */
     #[NoAdminRequired]
     #[NoCSRFRequired]
@@ -111,6 +113,7 @@ class SharedAccountController extends OCSController
      * @param string|null $receiverId
      * @return DataResponse
      * @throws OCSException
+     * @throws OCSNotFoundException
      */
     #[NoAdminRequired]
     #[ApiRoute(verb: 'DELETE', url: '/share/{accountId}')]
@@ -128,6 +131,7 @@ class SharedAccountController extends OCSController
      * @param int $accountId
      * @return DataResponse<ReceiverResponseDto[]>
      * @throws OCSException
+     * @throws OCSNotFoundException
      */
     #[NoAdminRequired]
     #[NoCSRFRequired]

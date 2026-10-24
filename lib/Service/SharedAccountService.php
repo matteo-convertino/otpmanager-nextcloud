@@ -20,6 +20,7 @@ use OCA\OtpManager\Utils\OtpType;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCS\OCSException;
+use OCP\AppFramework\OCS\OCSNotFoundException;
 use OCP\IRequest;
 use OCP\IUserManager;
 
@@ -44,9 +45,12 @@ class SharedAccountService
      * @param SharedAccountGetRequestDto $sharedAccountGetRequestDto
      * @return DataResponse<SharedAccountResponseDto[]>
      * @throws OCSException
+     * @throws OCSNotFoundException
      */
     public function getByAccount(SharedAccountGetRequestDto $sharedAccountGetRequestDto): DataResponse
     {
+        $this->assertOwner($sharedAccountGetRequestDto->accountId);
+
         $sharedAccounts = $this->sharedAccountMapper->findAllByAccount($sharedAccountGetRequestDto->accountId);
 
         $activeShares = [];
@@ -167,16 +171,21 @@ class SharedAccountService
      * @param SharedAccountDeleteRequestDto $sharedAccountDeleteRequestDto
      * @return DataResponse<null>
      * @throws OCSException
+     * @throws OCSNotFoundException
      */
     public function delete(SharedAccountDeleteRequestDto $sharedAccountDeleteRequestDto): DataResponse
     {
-//        $receiverId = $this->request->getParam("receiver");
+        $receiverId = $sharedAccountDeleteRequestDto->receiverId;
+
+        if ($receiverId === null || $receiverId === "" || $receiverId === $this->userId) {
+            $receiverId = $this->userId;
+        } else {
+            $this->assertOwner($sharedAccountDeleteRequestDto->accountId);
+        }
 
         $this->sharedAccountMapper->unshare(
             accountId: $sharedAccountDeleteRequestDto->accountId,
-            receiverId: $sharedAccountDeleteRequestDto->receiverId == null ?
-                $this->userId :
-                $sharedAccountDeleteRequestDto->receiverId
+            receiverId: $receiverId
         );
 
         return new DataResponse(null);
@@ -187,9 +196,12 @@ class SharedAccountService
      * @param SharedAccountGetRequestDto $sharedAccountGetUsersRequestDto
      * @return DataResponse<ReceiverResponseDto[]>
      * @throws OCSException
+     * @throws OCSNotFoundException
      */
     public function getUsers(SharedAccountGetRequestDto $sharedAccountGetUsersRequestDto): DataResponse
     {
+        $this->assertOwner($sharedAccountGetUsersRequestDto->accountId);
+
         $result = $this->sharedAccountMapper->findUsers(
             userId: $this->userId,
             accountId: $sharedAccountGetUsersRequestDto->accountId
@@ -280,4 +292,23 @@ class SharedAccountService
 
         return new DataResponse(AccountResponseDto::accountToDto($account));
     }
+
+    /**
+     * @param int $accountId
+     * @return void
+     * @throws OCSNotFoundException
+     */
+    private function assertOwner(int $accountId): void
+    {
+        $account = $this->accountMapper->find(
+            column: "id",
+            value: $accountId,
+            userId: $this->userId
+        );
+
+        if ($account === null) {
+            throw new OCSNotFoundException("The account does not exist");
+        }
+    }
+
 }
