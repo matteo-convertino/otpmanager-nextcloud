@@ -12,7 +12,6 @@ import {useSidebarStore} from "@/context/useSidebarStore.ts";
 import {useModalsStore} from "@/context/useModalsStore.ts";
 import {DeleteOtpAccount} from "@/components/modals/DeleteOtpAccount.tsx";
 import {Support} from "@/components/modals/Support.tsx";
-import {FeedbackIosApp} from "@/components/modals/FeedbackIosApp.tsx";
 import {useSettingsStore} from "@/context/useSettingsStore.ts";
 import {OtpViewMode} from "@/utils/enum/otpViewMode.ts";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
@@ -165,7 +164,6 @@ export function AppShellContent() {
 
             <Support/>
 
-            <FeedbackIosApp/>
         </>
     );
 }

@@ -3,6 +3,7 @@ import type {ComponentType} from "react";
 
 import {UpdateNews_1_1_6} from "./UpdateNews_1_1_6.tsx";
 import {UpdateNews_1_2_1} from "./UpdateNews_1_2_1.tsx";
+import {UpdateNews_1_2_5} from "./UpdateNews_1_2_5.tsx";
 
 export const updateNewsRegistry: {
     version: string;
@@ -18,6 +19,11 @@ export const updateNewsRegistry: {
         version: "1.2.1",
         size: "xl",
         content: UpdateNews_1_2_1,
+    },
+    {
+        version: "1.2.5",
+        size: "xl",
+        content: UpdateNews_1_2_5,
     },
 ];
 

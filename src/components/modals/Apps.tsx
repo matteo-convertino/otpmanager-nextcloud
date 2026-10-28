@@ -40,14 +40,19 @@ export function Apps() {
                 <AppCard
                     title="OTP Manager"
                     description="OTP Manager is an iOS application designed to simplify the
-                  management of OTP (One-Time Password) codes and allow you to
-                  access to your OTP codes in a secure and convenient way. The
-                  application has been developed to work in synergy with your
-                  personal Nextcloud server, which allows you to store and manage
-                  your OTP codes securely and accessibly from anywhere."
+            management of OTP (One-Time Password) codes and allow you to
+            access your OTP codes in a secure and convenient way. The
+            application has been developed to work in synergy with your
+            personal Nextcloud server, which allows you to store and manage
+            your OTP codes securely and accessibly from anywhere."
                     image={appstoreImage}
                     badges={[{text: "iOS"}]}
-                    buttons={[{text: "Install from Apple Store", disabled: true}]}
+                    buttons={[
+                        {
+                            text: "Join the iOS beta on TestFlight",
+                            link: "https://testflight.apple.com/join/c4MWN7v6",
+                        },
+                    ]}
                 />
 
                 <AppCard

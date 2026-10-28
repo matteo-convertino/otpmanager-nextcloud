@@ -3,7 +3,6 @@ import {useState} from "react";
 import {Box, Button, Checkbox, Collapse, Group, SegmentedControl, Stack, Text} from "@mantine/core";
 import {
     IconApps,
-    IconBrandApple,
     IconBulb,
     IconChevronLeft,
     IconChevronRight,
@@ -44,7 +43,6 @@ export function useNavbar() {
         setShowImportExport,
         setShowApps,
         setShowSupport,
-        setShowFeedbackIosApp,
     } = useModalsStore();
     const {onUpdate: onUpdateSettings} = useSettingsForm();
     const {activePage, setActivePage} = useNavbarPageStore();
@@ -109,21 +107,6 @@ export function useNavbar() {
                 mb={"md"}
                 onClick={() => setShowSupport(true)}>
                 <Text c={'yellow.9'}>Support me</Text>
-            </Button>
-
-            <Button
-                styles={{
-                    icon: {
-                        display: "inline",
-                    },
-                }}
-                leftIcon={<IconBrandApple/>}
-                variant="outline"
-                fullWidth
-                mb={"md"}
-                onClick={() => setShowFeedbackIosApp(true)}
-            >
-                iOS App
             </Button>
 
             <SegmentedControl
